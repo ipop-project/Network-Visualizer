@@ -1,0 +1,132 @@
+body {
+  width: 100%;
+  height: 100%;
+  background: #292b2d;
+}
+
+#pageheader {
+  background-color: #000;
+  text-align: center;
+  color: orange;
+  font-size: 40px;
+  font-family: Roboto, Arial, sans-serif;
+  padding-right: 0px;
+  padding-left: 0px;
+  margin: 0px;
+  width: 100%;
+  height: 60px;
+}
+
+#topology{
+    overflow-x: hidden;
+    overflow-y: hidden;
+    height: 100%;
+    width: 100%;
+    outline-style: solid;
+    outline-color: orange;
+    outline-width: 0px;
+    margin-top: 0px;
+    margin-left: 0%;
+}
+
+.config {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  background: #4e4e4e;
+  padding-left: 1%;
+  /*box-sizing: border-box;
+  padding-left:2.5% ;
+  padding-right: 2.5%;*/
+  color: #fff;
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 500ms; 
+  transition-timing-function: linear;
+  overflow: auto;
+  z-index: 1;
+}
+
+.config-toggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 1em;
+  margin: 0.2em;
+  cursor: pointer;
+  color: #C0C0C0;
+  z-index: 9999999;
+}
+
+.config-closed .config {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 500ms;
+  transition-timing-function: linear;
+  pointer-events: none;
+}
+
+.config-closed .config-toggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 1em;
+  margin: 0.2em;
+  cursor: pointer;
+  color: #C0C0C0;
+  z-index: 9999999;
+}
+
+#switchTopologyBtn {
+  /*margin-top: 30%;*/
+  cursor: 'pointer';
+  position: absolute;
+  background: #C0C0C0;
+  color: rgba(0,0,0,0.75);
+  opacity: 1;
+}
+
+#switchTopologyDpdwn {
+  margin-top: 30%;
+  width:90%;
+}
+
+#dpdwnMenu {
+  margin-top:22.5%;
+  background: #C0C0C0;
+  color: rgba(0,0,0,0.75);
+  opacity: 1;
+}
+
+#refreshbtn {
+  /*background: #C0C0C0;
+  margin-top: 75%;*/
+}
+
+#inputForm {
+  margin-top: 10%;
+}
+
+.numberBox {
+ color: #000;
+ width: 25%;
+ margin-left:8%;
+}
+
+#sendbtn {
+ margin-left:8%;
+}
+
+#fontSlider {
+ width:90%;
+}
+
+#zoomSlider {
+ width:90%;
+}
+
+.panel-body {
+ color: #000;
+}

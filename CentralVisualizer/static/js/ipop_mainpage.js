@@ -22,131 +22,55 @@ d3.json("http://"+serverip+"/nodedata", function(error, data) {
   // Get initial length of nodedetails (required for reload of page)
   if (lenofdata==0) lenofdata = nodedetaillist.length;
 
-  // Check if a single node is in running state else return
-  if (data["response"]["runningnodes"].length ==0)
-  {
-    setStoppedNodes(data["response"]["stoppednodes"]);
-    return;
-  }
-
   // Invokes function in common javascript module to build complete network topology
   buildnetworktopology(nodedetaillist);
 
   // Reload the page in the event of new node entering/leaving the network
   if (lenofdata !=node[0].length)
       location.reload();
-
-  // Invokes function that populates all stop nodes in the dropdownlist
-  setStoppedNodes(data["response"]["stoppednodes"]);
 });
 }
 
-// Function to enable the type of link
-function enableLink(event) {
-  var link_type = event.target.innerHTML;
-  if (link_type=="ondemand")
-    link_type="on_demand";
+$('#config-toggle').on('click', function(){ $('body').toggleClass('config-closed'); });
 
-  var pathele = svg.selectAll(".link");
+$refresh = '<i id="refreshbtn" class="fa fa-refresh btn btn-default"></i>';
+$collapsible='<div class="panel-group" id="switchTopologyDpDwn"><div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><a data-toggle="collapse" href="#collapse1">Switch Topology </a></h4></div><div id="collapse1" class="panel-collapse collapse"><div class="panel-body">GroupVPN</div><div class="panel-body">SocialVPN</div></div></div></div>';
 
-  pathele[0].forEach(function(element,i)
-  {
-    var element_id = element["id"];
-    if(link_type=="All")
-      element["style"]["display"]="block";
-    else if(element_id.includes(link_type)==false)
-      element["style"]["display"]="none";
-    else
-      element["style"]["display"]="block";
-  });
-}
+$('#config').append($collapsible);
+$('#config').append($refresh);
 
+$('#refreshbtn').on('click', function() { 
+  cy.makeLayout({name: 'circle'}).run()
+});
 
-function getsubgraph(event)
-{
-  disableoldclick = true;
-  document.getElementById("resetgraphstate").style.display = "block";
-  document.getElementById("getgraphstate").style.display = "none";
-  document.getElementById("nodedisplaytext").style.display = "block";
-}
+$('#refreshbtn').qtip({
+  content: 'Reset',
+  position: {
+      my: 'top center',
+      at: 'bottom center'
+      },
+  style: {
+      classes: 'qtip-bootstrap',  
+      }}); 
 
-function resetgraph(event)
-{
-  disableoldclick = false;
-  localStorage.setItem("subgraphelements", subgraphNodeDetails.toString());
-  document.getElementById("nodedisplaytext").setAttribute("value","");
-  document.getElementById("resetgraphstate").style.display = "none";
-  document.getElementById("nodedisplaytext").style.display = "none";
-  document.getElementById("getgraphstate").style.display = "block";
-  window.open("http://"+serverip+"/subgraphtemplate", "SubGraph"+subgraphcount, "width=500,height=500");
-  //window.open("http://"+serverip+":8080/subgraphdetails?"+subgraphNodeDetails.toString(), "SubGraph"+subgraphcount, "width=500,height=500");
-  subgraphcount+=1;
-  subgraphNodeDetails.length=0;
-  subgraphNodeNameDetails.length=0;
-}
+$form='<form id="inputForm" action="/IPOP" method="POST"><input class="numberBox" type="number" min="1" name="NoOfNodes"><label for="POST-name">&emsp;No. of Nodes</label><br><input class="numberBox" type="number" min="0" name="successor"><label for="POST-name">&emsp;Successor</label><br><input class="numberBox" type="number" min="0" name="chord"><label for="POST-name">&emsp;Chord</label><br><input class="numberBox" type="number" min="0" name="on_demand"><label for="POST-name">&emsp;On-Demand</label><br><br><input type="submit" id="sendbtn" name="user-input" class="btn btn-default" value="Submit"></form>';
+$('#config').append($form);
 
+$fontSlider = '<br><label>&ensp;Node Label Sizing</label><br><input id="fontSlider" type="range" min="0.5" max="8.5" value="1.5" step:"0.5" onchange="changeNodeLabelSize(this.value)" />';
+$('#config').append($fontSlider);
 
-function setStoppedNodes(nodeList)
-{
-    for (ele in nodeList){
-      if (document.getElementById(nodeList[ele]) == null)
-          $("#stoppednodes").append("<li id = '"+nodeList[ele]+"'><a href='#'>"+nodeList[ele]+"</a></li>");
-    }
-    var childNodeList  = document.getElementById("stoppednodes").childNodes;
-    var i;
-    for (i=0;i<childNodeList.length;i++)
-    {
-        var elementId = childNodeList[i].id;
-        if (nodeList.indexOf(elementId)==-1)
-        {
-           var el = document.getElementById(elementId);
-           el.parentNode.removeChild(el);
-        }
-    }
-}
+$zoomSlider = '<br><label>&ensp;Layout Zoom</label><br><input id="zoomSlider" type="range" min="1" max="31" value="11" step:"2" onchange="changeLayoutZoom(this.value)" />';
+$('#config').append($zoomSlider);
 
-function getHistory(event,type)
-{
-   var histtime = document.getElementById("hist-time").value;
-   var end_time = new Date(histtime.replace(/-/g,'/').replace('T',' '));
+function changeNodeLabelSize(newValue){
+  cy.style()
+    .selector('node')
+    .style({'font-size':newValue+'em'})
+    .update();
+}  
 
-   localStorage.setItem("endtime", end_time.getTime());
-   window.open("http://"+serverip+"/History/getTopologySnapshot", "Snapshot"+windowcount, "width=1000,height=600");
-   windowcount+=1;
-
-}
-
-function show(event,type)
-{
-    if (document.getElementById(type).style.display == "none")
-    {
-        document.getElementById(type).style.display = "block";
-        event.target.innerHTML = '- ';
-        if (document.getElementById("hour") == null)
-        {
-            $("#history").append("<datalist id='$id'></datalist>".replace("$id","hour"))
-            loadoptions("hour",1,12)
-        }
-        if (document.getElementById("minutes") == null)
-        {
-            $("#history").append("<datalist id='$id'></datalist>".replace("$id","minutes"))
-            loadoptions("minutes",0,59)
-        }
-    }
-    else
-    {
-        document.getElementById(type).style.display = "none";
-        event.target.innerHTML = '+ ';
-    }
-}
-var optionstemplate = "<option>$item</option>"
-function loadoptions(id,minvalue,maxvalue)
-{
-     var i=minvalue;
-     for (;i<=maxvalue;i++)
-     {
-        $("#"+id).append(optionstemplate.replace("$item",i))
-     }
+function changeLayoutZoom(newValue) {
+  cy.zoom(newValue/10);
 }
 
 setInterval(callWebservice,7500);
