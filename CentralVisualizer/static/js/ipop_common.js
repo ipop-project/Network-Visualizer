@@ -1,107 +1,76 @@
-var modaltemplate = "<H4>Node Info</H4><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>UID</td><td class='valueclass'>$uid</td></tr><tr><td class='keyclass'>MAC</td><td class='valueclass'>$macaddress</td></tr><tr><td class='keyclass'>IPOP-IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo-IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr><tr><td class='keyclass'>Links</td><td class='valueclass' id='myModal_chord'>Chords  (Orange)  &ensp; $chord</td></tr><tr><td class='keyclass'></td><td class='valueclass' id='myModal_successor'>Successor (Yellow) $successor</td></tr><tr><td class='keyclass'></td><td class='valueclass' id='myModal_ondemand'>On-Demand (Blue) $ondemand</td></tr></table>";
+var modaltemplate = "<H4>Node Info</H4><table id='NodeDetails'><col style='width:35%'><col style='width:65%'><tr><td class='keyclass'>Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>UID</td><td class='valueclass'>$uid</td></tr><tr><td class='keyclass'>MAC</td><td class='valueclass'>$macaddress</td></tr><tr><td class='keyclass'>IPOP-IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo-IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass'>$state</td></tr><tr><td class='keyclass'>Start-Time</td><td class='valueclass'>$startdate</td></tr><tr><td class='keyclass'></td><td class='valueclass'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$location</td></tr><tr><td class='keyclass'></td><td class='valueclass'>$country</td></tr><tr><td class='keyclass'>Links</td><td class='valueclass' id='myModal_chord'>Chords (O)&emsp;&emsp; $chord</td></tr><tr><td class='keyclass'></td><td class='valueclass' id='myModal_successor'>Successor (Y)&emsp;$successor</td></tr><tr><td class='keyclass'></td><td class='valueclass'>On-Demand (B) $ondemand</td></tr></table>";
 
 var serverip = location.host;
 
 // Flag to enable/disable subgraph node selection
 var disableoldclick = false;
-
-var diameter = Math.min(svg_width , svg_height),
-    radius = diameter / 2,
-    innerRadius = radius - 120;
-
-var cluster = d3.layout.cluster()
-    .size([360, innerRadius])
-    .sort(null)
-    .value(function(d) { return d.size; });
-
 var lenofdata = 0;
 
-var force = d3.layout.force();
-var bundle = d3.layout.bundle();
-
-var line = d3.svg.line.radial()
-    .interpolate("bundle")
-    .tension(.85)
-    .radius(function(d) { return d.y; })
-    .angle(function(d) { return d.x / 180 * Math.PI; });
-
-var svg = d3.select("#topology"); 
-  
 var cy = cytoscape({
-      container: document.getElementById('topology'),
-      layout: {
-              name: 'circle'
-              },
-      style: [{
-            selector: 'node',
-            style: {
-		              "width":"7.5em",
-		              "height":"7.5em",
-                  "label": "data(id)",
-              		"min-zoomed-font-size": "1.5em",	
-              		"background-color": "data(nodeColor)",	
-              		"color": "#fff",	
-                  }
-	           },	
-	             {
-                  selector: 'edge',
-                  style: {
-                  'line-color': 'data(edgeColor)',
-	             	}
-              }],
-	    minZoom: 1e-1,
-  	  maxZoom: 3.1,	
-	    wheelSensitivity: 0.2
-            });      
+                    container: document.getElementById('topology'),
+                    layout: {
+                            name: 'circle'
+                            },
+                    style: [
+                            {
+                              selector: 'node',
+                              style: {
+                  		              "width":"7.5em",
+                  		              "height":"7.5em",
+                                    "label": "data(label)",
+                                		"min-zoomed-font-size": "1.5em",	
+                                		"background-color": "data(nodeColor)",	
+                                		"color": "#fff",	
+                                  }
+              	            },	
+              	            {
+                              selector: 'edge',
+                              style: {
+                                    "line-color": "data(edgeColor)",
+              	                 }
+                            }
+                           ],
+              	    minZoom: 1e-1,
+                	  maxZoom: 3.1,	
+              	    wheelSensitivity: 0.2
+                  });      
 
-var link = svg.selectAll(".link"),
-    node = svg.selectAll(".node");
+var nodeDetails = {};
+var linkDetailes = {};
 
-var nodes;
-
-var nodeDetails={};
-var linkDetails={};
- 
 function buildnetworktopology()
 {
-  var interval;
   var nodelist = arguments[0];
-  if (arguments.length>1)
-  {
-      interval = arguments[1];
-      svg = d3.select("#topology_"+interval);
+    
+  for (node in nodelist) {
+    cy.add({
+            data: { 
+                    id: nodelist[node]["uid"],
+                    label: nodelist[node]["node_name"],  
+                    nodeColor: findNodeColor(nodelist[node]["state"]) 
+                  }
+          });
+    cy.makeLayout({name: 'circle'}).run();
+    nodeDetails[nodelist[node]["uid"]] = nodelist[node];
+    nodeDetails[nodelist[node]["uid"]]["linkIDs"] = [];  
   }
 
-  nodes = cluster.nodes(packageHierarchy(nodelist)),
-  links = connections(nodes);
-  node = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; }));
+  for (node in nodelist) {
+    for (linktype in nodelist[node]["links"]){
+      for (target in nodelist[node]["links"][linktype]){
+        cy.add({
+                data:{ 
+                      id: linktype + "_" + nodelist[node]["uid"] + "_" + nodelist[node]["links"][linktype][target], 
+                      source: nodelist[node]["uid"], 
+                      target: nodelist[node]["links"][linktype][target], 
+                      edgeColor: findEdgeColor(linktype) 
+                     }
+              });
+        nodeDetails[nodelist[node]["uid"]]["linkIDs"].push(linktype + "_" + nodelist[node]["uid"] + "_" + nodelist[node]["links"][linktype][target]);
+      }
+    }
+  }
 
-  node.enter().append('circle')
-    	.each(function(d){   
-                	cy.add({
-                        	data: { id: d["node_name"], nodeColor: findNodeColor(d["state"]) }
-                        }); 
-                	nodeDetails[d["node_name"]] = d;
-                	cy.makeLayout({name: 'circle'}).run();
-       	})
-    	.attr("class","node");
- 
-  link  = svg.selectAll(".link").data(bundle(links));
-
-  link.enter().append("path")
-      .each(function(d) {
-                	d.source = d[0], d.target = d[d.length - 1];                      	
-                	cy.add({
-                		data:{ id: findEdgeId(d), source: d[0]["node_name"], target: d[2]["node_name"], edgeColor: findEdgeColor(d) }
-	                       });
-	                linkDetails[findEdgeId(d)]=d;
-        })
-      .attr("class","link")
-      .attr("id",findEdgeId);
-     
-    
-   link.exit().remove();
-   node.exit().remove();
 }
 
 cy.on('mouseover','node',function(event){			
@@ -109,7 +78,7 @@ cy.on('mouseover','node',function(event){
 		.selector('#'+event.target.id())
 		.style({'opacity':'0.5'})
 		.update();
-	mouseovered(nodeDetails[event.target.id()]);	
+	mouseOverNode(nodeDetails[event.target.id()]["linkIDs"]);	
 });
 
 cy.on('mouseout','node',function(event){		
@@ -117,306 +86,122 @@ cy.on('mouseout','node',function(event){
 		.selector('#'+event.target.id())
 		.style({'opacity':'1'})
 		.update();
-	mouseouted(nodeDetails[event.target.id()]);
+	mouseOutNode(nodeDetails[event.target.id()]["linkIDs"]);
 });
 
 cy.on('click','node',function(event){
-	var t = mouseclick(nodeDetails[event.target.id()]);	
+	var t = mouseClickNode(nodeDetails[event.target.id()]);	
 	cy.$('#'+event.target.id()).qtip({
 		content: t,
-		position: {
-			my: 'top center',
-			at: 'bottom center'
-			},
-		style: {
-			classes: 'qtip-bootstrap',
-			tip: {
-				width: 16,
-				height: 8
-				}
-			}
-		});
+		style: {classes: 'qtip-bootstrap'}
 	});
+});
 
 cy.on('mouseover','edge',function(event){
-	linkmouseover(linkDetails[event.target.id()]);
+  var linktype = event.target.id().split("_")[0]; 
+  cy.style()
+        .selector('#'+event.target.id())
+        .style({'line-color':findLinkColor(linktype)})
+        .update();
 });
 		
 cy.on('mouseout','edge',function(event){
-	linkmouseout(linkDetails[event.target.id()]);
+  cy.style()
+        .selector('#'+event.target.id())
+        .style({'line-color':'data(edgeColor)'})
+        .update();
 });
 
 	
-function findNodeColor(state){
+function findNodeColor(state) {
 	if (state == "connected")
-       		 return "green";
+     		return "green";
 	if (state == "searching")
-        	return "yellow";
-       	if (state == "connecting")
-        	return "orange";
-       	if (state == "started")
-        	return "steelblue";
-       	return "red";
+      	return "yellow";
+  if (state == "connecting")
+      	return "orange";
+  if (state == "started")
+      	return "steelblue";
+   	return "red";
 }
 
-function findEdgeId(d){
-	dest_name  = d[2].key;
-	if (Object.keys(d[0]).indexOf("links")!=-1)
-	{
-		var history_interval = "";
-		if (Object.keys(d[0]).indexOf("interval")!=-1)
-      			history_interval = d[0]["interval"];
-		if (d[0].links.on_demand.indexOf(dest_name)!= -1)
-      			return "on_demand_"+d[0].key+"_"+d[2].key+"_"+history_interval;
-		if (d[0].links.successor.indexOf(dest_name)!= -1)
-      			return "successor_"+d[0].key+"_"+d[2].key+"_"+history_interval;
-		if (d[0].links.chord.indexOf(dest_name)!= -1)
-       			return "chord_"+d[0].key+"_"+d[2].key+"_"+history_interval;
-	}
-}
-
-function findEdgeColor(d){
-	dest_name  = d[2].key;
-       	if (Object.keys(d[0]).indexOf("links")!=-1)
-       	{
-       		if (d[0].links.on_demand.indexOf(dest_name)!= -1)
+function findEdgeColor(linktype) {
+	if (linktype == "successor")
        			return "#9E9E9E";
-       		if (d[0].links.successor.indexOf(dest_name)!= -1)
+	if (linktype == "chord")
        			return "#C0C0C0";
-      		if (d[0].links.chord.indexOf(dest_name)!= -1)
+	if (linktype == "on_demand")
        			return "#E2E2E2";
- 	}
 }
 
-function findLinkColor(torf,ltype){
-	if(torf==true){
-		if(ltype=="successor")
-			return "yellow";
-		if(ltype=="chord")
-			return "orange";
-		if(ltype=="on_demand")
-			return "blue";
-	}
-	else
-		return 'data(edgeColor)';	
+function findLinkColor(linktype){
+	if(linktype == "successor")
+		return "yellow";
+	if(linktype == "chord")
+		return "orange";
+	if(linktype == "on_demand")
+		return "blue";	
 }
 
-function linktype(source_keys,dest_name,ltype,torf,d)
-{
-  var history_interval = "";
-  if (Object.keys(d[0]).indexOf("interval")!=-1)
-      history_interval = d[0]["interval"];
-	
-  if (source_keys.indexOf(ltype) != -1)
-	{
-		if (d[0].links[ltype].indexOf(dest_name)!= -1){
-			cy.style()
-				.selector('#'+ltype+'_'+d[0].key+'_'+d[2].key+'_'+history_interval)
-				.style({'line-color':findLinkColor(torf,ltype)})
-				.update();
-		}
-	}
-}
-
-function linkmouseover(d)
-{
-  dest_name  = d[2].key;
-  if (Object.keys(d[0]).indexOf("links")!=-1)
-  {
-    source_keys = Object.keys(d[0].links);
-  	linktype(source_keys,dest_name,"on_demand",true,d);
-  	linktype(source_keys,dest_name,"successor",true,d);
-  	linktype(source_keys,dest_name,"chord",true,d);
+function mouseOverNode(linkIDs) {
+  for (edge in linkIDs){
+    var splitEdge = linkIDs[edge].split("_");
+    cy.style()
+        .selector('#'+ splitEdge[0]+"_"+splitEdge[1]+"_"+splitEdge[2])
+        .style({'line-color':findLinkColor(splitEdge[0])})
+        .update();
+    cy.style()
+        .selector('#'+ splitEdge[0]+"_"+splitEdge[2]+"_"+splitEdge[1])
+        .style({'line-color':findLinkColor(splitEdge[0])})
+        .update();
   }
 }
 
-function linkmouseout(d)
+function mouseOutNode(linkIDs) {
+  for (edge in linkIDs){
+    var splitEdge = linkIDs[edge].split("_");
+    cy.style()
+        .selector('#'+ splitEdge[0]+"_"+splitEdge[1]+"_"+splitEdge[2])
+        .style({'line-color':'data(edgeColor)'})
+        .update();
+    cy.style()
+        .selector('#'+ splitEdge[0]+"_"+splitEdge[2]+"_"+splitEdge[1])
+        .style({'line-color':'data(edgeColor)'})
+        .update();
+  }  
+}
+
+function mouseClickNode(node)
 {
-  dest_name  = d[2].key;
-  if (Object.keys(d[0]).indexOf("links")!=-1)
-  {
-    source_keys = Object.keys(d[0].links);
-    linktype(source_keys,dest_name,"on_demand",false,d);
-    linktype(source_keys,dest_name,"successor",false,d);
-    linktype(source_keys,dest_name,"chord",false,d);
+  var temptime = "";
+  var uptime = node["starttime"];
+  uptime = new Date(uptime*1000);
+  temptime = temptime + uptime.toString();
+  uptime = uptime.toLocaleString().split(" ");
+  date = uptime[0].substring(0,uptime[0].length-1);
+  time = uptime[1] + " " + uptime[2] + " " + temptime.split(" ")[6];            
+          
+  var location="";
+  if (node["GeoIP"] != " " && Object.keys(node).indexOf("location")!=-1){
+      location = node["location"]["city"]+", "+node["location"]["region"];
+      country = node["location"]["country"];
   }
-}
 
-function mouseovered(d) {
-  node
-      .each(function(n) { n.target = n.source = false; });
-  link[0]
-      .forEach(function(l) {
-            l = l["__data__"]
-            if (l[0].key == d.name || l[2].key == d.name)
-          	{
-                dest_name  = l[2].key;
-                if ( Object.keys(l[0]).indexOf("links")!=-1)
-                {
-                    source_keys = Object.keys(l[0].links);
-                	  linktype(source_keys,dest_name,"on_demand",true,l);
-                	  linktype(source_keys,dest_name,"successor",true,l);
-                	  linktype(source_keys,dest_name,"chord",true,l);
-                }
-           }
-      });
-}
-
-function mouseouted(d) {
-  link[0]
-      .forEach(function(l) {
-            l = l["__data__"]
-            if (l[0].key == d.name || l[2].key == d.name)
-            {
-                dest_name  = l[2].key;
-                if ( Object.keys(l[0]).indexOf("links")!=-1)
-                {
-                    source_keys = Object.keys(l[0].links);
-                    linktype(source_keys,dest_name,"on_demand",false,l);
-                    linktype(source_keys,dest_name,"successor",false,l);
-                    linktype(source_keys,dest_name,"chord",false,l);
-                }
-            }
-        });
-}
-
-function mouseclick(d)
-{
-  var circle  = d;
-  var state="";
-  var uptime= "";
-  var history_interval = "";
-  if (Object.keys(d).indexOf("interval")!=-1)
-      history_interval = d["interval"];
-
-  var element  = circle["name"]+"_"+history_interval;
-  state = state + circle["state"];
-  var temptime = circle["starttime"];
-  temptime = new Date(temptime*1000);
-  uptime = temptime;
-  temptime = temptime.toString();
-
-    var modalele = modaltemplate;
-        modalele = modalele.replace("$nodename",circle["node_name"]);
-        modalele = modalele.replace("$ui",circle["uid"].substring(0,7));
-        modalele = modalele.replace("$ipopip",circle["ip4"]);
-        modalele = modalele.replace("$phyip",circle["GeoIP"]);
-    //uptime = uptime + temptime;
-    //uptime = uptime.toUTCString();
-            uptime = uptime.toLocaleString().toString().split(" ");
-            if(uptime[2]== 'PM' )
-               uptime[1]=(parseInt(uptime[1].substr(0,2))+12).toString()+uptime[1].substr(2,3);    
-            uptime = uptime[0].split("/")[0]+"/"+ uptime[0].split("/")[1]+"/"+(uptime[0].split("/")[2]).substr(2,2) + " " + uptime[1].substr(0,5) + " " + temptime.split(" ")[6][1];
-            for(var i=7; i<temptime.split(" ").length;i++)
-               uptime += temptime.split(" ")[i][0];
-            
-            var location="";
-            if (circle["GeoIP"] != " " && Object.keys(circle).indexOf("location")!=-1)
-                location = circle["location"]["city"]+", "+circle["location"]["region"]+", "+circle["location"]["country"];
-        modalele = modalele.replace("$starttime",uptime);
-        modalele = modalele.replace("$location",location);
-        modalele = modalele.replace("$macaddress",circle["mac"]);
-        modalele = modalele.replace("$successor",countById(element,"successor"));
-        modalele = modalele.replace("$ondemand",countById(element,"on_demand"));
-        modalele = modalele.replace("$chord",countById(element,"chord")); 
-        modalele = modalele.replace("$state",state[0].toUpperCase()+state.substring(1));
+  var modalele = modaltemplate;
+      modalele = modalele.replace("$nodename",node["node_name"]);
+      modalele = modalele.replace("$ui",node["uid"].substring(0,7));
+      modalele = modalele.replace("$ipopip",node["ip4"]);
+      modalele = modalele.replace("$phyip",node["GeoIP"]);
+      modalele = modalele.replace("$startdate",date);
+      modalele = modalele.replace("$starttime",time);
+      modalele = modalele.replace("$location",location);
+      modalele = modalele.replace("$country",country);
+      modalele = modalele.replace("$macaddress",node["mac"]);
+      modalele = modalele.replace("$successor",node["links"]["successor"].length);
+      modalele = modalele.replace("$ondemand",node["links"]["chord"].length);
+      modalele = modalele.replace("$chord",node["links"]["on_demand"].length); 
+      modalele = modalele.replace("$state",node["state"][0].toUpperCase()+node["state"].substring(1));
     return modalele;
-}
-
-d3.select(self.frameElement).style("height", diameter + "px");
-
-function packageHierarchy() {
-  var map = {};
-  var classes = arguments[0];
-  function find(name, data) {
-
-    var node = map[name], i;
-    if (!node) {
-      node = map[name] = data || {name: name, children: []};
-      if (name.length) {
-        node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
-        node.parent.children.push(node);
-        node.key = name.substring(i + 1);
-      }
-    }
-    return node;
-  }
-
-  classes.forEach(function(d) {
-    find(d.name, d);
-  });
-
-  return map[""];
-}
-
-// Return a list of imports for the given array of nodes.
-function connections() {
-  var map = {},
-  conns = [];
-  var elenodes = arguments[0];
-
-  // Compute a map from name to node.
-  elenodes.forEach(function(d) {
-    map[d.name] = d;
-  });
-
-  elenodes.forEach(function(d) {
-    if (Object.keys(d).indexOf("links")!=-1)
-    {
-        if (d.links.successor) d.links.successor.forEach(function(i) {
-          conns.push({source: map[d.name], target: map[i],"type":"successor"});
-        });
-    	if (d.links.on_demand) d.links.on_demand.forEach(function(i) {
-          conns.push({source: map[d.name], target: map[i],"type":"ondemand"});
-        });
-    	if (d.links.chord) d.links.chord.forEach(function(i) {
-        if (d.links.successor.indexOf(map[i]["name"])==-1)
-          conns.push({source: map[d.name], target: map[i],"type":"chord"});
-        });
-    }
-  });
-  return conns;
-}
-
-function countById(id,type)
-{
-  var nodeuid = id.split("_")[0],
-      history_interval = id.split("_")[1];
-
-  var pathele = "",i=0;
-  if (history_interval=="")
-      pathele = $("#topology").find("path");
-  else
-      pathele = $("#topology_"+history_interval).find("path");
-  
-  var noOfElements = pathele["length"];
-  pathele = Object.values(pathele)
-  
-  var count=0;
-  var elementconns = [];
-
-  for(;i<noOfElements;i++){
-        var element_id = pathele[i]["id"].split("_");
-	
-	if(id=="*"&&(element_id[0].includes(type)==true))
-          count++;
-        else
-        {
-              if (type == "successor")
-              {	
-                  if((element_id[1].includes(nodeuid)==true)&&(element_id[0].includes(type)==true))
-                      count++;
-              }
-              else
-              {
-                  if((element_id[1].includes(nodeuid)==true)&&(element_id[0].includes(type)==true))
-                      count++;
-                  else if (element_id[1].includes(nodeuid)==true &&(element_id[0].includes(type)==true))
-                    count++;
-              }
-        }
-  }
-  return count;
 }
 
 function buildmanagednodetopology()

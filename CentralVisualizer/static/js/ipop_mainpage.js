@@ -2,20 +2,14 @@
 window.onload = function() {
         callWebservice();
     }
-var svg_width = 960,svg_height = 960;
-// Variables to store subgraph node UID and name
-var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
-
-var subgraphcount = 0,windowcount =0;
 
 // Variable to store retrieved state of nodes (either current or history)
 var nodedetaillist = [];
 
 // Invokes nodedata webservice and builds the network topology
 function callWebservice(){
-
-d3.json("http://"+serverip+"/nodedata", function(error, data) {
-  if (error) throw error;
+  $.getJSON("http://"+serverip+"/nodedata", function(data,status) {
+  if (status == "error") throw error;
 
   nodedetaillist = data["response"]["runningnodes"];
 
@@ -26,9 +20,9 @@ d3.json("http://"+serverip+"/nodedata", function(error, data) {
   buildnetworktopology(nodedetaillist);
 
   // Reload the page in the event of new node entering/leaving the network
-  if (lenofdata !=node[0].length)
+  if (lenofdata != nodedetaillist.length)
       location.reload();
-});
+  });
 }
 
 $('#config-toggle').on('click', function(){ $('body').toggleClass('config-closed'); });
