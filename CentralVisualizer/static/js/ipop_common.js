@@ -2,10 +2,6 @@ var modaltemplate = "<H4>Node Info</H4><table id='NodeDetails'><col style='width
 
 var serverip = location.host;
 
-// Flag to enable/disable subgraph node selection
-var disableoldclick = false;
-var lenofdata = 0;
-
 var cy = cytoscape({
                     container: document.getElementById('topology'),
                     layout: {
@@ -30,8 +26,8 @@ var cy = cytoscape({
               	                 }
                             }
                            ],
-              	    minZoom: 1e-1,
-                	  maxZoom: 3.1,	
+              	    minZoom: 0.1,
+                	  maxZoom: 2,	
               	    wheelSensitivity: 0.2
                   });      
 
@@ -41,7 +37,7 @@ var linkDetailes = {};
 function buildnetworktopology()
 {
   var nodelist = arguments[0];
-    
+
   for (node in nodelist) {
     cy.add({
             data: { 
@@ -52,8 +48,8 @@ function buildnetworktopology()
           });
     cy.makeLayout({name: 'circle'}).run();
     nodeDetails[nodelist[node]["uid"]] = nodelist[node];
-    nodeDetails[nodelist[node]["uid"]]["linkIDs"] = [];  
-  }
+    nodeDetails[nodelist[node]["uid"]]["linkIDs"] = []; 
+  } 
 
   for (node in nodelist) {
     for (linktype in nodelist[node]["links"]){
@@ -70,7 +66,6 @@ function buildnetworktopology()
       }
     }
   }
-
 }
 
 cy.on('mouseover','node',function(event){			
@@ -202,112 +197,4 @@ function mouseClickNode(node)
       modalele = modalele.replace("$chord",node["links"]["on_demand"].length); 
       modalele = modalele.replace("$state",node["state"][0].toUpperCase()+node["state"].substring(1));
     return modalele;
-}
-
-function buildmanagednodetopology()
-{
-    var nodedatas = arguments[0], eleuid = arguments[1];
-    var innerRadiusManagedTopology, h_interval = arguments[2];
-
-    if (h_interval=="")
-        innerRadiusManagedTopology = innerRadius -100;
-    else
-        innerRadiusManagedTopology = innerRadius;
-
-    var managednodecluster = d3.layout.cluster()
-    .size([360, innerRadiusManagedTopology])
-    .sort(null)
-    .value(function(d) { return d.size; });
-
-    if (nodedatas["response"].length == 0)
-        return;
-
-    var managednodes = managednodecluster.nodes(packageHierarchy(nodedatas["response"]));
-    var managedlinks = connections(managednodes);
-
-    var managednode_svg = d3.select("#managednode_topology_"+eleuid+"_modal").append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter)
-        .append("g")
-        .attr("transform", "translate(" + radius + "," + radius + ")");
-
-    var managedlink  = managednode_svg.selectAll(".link").data(bundle(managedlinks));
-    managedlink.enter().append("path")
-        .each(function(d) {
-        d.source = d[0], d.target = d[d.length - 1]})
-        .attr("class", "link")
-        .attr("style", "display=block;")
-        .attr("d", line)
-        .attr("stroke","grey");
-
-    var managednode = managednode_svg.selectAll(".node").data(managednodes.filter(function(n) { return !n.children; }));
-    var managednodetext = managednode_svg.selectAll(".node").data(managednodes.filter(function(n) { return !n.children; }));
-
-    managednode.enter().append("circle")
-          .attr("class", "node")
-          .attr("fill", "green")
-          .attr("dy", ".31em")
-            .attr("r", "10")
-          .attr("transform", function(d) {
-            return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
-          .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; });
-
-    managednodetext.enter().append("text")
-      .attr("fill", "black")
-      .attr("dy", ".31em")
-      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 28) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
-      .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      .text(function(d) { return d.name; });
-
-    managednodetext.exit().remove();
-    managedlink.exit().remove();
-    managednode.exit().remove();
-
-    document.getElementById(eleuid+"_modal_table_content").style.display = "none";
-    document.getElementById(eleuid+"_modal_back").style.display = "block";
-    document.getElementById(eleuid+"_modal_getunmanagednodes").style.display = "none";
-}
-
-
-function getunmanagednodes(event)
-{
-    var node_id = event.target.parentNode.id;
-    var nodedetails = node_id.substring(0,node_id.indexOf("_modal_content"));
-    var nodeuid = nodedetails.split("_")[0],
-        history_interval = nodedetails.split("_")[1];
-    var node_topology = document.getElementById("managednode_topology_"+nodedetails+"_modal");
-
-    if (node_topology.style.display == "")
-    {
-        // nodedetaillist contains current state. transform to switch topology
-        if (history_interval=="")
-            nodedetaillist = $("#topology").find("circle");
-        else
-            nodedetaillist = $("#topology_"+history_interval).find("circle");
-        var noOfElements = nodedetaillist["length"],i=0;
-        nodedetaillist = Object.values(nodedetaillist);
-        var switchnode = {"links":{}}
-        for (;i<noOfElements;i++) {
-            if(nodedetaillist[i]["__data__"]["uid"] == nodeuid) {
-                switchnode["name"] = nodedetaillist[i]["__data__"]["ip4"];
-                switchnode["links"]["successor"] = nodedetaillist[i]["__data__"]["unmanagednodelist"];
-                break;
-            }
-        }
-        if(switchnode["links"]["successor"].length > 0) {
-            linknodes = [];
-            switchnode["links"]["successor"].forEach(function(unmanlinknode) {
-                linknodes.push({"name":unmanlinknode, "links":{"successor":[switchnode["name"]]}});
-            });
-            linknodes.push(switchnode);
-            buildmanagednodetopology({"response":linknodes}, nodedetails,history_interval);
-        }
-    }
-    else
-    {
-        node_topology.style.display ="block";
-        document.getElementById(nodedetails+"_modal_table_content").style.display = "none";
-        document.getElementById(nodedetails+"_modal_back").style.display = "block";
-        document.getElementById(nodedetails+"_modal_getunmanagednodes").style.display = "none";
-    }
 }

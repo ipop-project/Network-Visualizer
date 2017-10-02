@@ -13,48 +13,35 @@ function callWebservice(){
 
   nodedetaillist = data["response"]["runningnodes"];
 
-  // Get initial length of nodedetails (required for reload of page)
-  if (lenofdata==0) lenofdata = nodedetaillist.length;
-
   // Invokes function in common javascript module to build complete network topology
   buildnetworktopology(nodedetaillist);
 
-  // Reload the page in the event of new node entering/leaving the network
-  if (lenofdata != nodedetaillist.length)
-      location.reload();
   });
 }
 
 $('#config-toggle').on('click', function(){ $('body').toggleClass('config-closed'); });
 
 $refresh = '<i id="refreshbtn" class="fa fa-refresh btn btn-default"></i>';
-$collapsible='<div class="panel-group" id="switchTopologyDpDwn"><div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><a data-toggle="collapse" href="#collapse1">Switch Topology </a></h4></div><div id="collapse1" class="panel-collapse collapse"><div class="panel-body">GroupVPN</div><div class="panel-body">SocialVPN</div></div></div></div>';
-
-$('#config').append($collapsible);
 $('#config').append($refresh);
 
 $('#refreshbtn').on('click', function() { 
-  cy.makeLayout({name: 'circle'}).run()
+  cy.remove(cy.edges());
+  cy.remove(cy.nodes());
+  callWebservice();
 });
 
 $('#refreshbtn').qtip({
   content: 'Reset',
-  position: {
-      my: 'top center',
-      at: 'bottom center'
-      },
   style: {
       classes: 'qtip-bootstrap',  
-      }}); 
-
-$form='<form id="inputForm" action="/IPOP" method="POST"><input class="numberBox" type="number" min="1" name="NoOfNodes"><label for="POST-name">&emsp;No. of Nodes</label><br><input class="numberBox" type="number" min="0" name="successor"><label for="POST-name">&emsp;Successor</label><br><input class="numberBox" type="number" min="0" name="chord"><label for="POST-name">&emsp;Chord</label><br><input class="numberBox" type="number" min="0" name="on_demand"><label for="POST-name">&emsp;On-Demand</label><br><br><input type="submit" id="sendbtn" name="user-input" class="btn btn-default" value="Submit"></form>';
-$('#config').append($form);
+      }
+  }); 
 
 $fontSlider = '<br><label>&ensp;Node Label Sizing</label><br><input id="fontSlider" type="range" min="0.5" max="8.5" value="1.5" step:"0.5" onchange="changeNodeLabelSize(this.value)" />';
 $('#config').append($fontSlider);
 
-$zoomSlider = '<br><label>&ensp;Layout Zoom</label><br><input id="zoomSlider" type="range" min="1" max="31" value="11" step:"2" onchange="changeLayoutZoom(this.value)" />';
-$('#config').append($zoomSlider);
+$zoomLimits = '<br><label>Layout Zoom Limits</label><br><label>minZoom</label>&emsp;&emsp;&emsp;&emsp;<label>maxZoom</label><select class="form-control" id="minzoom" onchange="changeLayoutZoomLimits(this.value,this.id)"><option>0.1</option><option>0.2</option><option>0.3</option><option>0.4</option><option>0.5</option><option>0.6</option><option>0.7</option></select><select class="form-control" id="maxzoom" onchange="changeLayoutZoomLimits(this.value,this.id)"><option>2</option><option>2.5</option><option>3</option><option>3.5</option><option>4</option><option>4.5</option><option>5</option></select>';
+$('#config').append($zoomLimits);
 
 function changeNodeLabelSize(newValue){
   cy.style()
@@ -63,8 +50,13 @@ function changeNodeLabelSize(newValue){
     .update();
 }  
 
-function changeLayoutZoom(newValue) {
-  cy.zoom(newValue/10);
+function changeLayoutZoomLimits(newValue,id) {
+  if(id=="maxzoom"){
+    cy.maxZoom(newValue/1);
+  }
+  else if(id=="minzoom"){
+    cy.minZoom(newValue/1);
+  }
 }
 
-setInterval(callWebservice,7500);
+//setInterval(callWebservice,7500);
