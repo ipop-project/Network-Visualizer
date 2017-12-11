@@ -5,15 +5,9 @@ body {
 }
 
 #topology{
-    overflow-x: hidden;
-    overflow-y: hidden;
-    height: 100%;
-    width: 100%;
-    outline-style: solid;
-    outline-color: orange;
-    outline-width: 0px;
-    margin-top: 0px;
-    margin-left: 0%;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .config {
@@ -21,12 +15,9 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 15%;
+  width: 20%;
   background: #4e4e4e;
   padding-left: 1%;
-  /*box-sizing: border-box;
-  padding-left:2.5% ;
-  padding-right: 2.5%;*/
   color: #fff;
   opacity: 1;
   transition-property: opacity;
@@ -55,7 +46,7 @@ body {
   pointer-events: none;
 }
 
-.config-closed .config-toggle {
+/*.config-closed .config-toggle {
   position: absolute;
   right: 0;
   top: 0;
@@ -64,20 +55,114 @@ body {
   cursor: pointer;
   color: #C0C0C0;
   z-index: 9999999;
+}*/
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    color: black;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    display: inline-block;
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    display: inline-block;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.NodeDetails {
+  color: #000;
+  margin-top: 10%;
+  width: 95%;
+}
+
+.panel-heading .NodeDetails {
+  background-color: #ccccff;
 }
 
 #refreshbtn {
-  /*background: #C0C0C0;*/
-  margin-top: 30%;
-  margin-bottom: 10%;
+  position: absolute;
+  display: inline-block;
+  margin-left: 45px;
 }
 
-#fontSlider {
+#LabelSizeSlider {
  width:90%;
+}
+
+#ControlsCollapse {
+  color: white;
+}
+
+#Controlwell {
+  background-color: #3170a5;
 }
 
 .form-control{
   /*position: absolute;*/
   width: 50%;
+}
+
+#OverlayList {
+  margin-bottom: 10%;
+}
+
+#overlay-form-control {
+  width: 75%;
+}
+
+#LayoutControls {
+  position: absolute;
+  display: inline-block;
+}
+
+#plusbtn{
+  position: absolute;
+  display: inline-block;
+  margin-top: 29.5%;
+  margin-left: 25px;
+}
+
+#minusbtn{
+  position: absolute;
+  display: inline-block;
+  margin-top: 45%;
+  margin-left: 25px;
+}
+
+#zoomslide{
+  margin-top: 37.5%;
+  margin-left: -35px;
+  position:absolute;
+  display: inline-block;
+  transform: rotate(-90deg);
+  width: 170px;
 }
 
