@@ -1,0 +1,214 @@
+body {
+  width: 100%;
+  height: 100%;
+  background: #292b2d;
+}
+
+#topology{
+  position: absolute;
+  opacity: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.config {
+  right: 0px;
+  top: 0;
+  bottom: 0;
+  position: fixed;
+  width: 220px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #4e4e4e;
+  border-left: solid 1px #3D4153;
+  z-index: 1;
+  box-sizing: border-box;
+  color: #498fff;
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 500ms; 
+  transition-timing-function: linear;
+  overflow: auto;
+}
+
+.config-toggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 1em;
+  margin: 0.2em;
+  cursor: pointer;
+  color: #C0C0C0;
+  z-index: 9999999;
+}
+
+.config-closed .config {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 500ms;
+  transition-timing-function: linear;
+  pointer-events: none;
+}
+
+#overlay-form-control {
+  width: 180px;
+  background: #498fff;
+  border-radius: 3px;
+  border: 1px solid #2e6da4;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  color: #292b2d;
+}
+
+.InfoPanel {
+  display: flex;
+  padding-bottom: 3px;
+  padding-left: 5px;
+}
+
+.leftColumn {
+  width: 50%;
+}
+
+.rightColumn {
+  width: 50%;
+}
+
+.qtip-bootstrap .qtip-content {
+  background-color: #efb82f;
+  border: 1px solid #efb82f;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  color: #292b2d;
+}
+
+.NodeInfoPanel {
+  position: relative;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  width: calc(100% - 15px);
+  background-color: #EFA430;
+  border: 1px solid #EFA430;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+  color: #292b2d;
+}
+
+.NodeInfoPanelBody{
+  padding: 5px;
+}
+
+.NodeInfoPanelHeading{
+  padding-top: 5px;
+  padding-left: 10px;
+  height: 30px;
+  background: #efb82f;
+  border-radius: 3px;
+  border: 1px solid #EFA430;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  font-size: 16px;
+  color: #292b2d;
+}
+
+#LabelSizeSlider {
+ width:90%;
+}
+
+#ControlsCollapse {
+  color: white;
+}
+
+#Controlwell {
+  background-color: #3170a5;
+}
+
+.form-control{
+  width: 50%;
+}
+
+#LayoutControls {
+  position: absolute;
+  display: inline-block;
+}
+
+#refreshbtn {
+  position: absolute;
+  display: inline-block;
+  margin-left: 45px;
+}
+
+#plusbtn{
+  position: absolute;
+  display: inline-block;
+  bottom: 210px;
+  margin-left: 25px;
+}
+
+#minusbtn{
+  position: absolute;
+  display: inline-block;
+  bottom: 10px;
+  margin-left: 25px;
+}
+
+#zoomslide{
+  position:absolute;
+  display: inline-block;
+  bottom: 114px;
+  margin-left: -40px;
+  transform: rotate(-90deg);
+  width: 170px;
+}
+
+#linkMetricsDialog {
+  position: absolute;
+  margin-top: 10px;
+  right: 230px;
+  width: 330px;
+  background-color: #EFA430;
+  border: 1px solid #EFA430;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  border-radius: 3px;
+  color: #FFFFFF;
+  box-sizing: border-box;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+}
+
+#linkMetricsDialogBody{
+  padding-left: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;  
+  overflow-y: scroll;
+  max-height: 300px;
+  color: #292b2d;
+}
+
+#linkMetricsDialogHeading{
+  padding-top: 5px;
+  padding-left: 10px;
+  background: #efb82f;
+  border-radius: 3px;
+  border: 1px solid #EFA430;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  height: 30px;
+  font-size: 16px;
+  color: #292b2d;
+}
+
+.linkID{
+  padding-left: 5px;
+  background-color: #efb82f;
+  border: 1px solid #EFA430;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
+  height: 20px;
+  color: #292b2d;
+}
+
+.leftColumnLinkMetric {
+  width: 60%;  
+}
+
+.rightColumnLinkMetric {
+  width: 40%;
+}
