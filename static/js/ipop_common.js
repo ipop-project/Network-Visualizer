@@ -1,10 +1,8 @@
-var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>Name&nbsp;</div><div>ID&nbsp;</div><div>Nodes&nbsp;</div><div>Links&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$name</div><div>&nbsp;$overlayid</div><div>&nbsp;$numnodes</div><div>&nbsp;$numlinks</div></section></section>"
+var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Nodes</div><div>Links</div></section><section id='rightColumn'><div>&nbsp;$overlayid</div><div>&nbsp;$numnodes</div><div>&nbsp;$numlinks</div></section></section>"
 
-var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>Name&nbsp;</div><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>VIP4&nbsp;</div><div>PrefixLen&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$name</div><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
+var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virtual IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
 
-var ipopNodePanelInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>VIP4&nbsp;</div><div>PrefixLen&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
-
-var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>ID</div><div>Source</div><div>Target</div><div>Sent_bytes_second</div><div>Sent_total_bytes</div><div>Recv_bytes_second</div><div>Recv_total_bytes</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$linkid</div><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div></section></section>"
+var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div></section></section>"
 
 var serverip = location.host;
 
@@ -32,6 +30,7 @@ var cy = cytoscape({
                               selector: 'edge',
                               style: {
                                     "line-color": "data(edgeColor)",
+                                    "width":"0.2em"
               	                 }
                             }
                            ],
@@ -43,7 +42,7 @@ var cy = cytoscape({
 
 function buildOverlaysGraph()
 {
-  $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2017-12-29T19:29:13&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (overlay in data["currentState"]) {
           cy.add({
@@ -65,7 +64,7 @@ function buildOverlaysGraph()
                                       return ele.data('id');
                                   });
     if(document.getElementById('overlay-form-control')==null){
-      var overlayDropdown = "<br><h4 class = 'section-heading'>Overlay Network</h4><select class='form-control' id='overlay-form-control' defaultValue='Select Overlay' onChange=overlayListClick(value)><option>Select Overlay</option>";
+      var overlayDropdown = "<br><section class='OverlayListPanel'><h4 class = 'section-heading'>Overlay Network</h4><select class='form-control' id='overlay-form-control' defaultValue='Select Overlay' onChange=overlayListClick(value)><option>Select Overlay</option>";
       for (var index in overlayList)
         overlayDropdown += "<option>"+overlayList[index]+"</option>";
       overlayDropdown += "</select>";
@@ -76,7 +75,7 @@ function buildOverlaysGraph()
 
 function buildNetworkTopology(overlayid)
 {
-  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getNodes?interval=2017-12-29T19:29:13&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getNodes?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (nodeid in data[overlayid]["currentState"]) {
       cy.add({
@@ -98,7 +97,7 @@ function buildNetworkTopology(overlayid)
     cy.makeLayout({name: 'circle'}).run();
   });
 
-  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getLinks?interval=2017-12-29T19:29:13&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getLinks?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (nodeid in data[overlayid]["currentState"]) {
       for (linkid in data[overlayid]["currentState"][nodeid]){
@@ -108,7 +107,7 @@ function buildNetworkTopology(overlayid)
                       source: data[overlayid]["currentState"][nodeid][linkid]["SrcNodeId"],
                       target: data[overlayid]["currentState"][nodeid][linkid]["TgtNodeId"],
                       // IceRole: data[overlayid]["currentState"][nodeid][linkid]["IceRole"],
-                      // Type: data[overlayid]["currentState"][nodeid][linkid]["Type"],
+                      Type: data[overlayid]["currentState"][nodeid][linkid]["Type"],
                       // rem_addr: data[overlayid]["currentState"][nodeid][linkid]["rem_addr"],
                       sent_bytes_second: data[overlayid]["currentState"][nodeid][linkid]["sent_bytes_second"],
                       sent_total_bytes: data[overlayid]["currentState"][nodeid][linkid]["sent_total_bytes"],
@@ -122,7 +121,7 @@ function buildNetworkTopology(overlayid)
                       // new_conn: data[overlayid]["currentState"][nodeid][linkid]["new_conn"],
                       // timeout: data[overlayid]["currentState"][nodeid][linkid]["timeout"],
                       // rtt: data[overlayid]["currentState"][nodeid][linkid]["rtt"],
-                      edgeColor: '#fff' //findEdgeColor(data[overlayid]["currentState"][nodeid][linkid]["Type"])     
+                      edgeColor: findEdgeColor(data[overlayid]["currentState"][nodeid][linkid]["Type"])     
                     }
         });
       }
@@ -133,7 +132,7 @@ function buildNetworkTopology(overlayid)
 function updateGraph()
 {
   if(cy.nodes().allAre('[type = "Overlay"]')){
-    $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2017-12-29T19:29:13", function(data,status) {
+    $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2018-01-11T21:47:59", function(data,status) {
       if (status == "error") throw error;
       for (overlay in data["added"]) {
         cy.add({
@@ -299,7 +298,7 @@ cy.on('mouseover','node',function(event){
   
   if(cy.$('#'+event.target.id()).data("type") == "IPOP"){
     cy.$('#'+event.target.id()).connectedEdges().animate({
-      style: { 'line-color': 'red' }
+      style: { 'width':'0.8em' }
     });
   }
 });
@@ -317,7 +316,7 @@ cy.on('mouseout','node',function(event){
   $(".qtip").remove();
   if(cy.$('#'+event.target.id()).data("type") == "IPOP"){
     cy.$('#'+event.target.id()).connectedEdges().animate({
-      style: { 'line-color': '#fff' }
+      style: { "width":"0.2em" }
     });
   }
 });
@@ -331,31 +330,21 @@ cy.on('click','node',function(event){
   }
   else{
     if(document.getElementById('infoPanel_'+event.target.id()) == null){
-      // $('#config').append("<div class='panel panel-default NodeDetails' id='infoPanel_"+event.target.id()+"'><div class='panel-heading'><button type='button' class='close' data-target='#infoPanel_"+event.target.id()+"' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button><h4 class = 'section-heading'>"+event.target._private.data.Name+"</h4></div><div class='panel-body'>"+mouseClickNode(event.target.id())+"</div><button id='infobtn' class='btn btn-info'>Link Metrics</button></div>");
-
-      $('#config').append("<section class='NodeInfoPanel' id='infoPanel_"+event.target.id()+"'><section class='NodeInfoPanelHeading'><article><button type='button' class='close' data-target='#infoPanel_"+event.target.id()+"' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>"+event.target._private.data.Name+"</article></section><section class='NodeInfoPanelBody'>"+mouseClickNode(event.target.id())+"</div><button id='infobtn' class='btn btn-primary'>Link Metrics</button></div></section>");
-
-      $('#infobtn').click(function(){
-        $('#toolsTab').append(moreInfo(event.target.id()));
-      });
-
+      $('#config').append("<section class='NodeInfoPanel' id='infoPanel_"+event.target.id()+"'><section class='NodeInfoPanelHeading'><article><button type='button' class='close' data-target='#infoPanel_"+event.target.id()+"' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>"+event.target._private.data.Name+"</article></section><section class='NodeInfoPanelBody'>"+mouseClickNode(event.target.id())+"</div><button id='infobtn_"+event.target.id()+"' class='btn btn-primary' onClick='linkMetrics(this.id)'>Link Metrics</button></div></section>");
     }
   }
 });
 
 cy.on('mouseover','edge',function(event){
-  //var linktype = event.target._private.data.type; 
-  cy.style()
-        .selector('#'+event.target.id())
-        .style({'line-color': 'red'})
-        .update();
+  cy.$('#'+event.target.id()).animate({
+      style: { "width":"0.8em" }
+  });
 });
 		
 cy.on('mouseout','edge',function(event){
-  cy.style()
-        .selector('#'+event.target.id())
-        .style({'line-color':'data(edgeColor)'})
-        .update();
+  cy.$('#'+event.target.id()).animate({
+      style: { "width":"0.2em" }
+  });
 });
 
 function findNodeColor(state) {
@@ -372,43 +361,30 @@ function findNodeColor(state) {
 
 function findEdgeColor(linktype) {
 	if (linktype == "TURN")
-    return "#9E9E9E";
+    return "yellow";
 	if (linktype == "STUN")
-    return "#C0C0C0";
+    return "orange";
 	if (linktype == "LOCAL")
-    return "#E2E2E2";
-}
-
-function findLinkColor(linktype){
-	if(linktype == "TURN")
-		return "yellow";
-	if(linktype == "STUN")
-		return "orange";
-	if(linktype == "LOCAL")
-		return "blue";	
+    return "red";
 }
 
 function mouseOverNode(nodeid) {
   nodeData = cy.$('#'+nodeid).data()
   if(nodeData.type == "Overlay"){
     var overlayNodeQTip = overlayNodeInfo;
-      overlayNodeQTip = overlayNodeQTip.replace("$name",nodeData.Name);
       overlayNodeQTip = overlayNodeQTip.replace("$overlayid",nodeData.id);
       overlayNodeQTip = overlayNodeQTip.replace("$numnodes",nodeData.NumNodes);
       overlayNodeQTip = overlayNodeQTip.replace("$numlinks",nodeData.NumLinks);
-      overlayNodeQTip = overlayNodeQTip.replace("$intervalno",nodeData.intervalNo);
     return overlayNodeQTip;
   }
   else{
     var ipopNodeQTip = ipopNodeInfo;
-      ipopNodeQTip = ipopNodeQTip.replace("$name",nodeData.Name);
       ipopNodeQTip = ipopNodeQTip.replace("$nodeid",nodeData.id);
       ipopNodeQTip = ipopNodeQTip.replace("$interfacename",nodeData.InterfaceName);
       ipopNodeQTip = ipopNodeQTip.replace("$geoip",nodeData.GeoIP);
       ipopNodeQTip = ipopNodeQTip.replace("$vip4",nodeData.VIP4);
       ipopNodeQTip = ipopNodeQTip.replace("$prefixlen",nodeData.PrefixLen);
       ipopNodeQTip = ipopNodeQTip.replace("$mac",nodeData.MAC);
-      ipopNodeQTip = ipopNodeQTip.replace("$intervalno",nodeData.intervalNo);
     return ipopNodeQTip;
 
   }
@@ -417,21 +393,22 @@ function mouseOverNode(nodeid) {
 function mouseClickNode(nodeid)
 {
   nodeData = cy.$('#'+nodeid).data()
-  var ipopNodePanel = ipopNodePanelInfo;
+  var ipopNodePanel = ipopNodeInfo;
       ipopNodePanel = ipopNodePanel.replace("$nodeid",nodeData.id);
       ipopNodePanel = ipopNodePanel.replace("$interfacename",nodeData.InterfaceName);
       ipopNodePanel = ipopNodePanel.replace("$geoip",nodeData.GeoIP);
       ipopNodePanel = ipopNodePanel.replace("$vip4",nodeData.VIP4);
       ipopNodePanel = ipopNodePanel.replace("$prefixlen",nodeData.PrefixLen);
       ipopNodePanel = ipopNodePanel.replace("$mac",nodeData.MAC);
-      ipopNodePanel = ipopNodePanel.replace("$intervalno",nodeData.intervalNo);
     return ipopNodePanel;
 }
 
-function moreInfo(nodeid)
+function linkMetrics(buttonid)
 {
   if(document.getElementById('linkMetricsDialog')!=null)
     $('#linkMetricsDialog').remove();
+
+  nodeid = buttonid.substr(8);
   connectedLinks = cy.nodes('#'+nodeid).connectedEdges().map(function( ele ){
                                                                 return ele.data('id');
                                                             });
@@ -440,15 +417,15 @@ function moreInfo(nodeid)
   for (var index in connectedLinks){
     linkData = cy.$('#'+connectedLinks[index]).data()
     var eachLinkMetrics = linkMetricsInfo;
-        eachLinkMetrics = eachLinkMetrics.replace("$linkid",linkData.id);
         eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source);
         eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_bytes_second",linkData.sent_bytes_second);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_total_bytes",linkData.sent_total_bytes);
         eachLinkMetrics = eachLinkMetrics.replace("$recv_bytes_second",linkData.recv_bytes_second);
         eachLinkMetrics = eachLinkMetrics.replace("$recv_total_bytes",linkData.recv_total_bytes);
-    allLinkMetrics += "<div class='linkID'>"+linkData.id+"</div>"+eachLinkMetrics;
+    allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+linkData.id+"</section>"+eachLinkMetrics+"</section>";
   }
-  linkMetricsDialog += "<section id='linkMetricsDialog'><section id='linkMetricsDialogHeading'><article><button type='button' class='close' data-target='#linkMetricsDialog' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Link Metrics</article></section><section id='linkMetricsDialogBody'>"+allLinkMetrics+"</section>";
-  return linkMetricsDialog
+  linkMetricsDialog += "<section id='linkMetricsDialog'><section id='linkMetricsDialogHeading'><button type='button' class='close' data-target='#linkMetricsDialog' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Link Metrics</section><section id='linkMetricsDialogBody'>"+allLinkMetrics+"</section>";
+
+  $('#toolsTab').append(linkMetricsDialog);
 }
