@@ -18,12 +18,7 @@ class RefreshLayout extends React.Component {
   	}
 
 	handleClick() {
-    $('.NodeDetails').remove();
-		cy.remove(cy.edges());
-		cy.remove(cy.nodes());
-    buildOverlaysGraph();
-    document.getElementById('overlay-form-control').value = 'Select Overlay';
-    document.getElementById('zoomslide').value = document.getElementById('zoomslide').defaultValue 
+    //updateGraph();
 	}
 
 	render() {
@@ -34,12 +29,29 @@ class RefreshLayout extends React.Component {
 }
 ReactDOM.render(<RefreshLayout />, document.getElementById('refreshbtn'));
 
-$('#refreshbtn').qtip({
-  content: 'Reset',
-  style: {
-      classes: 'qtip-bootstrap',  
-      }
-  });
+$('#toolsTab').append('<div id="homebtn"></div>');
+class HomeButton extends React.Component {
+  constructor(props) {
+      super(props);
+      this.handleClick = this.handleClick.bind(this);
+    }
+
+  handleClick() {
+    $('.NodeDetails').remove();
+    cy.remove(cy.edges());
+    cy.remove(cy.nodes());
+    buildOverlaysGraph();
+    document.getElementById('overlay-form-control').value = 'Select Overlay';
+    document.getElementById('zoomslide').value = document.getElementById('zoomslide').defaultValue 
+  }
+
+  render() {
+      return (
+        <button onClick={this.handleClick} className='btn btn-primary fa fa-home'/>
+      );
+    }
+}
+ReactDOM.render(<HomeButton />, document.getElementById('homebtn'));
 
 $('#toolsTab').append('<div id="LayoutZoom"></div>');
 class LayoutZoom extends React.Component {
@@ -74,9 +86,9 @@ class LayoutZoom extends React.Component {
   render() {
       return (
         <div>
-        <button onClick={this.handlePlus} className='btn btn-success fa fa-search-plus' id='plusbtn' />
+        <button onClick={this.handlePlus} className='btn btn-primary fa fa-search-plus' id='plusbtn' />
         <input id="zoomslide" type="range" min={cy.minZoom()} max={cy.maxZoom()} step={(cy.maxZoom()-cy.minZoom())/9} defaultValue={(cy.maxZoom()-cy.minZoom())*5/9} onChange={this.handleChange}/>
-        <button onClick={this.handleMinus} className='btn btn-danger fa fa-search-minus' id='minusbtn' />
+        <button onClick={this.handleMinus} className='btn btn-primary fa fa-search-minus' id='minusbtn' />
         </div>
       );
     }
