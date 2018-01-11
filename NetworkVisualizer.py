@@ -25,7 +25,7 @@ def findDiffBetweenIntervals(newDoc,oldDoc,requestedInterval):
 	existing = list(set(newDoc) - set(added))
 	modified ={}
 	for key in existing:
-		if frozenset(newDoc[key].itemsr()) != frozenset(oldDoc[key].items()) :
+		if frozenset(newDoc[key].items()) != frozenset(oldDoc[key].items()) :
 			modified[key] = newDoc[key]
 
 	responseMsg = {
