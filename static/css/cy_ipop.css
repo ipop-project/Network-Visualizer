@@ -109,6 +109,7 @@ body {
 .NodeInfoPanelHeading{
   padding-top: 5px;
   padding-left: 10px;
+  padding-right: 5px;
   height: 30px;
   background: #787878;
   border-radius: 3px;
@@ -203,6 +204,7 @@ body {
 #linkMetricsDialogHeading{
   padding-top: 5px;
   padding-left: 10px;
+  padding-right: 5px;
   background: #717171;
   border-radius: 3px;
   border: 1px solid #707070;

@@ -2,7 +2,7 @@ var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><d
 
 var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virtual IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
 
-var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div></section></section>"
+var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>Type</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$type</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div></section></section>"
 
 var serverip = location.host;
 
@@ -42,7 +42,7 @@ var cy = cytoscape({
 
 function buildOverlaysGraph()
 {
-  $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval=2018-01-12T14:00:47&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (overlay in data["currentState"]) {
           cy.add({
@@ -75,7 +75,7 @@ function buildOverlaysGraph()
 
 function buildNetworkTopology(overlayid)
 {
-  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getNodes?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/nodes?interval=2018-01-12T14:00:47&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (nodeid in data[overlayid]["currentState"]) {
       cy.add({
@@ -97,7 +97,7 @@ function buildNetworkTopology(overlayid)
     cy.makeLayout({name: 'circle'}).run();
   });
 
-  $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getLinks?interval=2018-01-11T21:47:59&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/links?interval=2018-01-12T14:00:47&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (nodeid in data[overlayid]["currentState"]) {
       for (linkid in data[overlayid]["currentState"][nodeid]){
@@ -171,7 +171,7 @@ function updateGraph()
   }
   else{
     var overlayid = document.getElementById('overlay-form-control');
-    $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getNodes?interval=2017-12-29T19:29:13", function(data,status) {
+    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/nodes?interval=2017-12-29T19:29:13", function(data,status) {
       if (status == "error") throw error;
       for (nodeid in data[overlayid]["added"]) {
         cy.add({
@@ -208,7 +208,7 @@ function updateGraph()
       cy.makeLayout({name: 'circle'}).run();
     });
 
-    $.getJSON("http://"+serverip+"/IPOP/"+overlayid+"/getLinks?interval=2017-12-29T19:29:13", function(data,status) {
+    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/links?interval=2017-12-29T19:29:13", function(data,status) {
       if (status == "error") throw error;
       for (linkid in data[overlayid]["added"]){
         cy.add({
@@ -269,6 +269,8 @@ function updateGraph()
 
 function overlayListClick(overlayid) {
   cy.remove(cy.nodes());
+  $('.NodeInfoPanel').remove();
+  $('#linkMetricsDialog').remove();
   if(overlayid != 'Select Overlay')
     buildNetworkTopology(overlayid);
   else
@@ -298,7 +300,7 @@ cy.on('mouseover','node',function(event){
   
   if(cy.$('#'+event.target.id()).data("type") == "IPOP"){
     cy.$('#'+event.target.id()).connectedEdges().animate({
-      style: { 'width':'0.8em' }
+      style: { 'width':'0.4em' }
     });
   }
 });
@@ -337,7 +339,7 @@ cy.on('click','node',function(event){
 
 cy.on('mouseover','edge',function(event){
   cy.$('#'+event.target.id()).animate({
-      style: { "width":"0.8em" }
+      style: { "width":"0.4em" }
   });
 });
 		
@@ -361,11 +363,11 @@ function findNodeColor(state) {
 
 function findEdgeColor(linktype) {
 	if (linktype == "TURN")
-    return "yellow";
-	if (linktype == "STUN")
     return "orange";
+	if (linktype == "STUN")
+    return "yellow";
 	if (linktype == "LOCAL")
-    return "red";
+    return "blue";
 }
 
 function mouseOverNode(nodeid) {
@@ -419,6 +421,7 @@ function linkMetrics(buttonid)
     var eachLinkMetrics = linkMetricsInfo;
         eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source);
         eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target);
+        eachLinkMetrics = eachLinkMetrics.replace("$type",linkData.Type);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_bytes_second",linkData.sent_bytes_second);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_total_bytes",linkData.sent_total_bytes);
         eachLinkMetrics = eachLinkMetrics.replace("$recv_bytes_second",linkData.recv_bytes_second);

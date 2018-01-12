@@ -37,7 +37,8 @@ class HomeButton extends React.Component {
     }
 
   handleClick() {
-    $('.NodeDetails').remove();
+    $('.NodeInfoPanel').remove();
+    $('#linkMetricsDialog').remove();
     cy.remove(cy.edges());
     cy.remove(cy.nodes());
     buildOverlaysGraph();
