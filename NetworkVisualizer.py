@@ -43,7 +43,7 @@ def homepage():
 	resp =  render_template('ipop_mainpage.html')
 	return resp
 
-@app.route('/IPOP/getIntervals')
+@app.route('/IPOP/getIntervals', methods=['GET'])
 def getIntervals():		
 	startTime = datetime.strptime(request.args.get('start') , "%Y-%m-%dT%H:%M:%S")
 	endTime = datetime.strptime(request.args.get('end') , "%Y-%m-%dT%H:%M:%S")
@@ -58,7 +58,7 @@ def getIntervals():
 	return resp
 
 
-@app.route('/IPOP/getOverlays')
+@app.route('/IPOP/getOverlays', methods=['GET'])
 def getOverlays():
 	currentState = request.args.get('currentState')	
 	requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
@@ -78,7 +78,7 @@ def getOverlays():
 	return resp
 
 
-@app.route('/IPOP/<overlayid>/getNodes')
+@app.route('/IPOP/overlays/<overlayid>/nodes', methods=['GET'])
 def getNodes(overlayid):
 	currentState = request.args.get('currentState')
 	requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
@@ -118,7 +118,7 @@ def getNodes(overlayid):
 	resp.headers['Content-Type'] = "application/json"
 	return resp
 
-@app.route('/IPOP/<overlayid>/<nodeid>/getNode')
+@app.route('/IPOP/overlays/<overlayid>/nodes/<nodeid>', methods=['GET'])
 def getNode(overlayid,nodeid):
 	requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
 	newDoc = mongoData.find_one({"_id": requestedInterval}, {"_id":1, "Nodes."+overlayid+"."+nodeid:1}) #modify to find nearest to requested interval 
@@ -137,7 +137,7 @@ def getNode(overlayid,nodeid):
 	resp.headers['Content-Type'] = "application/json"
 	return resp
 
-@app.route('/IPOP/<overlayid>/getLinks')
+@app.route('/IPOP/overlays/<overlayid>/links', methods=['GET'])
 def getLinksInAnOverlay(overlayid):
 	currentState = request.args.get('currentState')
 	requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
@@ -189,7 +189,7 @@ def getLinksInAnOverlay(overlayid):
 	resp.headers['Content-Type'] = "application/json"
 	return resp
 
-@app.route('/IPOP/<overlayid>/<nodeid>/getLinks')
+@app.route('/IPOP/overlays/<overlayid>/nodes/<nodeid>/links', methods=['GET'])
 def getLinksForANode(overlayid,nodeid):
 	currentState = request.args.get('currentState')
 	requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
