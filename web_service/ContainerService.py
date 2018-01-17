@@ -7,7 +7,8 @@ import threading
 from flask import Flask, abort
 
 from CollectorService import CollectorServiceInstance
-from config import COLLECTOR_CONFIG, CONTAINER_CONFIG
+from CentralVisualizerService import CentralVisualizerService
+from config import COLLECTOR_CONFIG, CONTAINER_CONFIG, VISUALIZER_CONFIG
 
 
 class ContainerService(Flask):
@@ -40,6 +41,7 @@ class ContainerService(Flask):
 
         # Instance of the collector service
         self._coll_serv = CollectorServiceInstance(COLLECTOR_CONFIG)
+        self._vis_serv = CentralVisualizerService(VISUALIZER_CONFIG)
 
         # NOTE: Important for the dumper thread to be started from the container
         # (i.e. Flask subclass) else it won't work
@@ -57,11 +59,35 @@ class ContainerService(Flask):
         sys.exit(sig)
 
 
-container_service = ContainerService(__name__)
-container_service \
-        .add_url_rule('/IPOP/nodes/<node_id>',
+container_service = ContainerService(__name__,
+        template_folder=CONTAINER_CONFIG['template_folder'],
+        static_folder=CONTAINER_CONFIG['static_folder'])
+
+# Collector Service URLs
+container_service.add_url_rule(
+        '/IPOP/nodes/<node_id>',
         view_func=container_service._coll_serv.process_update_req,
         methods=['PUT'])
+
+# Central Visualizer Service URLs
+container_service.add_url_rule('/IPOP', 
+        view_func=container_service._vis_serv.homepage, methods=['GET'])
+container_service.add_url_rule('/IPOP/getIntervals', 
+        view_func=container_service._vis_serv.getIntervals, methods=['GET'])
+container_service.add_url_rule('/IPOP/getOverlays', 
+        view_func=container_service._vis_serv.getOverlays, methods=['GET'])
+container_service.add_url_rule('/IPOP/overlays/<overlayid>/nodes', 
+        view_func=container_service._vis_serv.getNodesInAnOverlay, 
+        methods=['GET'])
+container_service.add_url_rule('/IPOP/overlays/<overlayid>/nodes/<nodeid>', 
+        view_func=container_service._vis_serv.getSingleNode, methods=['GET'])
+container_service.add_url_rule('/IPOP/overlays/<overlayid>/links', 
+        view_func=container_service._vis_serv.getLinksInAnOverlay, 
+        methods=['GET'])
+container_service.add_url_rule(
+        '/IPOP/overlays/<overlayid>/nodes/<nodeid>/links', 
+        view_func=container_service._vis_serv.getLinksForANode, 
+        methods=['GET'])
 
 
 if __name__ == '__main__':
