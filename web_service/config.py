@@ -22,3 +22,11 @@ COLLECTOR_CONFIG = {
     }
 }
 
+VISUALIZER_CONFIG = {
+    "mongo": {
+        "host": "localhost",
+        "port": 27017,
+        "dbname": "ipopdb",
+        "collection_name": "visualizer"
+    }
+}
