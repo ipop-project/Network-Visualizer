@@ -2,7 +2,7 @@ CONTAINER_CONFIG = {
     "ip": "0.0.0.0",
     "port": 5000,
     "debug": False, # WARNING! NEVER set debug = True in production!
-    "template_folder": "/UI/templates",
+    "template_folder": "UI/templates",
     "static_folder": "UI/static",
     "logging": {
         "console_level": "DEBUG",
