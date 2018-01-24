@@ -43,7 +43,7 @@ var cy = cytoscape({
 function buildOverlaysGraph()
 {
   var intervalNo = new Date().toISOString().split(".")[0];
-  $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval="+intervalNo+"&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo+"&currentState=True", function(data,status) {
     if (status == "error") throw error;
     for (overlay in data["currentState"]) {
           cy.add({
@@ -135,7 +135,7 @@ function updateGraph()
 {
   var intervalNo = new Date().toISOString().split(".")[0];
   if(cy.nodes().allAre('[type = "Overlay"]')){
-    $.getJSON("http://"+serverip+"/IPOP/getOverlays?interval="+intervalNo, function(data,status) {
+    $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo, function(data,status) {
       if (status == "error") throw error;
       var overlayDropdown = "";
       for (overlay in data["added"]) {

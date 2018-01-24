@@ -12,6 +12,7 @@ class CentralVisualizerService(object):
         self._mongo_data = ipopdb[config_dict["mongo"]["collection_name"]]
         self._logger = logging.getLogger("network_visualizer.central_visualizer")
     
+
     def _getCurrentState(self,currentDoc,requestedInterval):
         responseMsg = {
                         "currentState": currentDoc,
@@ -56,7 +57,7 @@ class CentralVisualizerService(object):
         resp.headers['Content-Type'] = "application/json"
         return resp
 
-    #route('/IPOP/getOverlays', methods=['GET'])
+    #route('/IPOP/overlays', methods=['GET'])
     def getOverlays(self):
         currentState = request.args.get('currentState') 
         requestedInterval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
@@ -244,4 +245,8 @@ class CentralVisualizerService(object):
         self._logger.debug('The server response for links from node {} in overlay {} request: {}'.format(nodeid,overlayid,responseMsg))
         resp = make_response(json.dumps(responseMsg))
         resp.headers['Content-Type'] = "application/json"
+<<<<<<< HEAD
         return resp
+=======
+        return resp
+>>>>>>> ashish/master
