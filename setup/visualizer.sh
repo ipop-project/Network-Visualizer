@@ -15,7 +15,7 @@ function options
 function start()
 {
 	source ./venv/bin/activate
-	nohup python ./web_service/DeploymentServer.py
+	nohup python ./web_service/DeploymentServer.py &> /dev/null &
 }
 
 function stop()

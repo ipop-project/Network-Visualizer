@@ -43,17 +43,17 @@ var cy = cytoscape({
 function buildOverlaysGraph()
 {
   var intervalNo = new Date().toISOString().split(".")[0];
-  $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo+"&currentState=True", function(data,status) {
+  $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo+"&current_state=True", function(data,status) {
     if (status == "error") throw error;
-    for (overlay in data["currentState"]) {
+    for (overlay in data["current_state"]) {
           cy.add({
              data: { 
                     id: overlay,
-                    Name: data["currentState"][overlay]["Name"],
-                    NumNodes: data["currentState"][overlay]["NumNodes"],
-                    NumLinks: data["currentState"][overlay]["NumLinks"],
+                    Name: data["current_state"][overlay]["Name"],
+                    NumNodes: data["current_state"][overlay]["NumNodes"],
+                    NumLinks: data["current_state"][overlay]["NumLinks"],
                     intervalNo: data["intervalNo"],
-                    label: data["currentState"][overlay]["Name"],
+                    label: data["current_state"][overlay]["Name"],
                     nodeColor: '#74CBE8',
                     type: 'Overlay' 
                   } 
@@ -78,22 +78,22 @@ function buildOverlaysGraph()
 function buildNetworkTopology(overlayid,intervalNo)
 {
   $.when(
-    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/nodes?interval="+intervalNo+"&currentState=True"),
-    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/links?interval="+intervalNo+"&currentState=True")
+    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/nodes?interval="+intervalNo+"&current_state=True"),
+    $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/links?interval="+intervalNo+"&current_state=True")
   ).then(function(nodeData, linkData) {
-    for (nodeid in nodeData["0"][overlayid]["currentState"]) {
+    for (nodeid in nodeData["0"][overlayid]["current_state"]) {
         cy.add({
           data: {
             id: nodeid,
-            Name: nodeid, //nodeData["0"][overlayid]["currentState"][nodeid]["NodeName"]
-            InterfaceName: nodeData["0"][overlayid]["currentState"][nodeid]["InterfaceName"],
-            GeoIP: nodeData["0"][overlayid]["currentState"][nodeid]["GeoIP"],
-            VIP4: nodeData["0"][overlayid]["currentState"][nodeid]["VIP4"],
-            PrefixLen: nodeData["0"][overlayid]["currentState"][nodeid]["PrefixLen"],
-            MAC: nodeData["0"][overlayid]["currentState"][nodeid]["MAC"],
+            Name: nodeid, //nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"]
+            InterfaceName: nodeData["0"][overlayid]["current_state"][nodeid]["InterfaceName"],
+            GeoIP: nodeData["0"][overlayid]["current_state"][nodeid]["GeoIP"],
+            VIP4: nodeData["0"][overlayid]["current_state"][nodeid]["VIP4"],
+            PrefixLen: nodeData["0"][overlayid]["current_state"][nodeid]["PrefixLen"],
+            MAC: nodeData["0"][overlayid]["current_state"][nodeid]["MAC"],
             intervalNo: nodeData["0"]["intervalNo"],
-            label: nodeid, //nodeData["0"][overlayid]["currentState"][nodeid]["NodeName"],  
-            nodeColor: '#02ed68', //findNodeColor(nodeData["0"][overlayid]["currentState"][nodeid]["state"])
+            label: nodeid, //nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],  
+            nodeColor: '#02ed68', //findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"])
             type: 'IPOP'
           }
         });
@@ -101,29 +101,29 @@ function buildNetworkTopology(overlayid,intervalNo)
 
       cy.makeLayout({name:'circle'}).run();
 
-      for (nodeid in linkData["0"][overlayid]["currentState"]) {
-        for (linkid in linkData["0"][overlayid]["currentState"][nodeid]){
+      for (nodeid in linkData["0"][overlayid]["current_state"]) {
+        for (linkid in linkData["0"][overlayid]["current_state"][nodeid]){
           cy.add({
             data: { 
               id: linkid,
-              source: linkData["0"][overlayid]["currentState"][nodeid][linkid]["SrcNodeId"],
-              target: linkData["0"][overlayid]["currentState"][nodeid][linkid]["TgtNodeId"],
-              // IceRole: linkData["0"][overlayid]["currentState"][nodeid][linkid]["IceRole"],
-              // Type: "TURN", //linkData["0"][overlayid]["currentState"][nodeid][linkid]["Type"],
-              rem_addr: linkData["0"][overlayid]["currentState"][nodeid][linkid]["rem_addr"],
-              sent_bytes_second: linkData["0"][overlayid]["currentState"][nodeid][linkid]["sent_bytes_second"],
-              // sent_total_bytes: linkData["0"][overlayid]["currentState"][nodeid][linkid]["sent_total_bytes"],
-              // local_type: linkData["0"][overlayid]["currentState"][nodeid][linkid]["local_type"],
-              // rem_type: linkData["0"][overlayid]["currentState"][nodeid][linkid]["rem_type"],
-              // writable: linkData["0"][overlayid]["currentState"][nodeid][linkid]["writable"],
-              // local_addr: linkData["0"][overlayid]["currentState"][nodeid][linkid]["local_addr"],
-              // recv_bytes_second: linkData["0"][overlayid]["currentState"][nodeid][linkid]["recv_bytes_second"],
-              // best_conn: linkData["0"][overlayid]["currentState"][nodeid][linkid]["best_conn"],
-              // recv_total_bytes: linkData["0"][overlayid]["currentState"][nodeid][linkid]["recv_total_bytes"],
-              // new_conn: linkData["0"][overlayid]["currentState"][nodeid][linkid]["new_conn"],
-              // timeout: linkData["0"][overlayid]["currentState"][nodeid][linkid]["timeout"],
-              // rtt: linkData["0"][overlayid]["currentState"][nodeid][linkid]["rtt"],
-              edgeColor: '#fff'//findEdgeColor(linkData["0"][overlayid]["currentState"][nodeid][linkid]["Type"])
+              source: linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
+              target: linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"],
+              // IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
+              // Type: "TURN", //linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"],
+              rem_addr: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_addr"],
+              sent_bytes_second: linkData["0"][overlayid]["current_state"][nodeid][linkid]["sent_bytes_second"],
+              // sent_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["sent_total_bytes"],
+              // local_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"],
+              // rem_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"],
+              // writable: linkData["0"][overlayid]["current_state"][nodeid][linkid]["writable"],
+              // local_addr: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_addr"],
+              // recv_bytes_second: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_bytes_second"],
+              // best_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["best_conn"],
+              // recv_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_total_bytes"],
+              // new_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["new_conn"],
+              // timeout: linkData["0"][overlayid]["current_state"][nodeid][linkid]["timeout"],
+              // rtt: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rtt"],
+              edgeColor: '#fff'//findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"])
             }
           });
         }

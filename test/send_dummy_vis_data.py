@@ -324,7 +324,7 @@ if __name__ == '__main__':
             node_id = r['NodeId']
             logging.info('Making {} request for node_id {}' \
                           .format(which, node_id))
-            requests.put('http://10.244.36.186:5000/IPOP/nodes/'+node_id,
+            requests.put('http://localhost:5000/IPOP/nodes/'+node_id,
                          data=json.dumps(r), headers={'Content-Type':
                                                       'application/json'})
 

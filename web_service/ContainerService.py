@@ -73,18 +73,18 @@ container_service.add_url_rule(
 container_service.add_url_rule("/IPOP", 
         view_func=container_service._vis_serv.homepage, methods=["GET"])
 container_service.add_url_rule("/IPOP/overlays", 
-        view_func=container_service._vis_serv.getOverlays, methods=["GET"])
+        view_func=container_service._vis_serv.get_overlays, methods=["GET"])
 container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes", 
-        view_func=container_service._vis_serv.getNodesInAnOverlay, 
+        view_func=container_service._vis_serv.get_nodes_in_an_overlay, 
         methods=["GET"])
 container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes/<nodeid>", 
-        view_func=container_service._vis_serv.getSingleNode, methods=["GET"])
+        view_func=container_service._vis_serv.get_single_node, methods=["GET"])
 container_service.add_url_rule("/IPOP/overlays/<overlayid>/links", 
-        view_func=container_service._vis_serv.getLinksInAnOverlay, 
+        view_func=container_service._vis_serv.get_links_in_an_overlay, 
         methods=["GET"])
 container_service.add_url_rule(
         "/IPOP/overlays/<overlayid>/nodes/<nodeid>/links", 
-        view_func=container_service._vis_serv.getLinksForANode, 
+        view_func=container_service._vis_serv.get_links_for_a_node, 
         methods=["GET"])
 
 
