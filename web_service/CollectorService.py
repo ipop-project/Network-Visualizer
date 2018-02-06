@@ -45,14 +45,13 @@ class CollectorServiceInstance(object):
         Serves the PUT request from the OverlayVisualizer controller module
         """
 
-        self._logger.debug("Received request {} for node_id" \
-               " {}".format(request.json, node_id))
+        self._logger.debug("Received request {} for node_id"
+                           " {}".format(request.json, node_id))
 
         if self.intr_or_term:
-            self._logger.warn("Rejecting request with a 500 because of" \
+            self._logger.warn("Rejecting request with a 500 because of"
                               " SIGINT/SIGTERM!")
             return abort(500)
-
 
         # NOTE request is intantiated when this method is registered
         # as a view_func in a flask container
@@ -61,7 +60,7 @@ class CollectorServiceInstance(object):
 
         self._data_held_lock.acquire()
         for ovrl_id in req_data:
-            self._logger.debug("Processing data for overlay_id" \
+            self._logger.debug("Processing data for overlay_id"
                                " {}".format(ovrl_id))
 
             # Initialise data for an overlay
@@ -96,17 +95,18 @@ class CollectorServiceInstance(object):
                 "Updating node data for node_id {}".format(node_id))
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
-            # Add/update data link data for the reporting node
-            for link_id in req_data[ovrl_id]["LinkManager"]:
-                req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
-                link_stats = req_link_data["Stats"]
-                link_data = {
-                    "SrcNodeId": node_id,
-                    "TgtNodeId": req_link_data["PeerId"],
-                    "rem_addr": link_stats["rem_addr"],
-                    "sent_bytes_second": link_stats["sent_bytes_second"],
-                }
-                self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
+            if "LinkManager" in req_data[ovrl_id]:
+                # Add/update data link data for the reporting node
+                for link_id in req_data[ovrl_id]["LinkManager"]:
+                    req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
+                    link_stats = req_link_data["Stats"]
+                    link_data = {
+                        "SrcNodeId": node_id,
+                        "TgtNodeId": req_link_data["PeerId"],
+                        "rem_addr": link_stats["rem_addr"],
+                        "sent_bytes_second": link_stats["sent_bytes_second"],
+                    }
+                    self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
 
         return "Success"
