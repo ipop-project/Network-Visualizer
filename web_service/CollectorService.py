@@ -132,7 +132,4 @@ class CollectorServiceInstance(object):
 
             self._reset_data_held()
 
-            self._logger.debug("Document after flushing is {}".format(
-                    self.data_held))
-
             self._data_held_lock.release()
