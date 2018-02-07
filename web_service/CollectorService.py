@@ -85,7 +85,7 @@ class CollectorServiceInstance(object):
             # Add/update node data for the reporting node
             req_node_data = req_data[ovrl_id]["Topology"]
             node_data = {
-                "InterfaceName": req_node_data["InterfaceName"],
+                "InterfaceName": req_node_data["TapName"],
                 "GeoIP": req_node_data["GeoIP"],
                 "VIP4": req_node_data["VIP4"],
                 "PrefixLen": req_node_data["PrefixLen"],
