@@ -61,6 +61,8 @@ class ContainerService(Flask):
 container_service = ContainerService(__name__,
         template_folder=CONTAINER_CONFIG["template_folder"],
         static_folder=CONTAINER_CONFIG["static_folder"])
+container_service.register_error_handler(500, lambda _: "Your request"
+                                         "was potentially malformed")
 
 # Collector Service URLs
 container_service.add_url_rule(
