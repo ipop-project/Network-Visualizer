@@ -18,7 +18,7 @@ class ContainerService(Flask):
         self._logger = logging.getLogger("network_visualizer")
 
         fmtr = logging.Formatter(
-            """%(asctime)s - %(name)s - %(threadName)s -""" \
+            """%(asctime)s - %(name)s - %(threadName)s -"""
             """ %(levelname)s - %(message)s"""
         )
         ch = logging.StreamHandler()
@@ -52,8 +52,7 @@ class ContainerService(Flask):
 
     def _intr_term_handler(self, sig, frame):
         self._coll_serv.intr_or_term = True
-        #self._intr_or_term = True
-        self._logger.warn("Received SIGINT/SIGTERM! Waiting for" \
+        self._logger.warn("Received SIGINT/SIGTERM! Waiting for"
                           " DumperThread to complete...")
         self._dumper_thread.join()
         sys.exit(sig)
@@ -70,21 +69,21 @@ container_service.add_url_rule(
         methods=["PUT"])
 
 # Central Visualizer Service URLs
-container_service.add_url_rule("/IPOP", 
+container_service.add_url_rule("/IPOP",
         view_func=container_service._vis_serv.homepage, methods=["GET"])
-container_service.add_url_rule("/IPOP/overlays", 
-        view_func=container_service._vis_serv.getOverlays, methods=["GET"])
-container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes", 
-        view_func=container_service._vis_serv.getNodesInAnOverlay, 
+container_service.add_url_rule("/IPOP/overlays",
+        view_func=container_service._vis_serv.get_overlays, methods=["GET"])
+container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes",
+        view_func=container_service._vis_serv.get_nodes_in_an_overlay,
         methods=["GET"])
-container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes/<nodeid>", 
-        view_func=container_service._vis_serv.getSingleNode, methods=["GET"])
-container_service.add_url_rule("/IPOP/overlays/<overlayid>/links", 
-        view_func=container_service._vis_serv.getLinksInAnOverlay, 
+container_service.add_url_rule("/IPOP/overlays/<overlayid>/nodes/<nodeid>",
+        view_func=container_service._vis_serv.get_single_node, methods=["GET"])
+container_service.add_url_rule("/IPOP/overlays/<overlayid>/links",
+        view_func=container_service._vis_serv.get_links_in_an_overlay,
         methods=["GET"])
 container_service.add_url_rule(
-        "/IPOP/overlays/<overlayid>/nodes/<nodeid>/links", 
-        view_func=container_service._vis_serv.getLinksForANode, 
+        "/IPOP/overlays/<overlayid>/nodes/<nodeid>/links",
+        view_func=container_service._vis_serv.get_links_for_a_node,
         methods=["GET"])
 
 

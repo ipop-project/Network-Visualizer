@@ -2,7 +2,7 @@
 
 function help()
 {
-	echo 'Enter start or stop as argument'
+    echo 'Enter start or stop as argument'
 }
 
 function options
@@ -14,13 +14,13 @@ function options
 
 function start()
 {
-	source ./venv/bin/activate
-	nohup python ./web_service/DeploymentServer.py
+    source ./venv/bin/activate
+    nohup python ./web_service/DeploymentServer.py &> /dev/null &
 }
 
 function stop()
 {
-	ps aux | grep -v grep | grep "DeploymentServer.py" | awk '{print $2}' | xargs sudo kill -9
+    ps aux | grep -v grep | grep "DeploymentServer.py" | awk '{print $2}' | xargs sudo kill -9
 }
 
 cmd=$1
@@ -35,5 +35,5 @@ case $cmd in
     ;;
     ("stop")
         stop
-    ;;  
+    ;;
 esac
