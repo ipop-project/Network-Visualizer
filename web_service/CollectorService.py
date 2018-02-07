@@ -100,13 +100,14 @@ class CollectorServiceInstance(object):
                 for link_id in req_data[ovrl_id]["LinkManager"]:
                     req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
                     link_stats = req_link_data["Stats"]
-                    link_data = {
-                        "SrcNodeId": node_id,
-                        "TgtNodeId": req_link_data["PeerId"],
-                        "rem_addr": link_stats["rem_addr"],
-                        "sent_bytes_second": link_stats["sent_bytes_second"],
-                    }
-                    self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
+                    if link_stats:
+                        link_data = {
+                            "SrcNodeId": node_id,
+                            "TgtNodeId": req_link_data["PeerId"],
+                            "rem_addr": link_stats["rem_addr"],
+                            "sent_bytes_second": link_stats["sent_bytes_second"],
+                        }
+                        self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
 
         return "Success"
