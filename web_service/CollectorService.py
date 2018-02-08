@@ -97,8 +97,13 @@ class CollectorServiceInstance(object):
             if "LinkManager" in req_data[ovrl_id]:
                 # Add/update data link data for the reporting node
                 for link_id in req_data[ovrl_id]["LinkManager"]:
+                    # Increment link counter in overlay if we did not have its data
+                    # for ovrl_id (meaning it is new in this overlay)
+                    # NOTE! This must be done before self.data_held["Links"] is
+                    # updated with link_data as it will add the key ovrl_id causing
+                    # this test to not behave as desired
                     if link_id not in self.data_held["Links"]:
-                        self.data_held["Overlays"][ovrl_id][link_id] += 1
+                        self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
 
                     req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
                     link_data = {
