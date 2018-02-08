@@ -97,6 +97,9 @@ class CollectorServiceInstance(object):
             if "LinkManager" in req_data[ovrl_id]:
                 # Add/update data link data for the reporting node
                 for link_id in req_data[ovrl_id]["LinkManager"]:
+                    if link_id not in self.data_held["Links"]:
+                        self.data_held["Overlays"][ovrl_id][link_id] += 1
+
                     req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
                     link_data = {
                         "SrcNodeId": node_id,
