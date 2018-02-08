@@ -102,7 +102,7 @@ class CollectorServiceInstance(object):
                     # NOTE! This must be done before self.data_held["Links"] is
                     # updated with link_data as it will add the key ovrl_id causing
                     # this test to not behave as desired
-                    if link_id not in self.data_held["Links"]:
+                    if link_id not in self.data_held["Links"][ovrl_id]:
                         self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
 
                     req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
