@@ -121,14 +121,15 @@ class CollectorServiceInstance(object):
             time.sleep(self._config_dict["flush_duration"])
 
             self._data_held_lock.acquire()
-            self.data_held["_id"] = \
-                    datetime.datetime.utcnow().replace(microsecond=0)
-            self._logger.debug(
-                "Beginning mongo dump on document {}".format(self.data_held))
-            self._db[self._config_dict["mongo"]["collection_name"]] \
-                    .insert_one(self.data_held)
-            self._logger.debug("Mongo dump successful")
+            if self.data_held["Overlays"]:
+                self.data_held["_id"] = \
+                        datetime.datetime.utcnow().replace(microsecond=0)
+                self._logger.debug(
+                    "Beginning mongo dump on document {}".format(self.data_held))
+                self._db[self._config_dict["mongo"]["collection_name"]] \
+                        .insert_one(self.data_held)
+                self._logger.debug("Mongo dump successful")
 
-            self._reset_data_held()
+                self._reset_data_held()
 
             self._data_held_lock.release()
