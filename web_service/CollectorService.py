@@ -4,7 +4,6 @@ import logging
 import datetime
 import threading
 from collections import defaultdict
-from logging.handlers import RotatingFileHandler
 
 from pymongo import MongoClient
 from flask import abort, request
