@@ -38,7 +38,7 @@ class CollectorServiceInstance(object):
             "Links": defaultdict(lambda:
                      defaultdict(lambda: defaultdict(dict)))
         }
-        self._unordered_links = set()
+        self._link_ids = set()
 
     def process_update_req(self, node_id):
         """
@@ -103,12 +103,8 @@ class CollectorServiceInstance(object):
                         "SrcNodeId": node_id,
                         "TgtNodeId": req_link_data["PeerId"],
                     }
-                    if (node_id, link_data["TgtNodeId"]) \
-                            not in self._unordered_links \
-                            and (link_data["TgtNodeId"], node_id) \
-                            not in self._unordered_links:
-                        self._unordered_links.add((node_id,
-                                                   link_data["TgtNodeId"]))
+                    if link_id not in self._link_ids:
+                        self._link_ids.add(link_id)
                         # Increment link counter in overlay if we did not have its data
                         # for ovrl_id (meaning it is new in this overlay)
                         # NOTE! This must be done before self.data_held["Links"] is
