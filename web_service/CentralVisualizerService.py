@@ -11,7 +11,7 @@ class CentralVisualizerService(object):
         _ipopdb = _mc[config_dict["mongo"]["dbname"]]
         self._mongo_data = _ipopdb[config_dict["mongo"]["collection_name"]]
         self._logger = logging.getLogger("network_visualizer.central_visualizer")
-    
+
 
     def _get_current_state(self,current_doc,requested_interval):
         response_msg = {
@@ -84,7 +84,7 @@ class CentralVisualizerService(object):
     def get_nodes_in_an_overlay(self,overlayid):
         current_state = request.args.get('current_state')
         requested_interval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
-        
+
         if current_state == "True":
             self._logger.debug('Request received for all nodes in overlay {} at {}'.format(overlayid,requested_interval))
             current_doc = self._mongo_data.find_one({"$query":{"_id": {"$lte": requested_interval}},"$orderby":{"_id":-1}},{"_id":1, "Nodes."+overlayid:1})
@@ -102,7 +102,7 @@ class CentralVisualizerService(object):
             new_doc = self._mongo_data.find_one({"$query":{"_id": {"$lte": requested_interval}},"$orderby":{"_id":-1}},{"_id":1, "Nodes."+overlayid:1})
             if new_doc == None: new_doc = {"_id":"", "Nodes":{ overlayid:{} }} 
             elif new_doc["Nodes"] == {}: new_doc["Nodes"][overlayid]={}
-            
+
             old_doc = self._mongo_data.find_one({"$query":{"_id": {"$lt": new_doc["_id"]}},"$orderby":{"_id":-1}},{"_id":1, "Nodes."+overlayid:1})
             if old_doc == None: old_doc = {"_id":"", "Nodes":{ overlayid:{} }} 
             elif old_doc["Nodes"] == {}: old_doc["Nodes"][overlayid]={}
@@ -117,7 +117,7 @@ class CentralVisualizerService(object):
                             "intervalNo": response["intervalNo"],
                             "updateOffset": response["updateOffset"]
                           }
-        
+
         self._logger.debug('The server response for nodes in overlay {} request: {}'.format(overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
@@ -223,12 +223,12 @@ class CentralVisualizerService(object):
             if new_doc == None: old_doc = {"_id":"", "Links":{ overlayid:{ nodeid:{} }}}
             elif new_doc["Links"] == {}: new_doc["Links"][overlayid] = {nodeid:{}}
             elif new_doc["Links"][overlayid] == {}: new_doc["Links"][overlayid][nodeid] = {}
-            
+
             old_doc = self._mongo_data.find_one({"$query":{"_id": {"$lt": new_doc["_id"]}},"$orderby":{"_id":-1}},{"_id":1, "Links."+overlayid+"."+nodeid:1})
             if old_doc == None: old_doc = {"_id":"", "Links":{ overlayid:{ nodeid:{} }}} 
             elif old_doc["Links"] == {}: old_doc["Links"][overlayid] = {nodeid:{}}
             elif old_doc["Links"][overlayid] == {}: old_doc["Links"][overlayid][nodeid] = {}
-            
+
             response = self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]))
             response_msg = {
                             overlayid: {
@@ -241,7 +241,7 @@ class CentralVisualizerService(object):
                             "intervalNo": response["intervalNo"],
                             "updateOffset": response["updateOffset"]
                           }
-        
+
         self._logger.debug('The server response for links from node {} in overlay {} request: {}'.format(nodeid,overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
