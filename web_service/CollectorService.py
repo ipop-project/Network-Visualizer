@@ -95,7 +95,7 @@ class CollectorServiceInstance(object):
                 "InterfaceName": req_node_data["TapName"],
                 #"GeoIP": req_node_data["GeoIP"],
                 "VIP4": req_node_data["VIP4"],
-                #"PrefixLen": req_node_data["PrefixLen"],
+                "IP4PrefixLen": req_node_data["IP4PrefixLen"],
                 "MAC": req_node_data["MAC"]
             }
 
