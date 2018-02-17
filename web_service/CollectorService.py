@@ -38,7 +38,7 @@ class CollectorServiceInstance(object):
             "Links": defaultdict(lambda:
                      defaultdict(lambda: defaultdict(dict)))
         }
-        self._link_ids = set()
+        self._link_ids = defaultdict(set)
 
     def process_update_req(self, node_id):
         """
@@ -107,13 +107,11 @@ class CollectorServiceInstance(object):
                     "SrcNodeId": node_id,
                     "TgtNodeId": req_link_data["PeerId"],
                 }
-                if link_id not in self._link_ids:
-                    self._link_ids.add(link_id)
-                    # Increment link counter in overlay if we did not have its data
-                    # for ovrl_id (meaning it is new in this overlay)
-                    # NOTE! This must be done before self.data_held["Links"] is
-                    # updated with link_data as it will add the key ovrl_id causing
-                    # this test to not behave as desired
+
+                # Increment link counter in overlay if we did not have its data
+                # for ovrl_id (meaning it is new in this overlay)
+                if link_id not in self._link_ids[ovrl_id]:
+                    self._link_ids[ovrl_id].add(link_id)
                     self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
 
                 if "Stats" in req_link_data and req_link_data["Stats"]:
