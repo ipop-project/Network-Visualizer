@@ -82,8 +82,8 @@ class CollectorServiceInstance(object):
 
             # TODO handle removal of a node within an interval
 
-            #self._logger.debug(
-            #    "Updating node data for node_id {}".format(node_id))
+            self._logger.debug(
+                "Updating node data for node_id {}".format(node_id))
 
             # TODO change the empty dict placeholder?
             self.data_held["Nodes"][ovrl_id][node_id] = {}
