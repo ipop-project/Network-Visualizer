@@ -38,7 +38,7 @@ class CollectorServiceInstance(object):
             "Links": defaultdict(lambda:
                      defaultdict(lambda: defaultdict(dict)))
         }
-        self._link_ids = set()
+        self._link_ids = defaultdict(set)
 
     def process_update_req(self, node_id):
         """
@@ -82,41 +82,41 @@ class CollectorServiceInstance(object):
 
             # TODO handle removal of a node within an interval
 
-            # Add/update node data for the reporting node
-            req_node_data = req_data[ovrl_id]["Topology"]
-            node_data = {
-                "InterfaceName": req_node_data["TapName"],
-                "GeoIP": req_node_data["GeoIP"],
-                "VIP4": req_node_data["VIP4"],
-                "PrefixLen": req_node_data["PrefixLen"],
-                "MAC": req_node_data["MAC"]
-            }
             self._logger.debug(
                 "Updating node data for node_id {}".format(node_id))
+
+            # Add/update node data for the reporting node
+            req_node_data = \
+                req_data[ovrl_id]["LinkManager"][node_id]["NodeData"]
+            node_data = {
+                "InterfaceName": req_node_data["TapName"],
+                #"GeoIP": req_node_data["GeoIP"],
+                "VIP4": req_node_data["VIP4"],
+                "IP4PrefixLen": req_node_data["IP4PrefixLen"],
+                "MAC": req_node_data["MAC"]
+            }
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
-            if "LinkManager" in req_data[ovrl_id]:
-                # Add/update data link data for the reporting node
-                for link_id in req_data[ovrl_id]["LinkManager"]:
-                    req_link_data = req_data[ovrl_id]["LinkManager"][link_id]
-                    link_data = {
-                        "SrcNodeId": node_id,
-                        "TgtNodeId": req_link_data["PeerId"],
-                    }
-                    if link_id not in self._link_ids:
-                        self._link_ids.add(link_id)
-                        # Increment link counter in overlay if we did not have its data
-                        # for ovrl_id (meaning it is new in this overlay)
-                        # NOTE! This must be done before self.data_held["Links"] is
-                        # updated with link_data as it will add the key ovrl_id causing
-                        # this test to not behave as desired
-                        self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
+            # Add/update data link data for the reporting node
+            for link_id in req_data[ovrl_id]["LinkManager"][node_id]["Links"]:
+                req_link_data = \
+                    req_data[ovrl_id]["LinkManager"][node_id]["Links"][link_id]
+                link_data = {
+                    "SrcNodeId": node_id,
+                    "TgtNodeId": req_link_data["PeerId"],
+                }
 
+                # Increment link counter in overlay if we did not have its data
+                # for ovrl_id (meaning it is new in this overlay)
+                if link_id not in self._link_ids[ovrl_id]:
+                    self._link_ids[ovrl_id].add(link_id)
+                    self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
+
+                if "Stats" in req_link_data and req_link_data["Stats"]:
                     link_stats = req_link_data["Stats"]
-                    if link_stats:
-                        link_data["rem_addr"] = link_stats["rem_addr"],
-                        link_data["sent_bytes_second"] = link_stats["sent_bytes_second"]
-                    self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
+                    link_data["rem_addr"] = link_stats["rem_addr"],
+                    link_data["sent_bytes_second"] = link_stats["sent_bytes_second"]
+                self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
 
         return "Success"
