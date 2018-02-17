@@ -85,9 +85,6 @@ class CollectorServiceInstance(object):
             self._logger.debug(
                 "Updating node data for node_id {}".format(node_id))
 
-            # TODO change the empty dict placeholder?
-            self.data_held["Nodes"][ovrl_id][node_id] = {}
-
             # Add/update node data for the reporting node
             req_node_data = \
                 req_data[ovrl_id]["LinkManager"][node_id]["NodeData"]
@@ -98,6 +95,7 @@ class CollectorServiceInstance(object):
                 "IP4PrefixLen": req_node_data["IP4PrefixLen"],
                 "MAC": req_node_data["MAC"]
             }
+            self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
             # Add/update data link data for the reporting node
             for link_id in req_data[ovrl_id]["LinkManager"][node_id]["Links"]:
