@@ -2,7 +2,7 @@ var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><d
 
 var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virtual IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
 
-var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>Type</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$type</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div></section></section>"
+var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>IceRole</div><div>Type</div><div>Rem addr</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>LocalType</div><div>Rem Type</div><div>Writable</div><div>Local addr</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div><div>Best Conn</div><div>New Conn</div><div>Timeout</div><div>rtt</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$icerole</div><div>&nbsp;$type</div><div>&nbsp;$remaddr</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$localtype</div><div>&nbsp;$remtype</div><div>&nbsp;$writable</div><div>&nbsp;$localaddr</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div><div>&nbsp;$bestconn</div><div>&nbsp;$newconn</div><div>&nbsp;$timeout</div><div>&nbsp;$rtt</div></section></section>"
 
 var serverip = location.host;
 
@@ -85,15 +85,15 @@ function buildNetworkTopology(overlayid,intervalNo)
         cy.add({
           data: {
             id: nodeid,
-            Name: nodeid, //nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"]
+            Name: nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],
             InterfaceName: nodeData["0"][overlayid]["current_state"][nodeid]["InterfaceName"],
             GeoIP: nodeData["0"][overlayid]["current_state"][nodeid]["GeoIP"],
             VIP4: nodeData["0"][overlayid]["current_state"][nodeid]["VIP4"],
             PrefixLen: nodeData["0"][overlayid]["current_state"][nodeid]["PrefixLen"],
             MAC: nodeData["0"][overlayid]["current_state"][nodeid]["MAC"],
             intervalNo: nodeData["0"]["intervalNo"],
-            label: nodeid, //nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],  
-            nodeColor: '#02ed68', //findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"])
+            label: (nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"]).substring(0,7),  
+            nodeColor: findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
             type: 'IPOP'
           }
         });
@@ -108,22 +108,22 @@ function buildNetworkTopology(overlayid,intervalNo)
               id: linkid,
               source: linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
               target: linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"],
-              // IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
-              // Type: "TURN", //linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"],
+              IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
+              Type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"],
               rem_addr: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_addr"],
               sent_bytes_second: linkData["0"][overlayid]["current_state"][nodeid][linkid]["sent_bytes_second"],
-              // sent_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["sent_total_bytes"],
-              // local_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"],
-              // rem_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"],
-              // writable: linkData["0"][overlayid]["current_state"][nodeid][linkid]["writable"],
-              // local_addr: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_addr"],
-              // recv_bytes_second: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_bytes_second"],
-              // best_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["best_conn"],
-              // recv_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_total_bytes"],
-              // new_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["new_conn"],
-              // timeout: linkData["0"][overlayid]["current_state"][nodeid][linkid]["timeout"],
-              // rtt: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rtt"],
-              edgeColor: '#fff'//findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"])
+              sent_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["sent_total_bytes"],
+              local_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"],
+              rem_type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"],
+              writable: linkData["0"][overlayid]["current_state"][nodeid][linkid]["writable"],
+              local_addr: linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_addr"],
+              recv_bytes_second: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_bytes_second"],
+              best_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["best_conn"],
+              recv_total_bytes: linkData["0"][overlayid]["current_state"][nodeid][linkid]["recv_total_bytes"],
+              new_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["new_conn"],
+              timeout: linkData["0"][overlayid]["current_state"][nodeid][linkid]["timeout"],
+              rtt: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rtt"],
+              edgeColor: findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"])
             }
           });
         }
@@ -192,15 +192,15 @@ function updateGraph()
           cy.add({
             data: { 
               id: nodeid,
-              Name: nodeid, //nodeData["0"][overlayid]["added"][nodeid]["NodeName"]
+              Name: nodeData["0"][overlayid]["added"][nodeid]["NodeName"],
               InterfaceName: nodeData["0"][overlayid]["added"][nodeid]["InterfaceName"],
               GeoIP: nodeData["0"][overlayid]["added"][nodeid]["GeoIP"],
               VIP4: nodeData["0"][overlayid]["added"][nodeid]["VIP4"],
               PrefixLen: nodeData["0"][overlayid]["added"][nodeid]["PrefixLen"],
               MAC: nodeData["0"][overlayid]["added"][nodeid]["MAC"],
               intervalNo: nodeData["0"]["intervalNo"],
-              label: nodeid, //nodeData["0"][overlayid]["added"][nodeid]["NodeName"],  
-              nodeColor: '#02ed68', //findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"])
+              label: (nodeData["0"][overlayid]["added"][nodeid]["NodeName"]).substring(0,7),  
+              nodeColor: findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"]),
               type: 'IPOP' 
             } 
           });
@@ -216,15 +216,15 @@ function updateGraph()
       for (nodeid in nodeData["0"][overlayid]["modified"]){
         cy.getElementById(nodeid).data({
           id: nodeid,
-          Name: nodeid, //nodeData["0"][overlayid]["modified"][nodeid]["NodeName"]
+          Name: nodeData["0"][overlayid]["modified"][nodeid]["NodeName"],
           InterfaceName: nodeData["0"][overlayid]["modified"][nodeid]["InterfaceName"],
           GeoIP: nodeData["0"][overlayid]["modified"][nodeid]["GeoIP"],
           VIP4: nodeData["0"][overlayid]["modified"][nodeid]["VIP4"],
           PrefixLen: nodeData["0"][overlayid]["modified"][nodeid]["PrefixLen"],
           MAC: nodeData["0"][overlayid]["modified"][nodeid]["MAC"],
           intervalNo: nodeData["0"]["intervalNo"],
-          label: nodeid, //nodeData["0"][overlayid]["modified"][nodeid]["NodeName"],  
-          nodeColor: '#02ed68', //findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"])
+          label: (nodeData["0"][overlayid]["modified"][nodeid]["NodeName"]).substring(0,7),  
+          nodeColor: findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"]),
           type: 'IPOP'
         });
       }
@@ -238,22 +238,22 @@ function updateGraph()
               id: linkid,
               source: linkData["0"][overlayid]["added"][linkid]["SrcNodeId"],
               target: linkData["0"][overlayid]["added"][linkid]["TgtNodeId"],
-              // IceRole: linkData["0"][overlayid]["added"][linkid]["IceRole"],
-              // Type: linkData["0"][overlayid]["added"][linkid]["Type"],
+              IceRole: linkData["0"][overlayid]["added"][linkid]["IceRole"],
+              Type: linkData["0"][overlayid]["added"][linkid]["Type"],
               rem_addr: linkData["0"][overlayid]["added"][linkid]["rem_addr"],
               sent_bytes_second: linkData["0"][overlayid]["added"][linkid]["sent_bytes_second"],
-              // sent_total_bytes: linkData["0"][overlayid]["added"][linkid]["sent_total_bytes"],
-              // local_type: linkData["0"][overlayid]["added"][linkid]["local_type"],
-              // rem_type: linkData["0"][overlayid]["added"][linkid]["rem_type"],
-              // writable: linkData["0"][overlayid]["added"][linkid]["writable"],
-              // local_addr: linkData["0"][overlayid]["added"][linkid]["local_addr"],
-              // recv_bytes_second: linkData["0"][overlayid]["added"][linkid]["recv_bytes_second"],
-              // best_conn: linkData["0"][overlayid]["added"][linkid]["best_conn"],
-              // recv_total_bytes: linkData["0"][overlayid]["added"][linkid]["recv_total_bytes"],
-              // new_conn: linkData["0"][overlayid]["added"][linkid]["new_conn"],
-              // timeout: linkData["0"][overlayid]["added"][linkid]["timeout"],
-              // rtt: linkData["0"][overlayid]["added"][linkid]["rtt"],
-              edgeColor: '#fff'//findEdgeColor(linkData["0"][overlayid]["added"][linkid]["Type"])     
+              sent_total_bytes: linkData["0"][overlayid]["added"][linkid]["sent_total_bytes"],
+              local_type: linkData["0"][overlayid]["added"][linkid]["local_type"],
+              rem_type: linkData["0"][overlayid]["added"][linkid]["rem_type"],
+              writable: linkData["0"][overlayid]["added"][linkid]["writable"],
+              local_addr: linkData["0"][overlayid]["added"][linkid]["local_addr"],
+              recv_bytes_second: linkData["0"][overlayid]["added"][linkid]["recv_bytes_second"],
+              best_conn: linkData["0"][overlayid]["added"][linkid]["best_conn"],
+              recv_total_bytes: linkData["0"][overlayid]["added"][linkid]["recv_total_bytes"],
+              new_conn: linkData["0"][overlayid]["added"][linkid]["new_conn"],
+              timeout: linkData["0"][overlayid]["added"][linkid]["timeout"],
+              rtt: linkData["0"][overlayid]["added"][linkid]["rtt"],
+              edgeColor: findEdgeColor(linkData["0"][overlayid]["added"][linkid]["Type"])     
             }
           });
         }
@@ -270,22 +270,22 @@ function updateGraph()
           id: linkid,
           source: linkData["0"][overlayid]["modified"][linkid]["SrcNodeId"],
           target: linkData["0"][overlayid]["modified"][linkid]["TgtNodeId"],
-          // IceRole: linkData["0"][overlayid]["modified"][linkid]["IceRole"],
-          // Type: linkData["0"][overlayid]["modified"][linkid]["Type"],
+          IceRole: linkData["0"][overlayid]["modified"][linkid]["IceRole"],
+          Type: linkData["0"][overlayid]["modified"][linkid]["Type"],
           rem_addr: linkData["0"][overlayid]["modified"][linkid]["rem_addr"],
-          // sent_bytes_second: linkData["0"][overlayid]["modified"][linkid]["sent_bytes_second"],
-          // sent_total_bytes: linkData["0"][overlayid]["modified"][linkid]["sent_total_bytes"],
-          // local_type: linkData["0"][overlayid]["modified"][linkid]["local_type"],
-          // rem_type: linkData["0"][overlayid]["modified"][linkid]["rem_type"],
-          // writable: linkData["0"][overlayid]["modified"][linkid]["writable"],
-          // local_addr: linkData["0"][overlayid]["modified"][linkid]["local_addr"],
-          // recv_bytes_second: linkData["0"][overlayid]["modified"][linkid]["recv_bytes_second"],
-          // best_conn: linkData["0"][overlayid]["modified"][linkid]["best_conn"],
-          // recv_total_bytes: linkData["0"][overlayid]["modified"][linkid]["recv_total_bytes"],
-          // new_conn: linkData["0"][overlayid]["modified"][linkid]["new_conn"],
-          // timeout: linkData["0"][overlayid]["modified"][linkid]["timeout"],
-          // rtt: linkData["0"][overlayid]["modified"][linkid]["rtt"],
-          edgeColor: '#fff'//findEdgeColor(linkData["0"][overlayid]["modified"][linkid]["Type"])
+          sent_bytes_second: linkData["0"][overlayid]["modified"][linkid]["sent_bytes_second"],
+          sent_total_bytes: linkData["0"][overlayid]["modified"][linkid]["sent_total_bytes"],
+          local_type: linkData["0"][overlayid]["modified"][linkid]["local_type"],
+          rem_type: linkData["0"][overlayid]["modified"][linkid]["rem_type"],
+          writable: linkData["0"][overlayid]["modified"][linkid]["writable"],
+          local_addr: linkData["0"][overlayid]["modified"][linkid]["local_addr"],
+          recv_bytes_second: linkData["0"][overlayid]["modified"][linkid]["recv_bytes_second"],
+          best_conn: linkData["0"][overlayid]["modified"][linkid]["best_conn"],
+          recv_total_bytes: linkData["0"][overlayid]["modified"][linkid]["recv_total_bytes"],
+          new_conn: linkData["0"][overlayid]["modified"][linkid]["new_conn"],
+          timeout: linkData["0"][overlayid]["modified"][linkid]["timeout"],
+          rtt: linkData["0"][overlayid]["modified"][linkid]["rtt"],
+          edgeColor: findEdgeColor(linkData["0"][overlayid]["modified"][linkid]["Type"])
         });
       }
     });
@@ -411,7 +411,7 @@ function mouseOverNode(nodeid) {
   }
   else{
     var ipopNodeQTip = ipopNodeInfo;
-      ipopNodeQTip = ipopNodeQTip.replace("$nodeid",nodeData.id);
+      ipopNodeQTip = ipopNodeQTip.replace("$nodeid",(nodeData.id).substring(0,7));
       ipopNodeQTip = ipopNodeQTip.replace("$interfacename",nodeData.InterfaceName);
       ipopNodeQTip = ipopNodeQTip.replace("$geoip",nodeData.GeoIP);
       ipopNodeQTip = ipopNodeQTip.replace("$vip4",nodeData.VIP4);
@@ -451,11 +451,22 @@ function linkMetrics(buttonid)
     var eachLinkMetrics = linkMetricsInfo;
         eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source);
         eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target);
+        eachLinkMetrics = eachLinkMetrics.replace("$icerole",linkData.IceRole);
         eachLinkMetrics = eachLinkMetrics.replace("$type",linkData.Type);
+        eachLinkMetrics = eachLinkMetrics.replace("$remaddr",linkData.rem_addr);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_bytes_second",linkData.sent_bytes_second);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_total_bytes",linkData.sent_total_bytes);
+        eachLinkMetrics = eachLinkMetrics.replace("$localtype",linkData.local_type);
+        eachLinkMetrics = eachLinkMetrics.replace("$remtype",linkData.rem_type);
+        eachLinkMetrics = eachLinkMetrics.replace("$writable",linkData.writable);
+        eachLinkMetrics = eachLinkMetrics.replace("$localaddr",linkData.local_addr);
         eachLinkMetrics = eachLinkMetrics.replace("$recv_bytes_second",linkData.recv_bytes_second);
+        eachLinkMetrics = eachLinkMetrics.replace("$bestconn",linkData.best_conn);
         eachLinkMetrics = eachLinkMetrics.replace("$recv_total_bytes",linkData.recv_total_bytes);
+        eachLinkMetrics = eachLinkMetrics.replace("$newconn",linkData.new_conn);
+        eachLinkMetrics = eachLinkMetrics.replace("$timeout",linkData.timeout);
+        eachLinkMetrics = eachLinkMetrics.replace("$rtt",linkData.rtt);
+
     allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+linkData.id+"</section>"+eachLinkMetrics+"</section>";
   }
   linkMetricsDialog += "<section id='linkMetricsDialog'><section id='linkMetricsDialogHeading'><button type='button' class='close' data-target='#linkMetricsDialog' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Link Metrics</section><section id='linkMetricsDialogBody'>"+allLinkMetrics+"</section>";
