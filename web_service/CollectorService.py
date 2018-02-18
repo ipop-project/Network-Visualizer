@@ -95,6 +95,10 @@ class CollectorServiceInstance(object):
                 "IP4PrefixLen": req_node_data["IP4PrefixLen"],
                 "MAC": req_node_data["MAC"]
             }
+            # Add the optional human-readable node name (if provided)
+            if "NodeName" in req:
+                node_data["NodeName"] = req["NodeName"]
+
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
             # Add/update data link data for the reporting node
