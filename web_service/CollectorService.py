@@ -127,6 +127,9 @@ class CollectorServiceInstance(object):
                 if "Type" in req_link_data:
                     link_data["Type"] = req_link_data["Type"]
 
+                if "Status" in req_link_data:
+                    link_data["Status"] = req_link_data["Status"]
+
                 self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
 
