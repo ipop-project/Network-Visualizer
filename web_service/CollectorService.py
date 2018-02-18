@@ -95,6 +95,10 @@ class CollectorServiceInstance(object):
                 "IP4PrefixLen": req_node_data["IP4PrefixLen"],
                 "MAC": req_node_data["MAC"]
             }
+            # Add the optional human-readable node name (if provided)
+            if "NodeName" in req:
+                node_data["NodeName"] = req["NodeName"]
+
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
             # Add/update data link data for the reporting node
@@ -114,7 +118,7 @@ class CollectorServiceInstance(object):
 
                 if "Stats" in req_link_data and req_link_data["Stats"]:
                     link_stats = req_link_data["Stats"]
-                    link_data["rem_addr"] = link_stats["rem_addr"],
+                    link_data["rem_addr"] = link_stats["rem_addr"]
                     link_data["sent_bytes_second"] = link_stats["sent_bytes_second"]
                 self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
