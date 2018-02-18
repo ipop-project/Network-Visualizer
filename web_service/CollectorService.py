@@ -118,8 +118,15 @@ class CollectorServiceInstance(object):
 
                 if "Stats" in req_link_data and req_link_data["Stats"]:
                     link_stats = req_link_data["Stats"]
-                    link_data["rem_addr"] = link_stats["rem_addr"]
-                    link_data["sent_bytes_second"] = link_stats["sent_bytes_second"]
+                    for stat_name in link_stats:
+                        link_data[stat_name] = link_stats[stat_name]
+
+                if "IceRole" in req_link_data:
+                    link_data["IceRole"] = req_link_data["IceRole"]
+
+                if "Type" in req_link_data:
+                    link_data["Type"] = req_link_data["Type"]
+
                 self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
         self._data_held_lock.release()
 
