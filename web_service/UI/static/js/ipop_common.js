@@ -1,6 +1,6 @@
 var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Nodes</div><div>Links</div></section><section id='rightColumn'><div>&nbsp;$overlayid</div><div>&nbsp;$numnodes</div><div>&nbsp;$numlinks</div></section></section>"
 
-var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virtual IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
+var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virt IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
 
 var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>IceRole</div><div>Type</div><div>Rem addr</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>LocalType</div><div>Rem Type</div><div>Writable</div><div>Local addr</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div><div>Best Conn</div><div>New Conn</div><div>Timeout</div><div>rtt</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$icerole</div><div>&nbsp;$type</div><div>&nbsp;$remaddr</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$localtype</div><div>&nbsp;$remtype</div><div>&nbsp;$writable</div><div>&nbsp;$localaddr</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div><div>&nbsp;$bestconn</div><div>&nbsp;$newconn</div><div>&nbsp;$timeout</div><div>&nbsp;$rtt</div></section></section>"
 
@@ -36,7 +36,7 @@ var cy = cytoscape({
                            ],
                     zoom: 1.05,
               	    minZoom: 0.1,
-                	  maxZoom: 2,	
+                    maxZoom: 2,	
               	    wheelSensitivity: 0.2
                   });      
 
@@ -53,7 +53,7 @@ function buildOverlaysGraph()
                     NumNodes: data["current_state"][overlay]["NumNodes"],
                     NumLinks: data["current_state"][overlay]["NumLinks"],
                     intervalNo: data["intervalNo"],
-                    label: data["current_state"][overlay]["Name"],
+                    label: overlay,
                     nodeColor: '#74CBE8',
                     type: 'Overlay' 
                   } 
@@ -89,10 +89,10 @@ function buildNetworkTopology(overlayid,intervalNo)
             InterfaceName: nodeData["0"][overlayid]["current_state"][nodeid]["InterfaceName"],
             GeoIP: nodeData["0"][overlayid]["current_state"][nodeid]["GeoIP"],
             VIP4: nodeData["0"][overlayid]["current_state"][nodeid]["VIP4"],
-            PrefixLen: nodeData["0"][overlayid]["current_state"][nodeid]["PrefixLen"],
+            IP4PrefixLen: nodeData["0"][overlayid]["current_state"][nodeid]["IP4PrefixLen"],
             MAC: nodeData["0"][overlayid]["current_state"][nodeid]["MAC"],
             intervalNo: nodeData["0"]["intervalNo"],
-            label: (nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"]).substring(0,7),  
+            label: nodeid.substring(0,7),  
             nodeColor: findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
             type: 'IPOP'
           }
@@ -196,10 +196,10 @@ function updateGraph()
               InterfaceName: nodeData["0"][overlayid]["added"][nodeid]["InterfaceName"],
               GeoIP: nodeData["0"][overlayid]["added"][nodeid]["GeoIP"],
               VIP4: nodeData["0"][overlayid]["added"][nodeid]["VIP4"],
-              PrefixLen: nodeData["0"][overlayid]["added"][nodeid]["PrefixLen"],
+              IP4PrefixLen: nodeData["0"][overlayid]["added"][nodeid]["IP4PrefixLen"],
               MAC: nodeData["0"][overlayid]["added"][nodeid]["MAC"],
               intervalNo: nodeData["0"]["intervalNo"],
-              label: (nodeData["0"][overlayid]["added"][nodeid]["NodeName"]).substring(0,7),  
+              label: nodeid.substring(0,7),  
               nodeColor: findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"]),
               type: 'IPOP' 
             } 
@@ -220,10 +220,10 @@ function updateGraph()
           InterfaceName: nodeData["0"][overlayid]["modified"][nodeid]["InterfaceName"],
           GeoIP: nodeData["0"][overlayid]["modified"][nodeid]["GeoIP"],
           VIP4: nodeData["0"][overlayid]["modified"][nodeid]["VIP4"],
-          PrefixLen: nodeData["0"][overlayid]["modified"][nodeid]["PrefixLen"],
+          IP4PrefixLen: nodeData["0"][overlayid]["modified"][nodeid]["IP4PrefixLen"],
           MAC: nodeData["0"][overlayid]["modified"][nodeid]["MAC"],
           intervalNo: nodeData["0"]["intervalNo"],
-          label: (nodeData["0"][overlayid]["modified"][nodeid]["NodeName"]).substring(0,7),  
+          label: nodeid.substring(0,7),  
           nodeColor: findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"]),
           type: 'IPOP'
         });
@@ -392,12 +392,13 @@ function findNodeColor(state) {
 }
 
 function findEdgeColor(linktype) {
-	if (linktype == "TURN")
+  if (linktype == "TURN")
     return "orange";
-	if (linktype == "STUN")
+  if (linktype == "STUN")
     return "yellow";
-	if (linktype == "LOCAL")
+  if (linktype == "LOCAL")
     return "blue";
+  return "white";
 }
 
 function mouseOverNode(nodeid) {
@@ -415,7 +416,7 @@ function mouseOverNode(nodeid) {
       ipopNodeQTip = ipopNodeQTip.replace("$interfacename",nodeData.InterfaceName);
       ipopNodeQTip = ipopNodeQTip.replace("$geoip",nodeData.GeoIP);
       ipopNodeQTip = ipopNodeQTip.replace("$vip4",nodeData.VIP4);
-      ipopNodeQTip = ipopNodeQTip.replace("$prefixlen",nodeData.PrefixLen);
+      ipopNodeQTip = ipopNodeQTip.replace("$prefixlen",nodeData.IP4PrefixLen);
       ipopNodeQTip = ipopNodeQTip.replace("$mac",nodeData.MAC);
     return ipopNodeQTip;
 
@@ -426,11 +427,11 @@ function mouseClickNode(nodeid)
 {
   nodeData = cy.getElementById(nodeid).data()
   var ipopNodePanel = ipopNodeInfo;
-      ipopNodePanel = ipopNodePanel.replace("$nodeid",nodeData.id);
+      ipopNodePanel = ipopNodePanel.replace("$nodeid",nodeData.id.substring(0,20));
       ipopNodePanel = ipopNodePanel.replace("$interfacename",nodeData.InterfaceName);
       ipopNodePanel = ipopNodePanel.replace("$geoip",nodeData.GeoIP);
       ipopNodePanel = ipopNodePanel.replace("$vip4",nodeData.VIP4);
-      ipopNodePanel = ipopNodePanel.replace("$prefixlen",nodeData.PrefixLen);
+      ipopNodePanel = ipopNodePanel.replace("$prefixlen",nodeData.IP4PrefixLen);
       ipopNodePanel = ipopNodePanel.replace("$mac",nodeData.MAC);
     return ipopNodePanel;
 }
@@ -449,8 +450,8 @@ function linkMetrics(buttonid)
   for (var index in connectedLinks){
     linkData = cy.getElementById(connectedLinks[index]).data()
     var eachLinkMetrics = linkMetricsInfo;
-        eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source);
-        eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target);
+        eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source.substring(0,20));
+        eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target.substring(0,20));
         eachLinkMetrics = eachLinkMetrics.replace("$icerole",linkData.IceRole);
         eachLinkMetrics = eachLinkMetrics.replace("$type",linkData.Type);
         eachLinkMetrics = eachLinkMetrics.replace("$remaddr",linkData.rem_addr);
@@ -467,7 +468,7 @@ function linkMetrics(buttonid)
         eachLinkMetrics = eachLinkMetrics.replace("$timeout",linkData.timeout);
         eachLinkMetrics = eachLinkMetrics.replace("$rtt",linkData.rtt);
 
-    allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+linkData.id+"</section>"+eachLinkMetrics+"</section>";
+    allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+linkData.id.substring(0,20)+"</section>"+eachLinkMetrics+"</section>";
   }
   linkMetricsDialog += "<section id='linkMetricsDialog'><section id='linkMetricsDialogHeading'><button type='button' class='close' data-target='#linkMetricsDialog' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Link Metrics</section><section id='linkMetricsDialogBody'>"+allLinkMetrics+"</section>";
 

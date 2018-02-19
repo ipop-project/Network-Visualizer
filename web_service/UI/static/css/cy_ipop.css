@@ -54,7 +54,7 @@ body {
 .OverlayListPanel {
   margin-top:15px;
   padding: 5px;
-  width: 200px; 
+  width: 210px; 
   background: #646464;
   border: 1px solid #808080;
   border-radius: 3px;
@@ -93,7 +93,7 @@ body {
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 3px;
-  width: 200px;
+  width: 210px;
   background-color: #505050;
   border: 1px solid #808080;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
@@ -182,7 +182,7 @@ body {
   position: absolute;
   margin-top: 10px;
   right: 245px;
-  width: 330px;
+  width: 350px;
   background-color: #505050;
   border: 1px solid #707070;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
