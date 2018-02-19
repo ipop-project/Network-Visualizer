@@ -94,6 +94,7 @@ function buildNetworkTopology(overlayid,intervalNo)
             intervalNo: nodeData["0"]["intervalNo"],
             label: nodeid.substring(0,7),  
             nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
+            nodeColor: findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
             type: 'IPOP'
           }
         });
