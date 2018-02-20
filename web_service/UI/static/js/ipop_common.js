@@ -93,7 +93,7 @@ function buildNetworkTopology(overlayid,intervalNo)
             MAC: nodeData["0"][overlayid]["current_state"][nodeid]["MAC"],
             intervalNo: nodeData["0"]["intervalNo"],
             label: nodeid.substring(0,7),  
-            nodeColor: findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
+            nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
             type: 'IPOP'
           }
         });
@@ -200,7 +200,7 @@ function updateGraph()
               MAC: nodeData["0"][overlayid]["added"][nodeid]["MAC"],
               intervalNo: nodeData["0"]["intervalNo"],
               label: nodeid.substring(0,7),  
-              nodeColor: findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"]),
+              nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"]),
               type: 'IPOP' 
             } 
           });
@@ -224,7 +224,7 @@ function updateGraph()
           MAC: nodeData["0"][overlayid]["modified"][nodeid]["MAC"],
           intervalNo: nodeData["0"]["intervalNo"],
           label: nodeid.substring(0,7),  
-          nodeColor: findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"]),
+          nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"]),
           type: 'IPOP'
         });
       }
