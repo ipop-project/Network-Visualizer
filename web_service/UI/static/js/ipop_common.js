@@ -1,8 +1,8 @@
 var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Nodes</div><div>Links</div></section><section id='rightColumn'><div>&nbsp;$overlayid</div><div>&nbsp;$numnodes</div><div>&nbsp;$numlinks</div></section></section>"
 
-var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Tap&nbsp;</div><div>GeoIP&nbsp;</div><div>Virt IP&nbsp;</div><div>Prefix&nbsp;</div><div>MAC&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$interfacename</div><div>&nbsp;$geoip</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$mac</div></section></section>"
+var ipopNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>MAC&nbsp;</div><div>Tap&nbsp;</div><div>Virt IP&nbsp;</div><div>Prefix&nbsp;</div><div>GeoIP&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$mac</div><div>&nbsp;$interfacename</div><div>&nbsp;$vip4</div><div>&nbsp;$prefixlen</div><div>&nbsp;$geoip</div></section></section>"
 
-var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>IceRole</div><div>Type</div><div>Rem addr</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>LocalType</div><div>Rem Type</div><div>Writable</div><div>Local addr</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div><div>Best Conn</div><div>New Conn</div><div>Timeout</div><div>rtt</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$icerole</div><div>&nbsp;$type</div><div>&nbsp;$remaddr</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$localtype</div><div>&nbsp;$remtype</div><div>&nbsp;$writable</div><div>&nbsp;$localaddr</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div><div>&nbsp;$bestconn</div><div>&nbsp;$newconn</div><div>&nbsp;$timeout</div><div>&nbsp;$rtt</div></section></section>"
+var linkMetricsInfo = "<section class='InfoPanel'><section class='leftColumnLinkMetric'><div>Source</div><div>Target</div><div>IceRole</div><div>Remote Address</div><div>Bytes Sent (Bs)</div><div>Total Bytes Sent (MB)</div><div>Local Type</div><div>Remote Type</div><div>Writable</div><div>Local Address</div><div>Bytes Received (Bs)</div><div>Total Bytes Received (MB)</div><div>Best Connection</div><div>New Connection</div><div>Timeout</div><div>rtt</div></section><section id='rightColumnLinkMetric'><div>&nbsp;$source</div><div>&nbsp;$target</div><div>&nbsp;$icerole</div><div>&nbsp;$remaddr</div><div>&nbsp;$sent_bytes_second</div><div>&nbsp;$sent_total_bytes</div><div>&nbsp;$localtype</div><div>&nbsp;$remtype</div><div>&nbsp;$writable</div><div>&nbsp;$localaddr</div><div>&nbsp;$recv_bytes_second</div><div>&nbsp;$recv_total_bytes</div><div>&nbsp;$bestconn</div><div>&nbsp;$newconn</div><div>&nbsp;$timeout</div><div>&nbsp;$rtt</div></section></section>"
 
 var serverip = location.host;
 
@@ -46,6 +46,8 @@ function buildOverlaysGraph()
   $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo+"&current_state=True", function(data,status) {
     if (status == "error") throw error;
     for (overlay in data["current_state"]) {
+          if(data["current_state"][overlay]["Name"] == "")
+             data["current_state"][overlay]["Name"] = overlay;
           cy.add({
              data: { 
                     id: overlay,
@@ -53,7 +55,7 @@ function buildOverlaysGraph()
                     NumNodes: data["current_state"][overlay]["NumNodes"],
                     NumLinks: data["current_state"][overlay]["NumLinks"],
                     intervalNo: data["intervalNo"],
-                    label: overlay,
+                    label: data["current_state"][overlay]["Name"],
                     nodeColor: '#74CBE8',
                     type: 'Overlay' 
                   } 
@@ -82,6 +84,8 @@ function buildNetworkTopology(overlayid,intervalNo)
     $.getJSON("http://"+serverip+"/IPOP/overlays/"+overlayid+"/links?interval="+intervalNo+"&current_state=True")
   ).then(function(nodeData, linkData) {
     for (nodeid in nodeData["0"][overlayid]["current_state"]) {
+        if(nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"] == "")
+            nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"] = nodeid;  
         cy.add({
           data: {
             id: nodeid,
@@ -92,8 +96,8 @@ function buildNetworkTopology(overlayid,intervalNo)
             IP4PrefixLen: nodeData["0"][overlayid]["current_state"][nodeid]["IP4PrefixLen"],
             MAC: nodeData["0"][overlayid]["current_state"][nodeid]["MAC"],
             intervalNo: nodeData["0"]["intervalNo"],
-            label: nodeid.substring(0,7),  
-            nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["current_state"][nodeid]["state"]),
+            label: nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],  
+            nodeColor: "red",
             type: 'IPOP'
           }
         });
@@ -101,11 +105,11 @@ function buildNetworkTopology(overlayid,intervalNo)
 
       cy.makeLayout({name:'circle'}).run();
 
-      for (nodeid in linkData["0"][overlayid]["current_state"]) {
+      for (nodeid in linkData["0"][overlayid]["current_state"]) { 
         for (linkid in linkData["0"][overlayid]["current_state"][nodeid]){
           cy.add({
             data: { 
-              id: linkid,
+              id: linkid + "_" + linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
               source: linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
               target: linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"],
               IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
@@ -123,9 +127,11 @@ function buildNetworkTopology(overlayid,intervalNo)
               new_conn: linkData["0"][overlayid]["current_state"][nodeid][linkid]["new_conn"],
               timeout: linkData["0"][overlayid]["current_state"][nodeid][linkid]["timeout"],
               rtt: linkData["0"][overlayid]["current_state"][nodeid][linkid]["rtt"],
-              edgeColor: findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"])
+              edgeColor: findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"] , linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"])
             }
           });
+          cy.getElementById(linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"]).data({ nodeColor :"#02ed68" }); 
+          cy.getElementById(linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"]).data({ nodeColor :"#02ed68" });
         }
       }
   });
@@ -137,9 +143,11 @@ function updateGraph()
   if(cy.nodes().allAre('[type = "Overlay"]')){
     $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo, function(data,status) {
       if (status == "error") throw error;
-      var overlayDropdown = "";
-      for (overlay in data["added"]) {
+      var overlayDropdown = ""; 
+      for (overlay in data["added"]) { 
         if(cy.getElementById(overlay).length == 0){
+         if(data["added"][overlay]["Name"] == "")
+              data["added"][overlay]["Name"] == overlay; 
           cy.add({
             data: { 
               id: overlay,
@@ -167,6 +175,8 @@ function updateGraph()
       }
 
       for (overlay in data["modified"]){
+        if(data["modified"][overlay]["Name"] == "")
+              data["modified"][overlay]["Name"] == overlay;
         cy.getElementById(overlay).data({
           id: overlay,
           Name: data["modified"][overlay]["Name"],
@@ -189,6 +199,8 @@ function updateGraph()
     ).then(function(nodeData, linkData) {
       for (nodeid in nodeData["0"][overlayid]["added"]) {
         if(cy.getElementById(nodeid).length == 0){
+          if(nodeData["0"][overlayid]["added"][nodeid]["NodeName"] == "")
+            nodeData["0"][overlayid]["added"][nodeid]["NodeName"] = nodeid;
           cy.add({
             data: { 
               id: nodeid,
@@ -199,8 +211,8 @@ function updateGraph()
               IP4PrefixLen: nodeData["0"][overlayid]["added"][nodeid]["IP4PrefixLen"],
               MAC: nodeData["0"][overlayid]["added"][nodeid]["MAC"],
               intervalNo: nodeData["0"]["intervalNo"],
-              label: nodeid.substring(0,7),  
-              nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["added"][nodeid]["state"]),
+              label: nodeData["0"][overlayid]["added"][nodeid]["NodeName"],  
+              nodeColor: "red", 
               type: 'IPOP' 
             } 
           });
@@ -214,6 +226,8 @@ function updateGraph()
       }
 
       for (nodeid in nodeData["0"][overlayid]["modified"]){
+        if(nodeData["0"][overlayid]["modified"][nodeid]["NodeName"] == "")
+            nodeData["0"][overlayid]["modified"][nodeid]["NodeName"] = nodeid;
         cy.getElementById(nodeid).data({
           id: nodeid,
           Name: nodeData["0"][overlayid]["modified"][nodeid]["NodeName"],
@@ -223,71 +237,85 @@ function updateGraph()
           IP4PrefixLen: nodeData["0"][overlayid]["modified"][nodeid]["IP4PrefixLen"],
           MAC: nodeData["0"][overlayid]["modified"][nodeid]["MAC"],
           intervalNo: nodeData["0"]["intervalNo"],
-          label: nodeid.substring(0,7),  
-          nodeColor: "#02ed68", //findNodeColor(nodeData["0"][overlayid]["modified"][nodeid]["state"]),
+          label: nodeData["0"][overlayid]["modified"][nodeid]["NodeName"],  
+          nodeColor: "red",
           type: 'IPOP'
         });
       }
 
       cy.center();
-
-      for (linkid in linkData["0"][overlayid]["added"]){
-        if(cy.getElementById(linkid).length == 0){
-          cy.add({
-            data: { 
-              id: linkid,
-              source: linkData["0"][overlayid]["added"][linkid]["SrcNodeId"],
-              target: linkData["0"][overlayid]["added"][linkid]["TgtNodeId"],
-              IceRole: linkData["0"][overlayid]["added"][linkid]["IceRole"],
-              Type: linkData["0"][overlayid]["added"][linkid]["Type"],
-              rem_addr: linkData["0"][overlayid]["added"][linkid]["rem_addr"],
-              sent_bytes_second: linkData["0"][overlayid]["added"][linkid]["sent_bytes_second"],
-              sent_total_bytes: linkData["0"][overlayid]["added"][linkid]["sent_total_bytes"],
-              local_type: linkData["0"][overlayid]["added"][linkid]["local_type"],
-              rem_type: linkData["0"][overlayid]["added"][linkid]["rem_type"],
-              writable: linkData["0"][overlayid]["added"][linkid]["writable"],
-              local_addr: linkData["0"][overlayid]["added"][linkid]["local_addr"],
-              recv_bytes_second: linkData["0"][overlayid]["added"][linkid]["recv_bytes_second"],
-              best_conn: linkData["0"][overlayid]["added"][linkid]["best_conn"],
-              recv_total_bytes: linkData["0"][overlayid]["added"][linkid]["recv_total_bytes"],
-              new_conn: linkData["0"][overlayid]["added"][linkid]["new_conn"],
-              timeout: linkData["0"][overlayid]["added"][linkid]["timeout"],
-              rtt: linkData["0"][overlayid]["added"][linkid]["rtt"],
-              edgeColor: findEdgeColor(linkData["0"][overlayid]["added"][linkid]["Type"])     
-            }
-          });
-        }
-      }
       
-      for (linkid in linkData["0"][overlayid]["removed"]){
-        if(cy.getElementById(linkid).length == 1){
-          cy.remove(cy.getElementById(linkid));
+      for(nodeid in linkData["0"][overlayid]["added"]){
+        for (linkid in linkData["0"][overlayid]["added"][nodeid]){
+          if(cy.getElementById(linkid).length == 0){
+            cy.add({
+              data: { 
+                id: linkid + "_" + linkData["0"][overlayid]["added"][nodeid][linkid]["SrcNodeId"],
+                source: linkData["0"][overlayid]["added"][nodeid][linkid]["SrcNodeId"],
+                target: linkData["0"][overlayid]["added"][nodeid][linkid]["TgtNodeId"],
+                IceRole: linkData["0"][overlayid]["added"][nodeid][linkid]["IceRole"],
+                Type: linkData["0"][overlayid]["added"][nodeid][linkid]["Type"],
+                rem_addr: linkData["0"][overlayid]["added"][nodeid][linkid]["rem_addr"],
+                sent_bytes_second: linkData["0"][overlayid]["added"][nodeid][linkid]["sent_bytes_second"],
+                sent_total_bytes: linkData["0"][overlayid]["added"][nodeid][linkid]["sent_total_bytes"],
+                local_type: linkData["0"][overlayid]["added"][nodeid][linkid]["local_type"],
+                rem_type: linkData["0"][overlayid]["added"][nodeid][linkid]["rem_type"],
+                writable: linkData["0"][overlayid]["added"][nodeid][linkid]["writable"],
+                local_addr: linkData["0"][overlayid]["added"][nodeid][linkid]["local_addr"],
+                recv_bytes_second: linkData["0"][overlayid]["added"][nodeid][linkid]["recv_bytes_second"],
+                best_conn: linkData["0"][overlayid]["added"][nodeid][linkid]["best_conn"],
+                recv_total_bytes: linkData["0"][overlayid]["added"][nodeid][linkid]["recv_total_bytes"],
+                new_conn: linkData["0"][overlayid]["added"][nodeid][linkid]["new_conn"],
+                timeout: linkData["0"][overlayid]["added"][nodeid][linkid]["timeout"],
+                rtt: linkData["0"][overlayid]["added"][nodeid][linkid]["rtt"],
+                edgeColor: findEdgeColor(linkData["0"][overlayid]["added"][nodeid][linkid]["rem_type"],linkData["0"][overlayid]["added"][nodeid][linkid]["local_type"])     
+              }
+            });
+            cy.getElementById(linkData["0"][overlayid]["added"][nodeid][linkid]["SrcNodeId"]).data({ nodeColor :"#02ed68" }); 
+            cy.getElementById(linkData["0"][overlayid]["added"][nodeid][linkid]["TgtNodeId"]).data({ nodeColor :"#02ed68" });
+          }
         }
       }
+     
+      for (nodeid in linkData["0"][overlayid]["removed"]){    
+        for (linkid in linkData["0"][overlayid]["removed"][nodeid]){
+          if(cy.getElementById(linkid).length == 1){ 
+            var srcNode = cy.getElementById(linkid + "_" + nodeid).source(); 
+            var tgtNode = cy.getElementById(linkid + "_" + nodeid).target();
+            cy.remove(cy.getElementById(linkid + "_" + nodeid));
+            if(srcNode.connectedEdges().length == 0)
+              srcNode.data({ nodeColor :"red" }); 
+            if(tgtNode.connectedEdges().length == 0)
+              tgtNode.data({ nodeColor :"red" });   
+          }
+        }
+      } 
 
-      for (linkid in linkData["0"][overlayid]["modified"]){
-        cy.getElementById(linkid).data({
-          id: linkid,
-          source: linkData["0"][overlayid]["modified"][linkid]["SrcNodeId"],
-          target: linkData["0"][overlayid]["modified"][linkid]["TgtNodeId"],
-          IceRole: linkData["0"][overlayid]["modified"][linkid]["IceRole"],
-          Type: linkData["0"][overlayid]["modified"][linkid]["Type"],
-          rem_addr: linkData["0"][overlayid]["modified"][linkid]["rem_addr"],
-          sent_bytes_second: linkData["0"][overlayid]["modified"][linkid]["sent_bytes_second"],
-          sent_total_bytes: linkData["0"][overlayid]["modified"][linkid]["sent_total_bytes"],
-          local_type: linkData["0"][overlayid]["modified"][linkid]["local_type"],
-          rem_type: linkData["0"][overlayid]["modified"][linkid]["rem_type"],
-          writable: linkData["0"][overlayid]["modified"][linkid]["writable"],
-          local_addr: linkData["0"][overlayid]["modified"][linkid]["local_addr"],
-          recv_bytes_second: linkData["0"][overlayid]["modified"][linkid]["recv_bytes_second"],
-          best_conn: linkData["0"][overlayid]["modified"][linkid]["best_conn"],
-          recv_total_bytes: linkData["0"][overlayid]["modified"][linkid]["recv_total_bytes"],
-          new_conn: linkData["0"][overlayid]["modified"][linkid]["new_conn"],
-          timeout: linkData["0"][overlayid]["modified"][linkid]["timeout"],
-          rtt: linkData["0"][overlayid]["modified"][linkid]["rtt"],
-          edgeColor: findEdgeColor(linkData["0"][overlayid]["modified"][linkid]["Type"])
-        });
-      }
+      for (nodeid in linkData["0"][overlayid]["modified"]){
+        for (linkid in linkData["0"][overlayid]["modified"][nodeid]){
+          cy.getElementById(linkid).data({
+            id: linkid + "_" + linkData["0"][overlayid]["modified"][nodeid][linkid]["SrcNodeId"],
+            source: linkData["0"][overlayid]["modified"][nodeid][linkid]["SrcNodeId"],
+            target: linkData["0"][overlayid]["modified"][nodeid][linkid]["TgtNodeId"],
+            IceRole: linkData["0"][overlayid]["modified"][nodeid][linkid]["IceRole"],
+            Type: linkData["0"][overlayid]["modified"][nodeid][linkid]["Type"],
+            rem_addr: linkData["0"][overlayid]["modified"][nodeid][linkid]["rem_addr"],
+            sent_bytes_second: linkData["0"][overlayid]["modified"][nodeid][linkid]["sent_bytes_second"],
+            sent_total_bytes: linkData["0"][overlayid]["modified"][nodeid][linkid]["sent_total_bytes"],
+            local_type: linkData["0"][overlayid]["modified"][nodeid][linkid]["local_type"],
+            rem_type: linkData["0"][overlayid]["modified"][nodeid][linkid]["rem_type"],
+            writable: linkData["0"][overlayid]["modified"][nodeid][linkid]["writable"],
+            local_addr: linkData["0"][overlayid]["modified"][nodeid][linkid]["local_addr"],
+            recv_bytes_second: linkData["0"][overlayid]["modified"][nodeid][linkid]["recv_bytes_second"],
+            best_conn: linkData["0"][overlayid]["modified"][nodeid][linkid]["best_conn"],
+            recv_total_bytes: linkData["0"][overlayid]["modified"][nodeid][linkid]["recv_total_bytes"],
+            new_conn: linkData["0"][overlayid]["modified"][nodeid][linkid]["new_conn"],
+            timeout: linkData["0"][overlayid]["modified"][nodeid][linkid]["timeout"],
+            rtt: linkData["0"][overlayid]["modified"][nodeid][linkid]["rtt"],
+            edgeColor: findEdgeColor(linkData["0"][overlayid]["modified"][nodeid][linkid]["rem_type"],linkData["0"][overlayid]["modified"][nodeid][linkid]["local_type"])
+          });
+       }
+     }
     });
   }
 }
@@ -391,12 +419,12 @@ function findNodeColor(state) {
   return "red";
 }
 
-function findEdgeColor(linktype) {
-  if (linktype == "TURN")
+function findEdgeColor(remtype,localtype) {
+  if (remtype == "turn" || localtype == "turn")
     return "orange";
-  if (linktype == "STUN")
+  if (remtype == "stun" || localtype == "stun")
     return "yellow";
-  if (linktype == "LOCAL")
+  if (remtype == "local" || localtype == "local")
     return "blue";
   return "white";
 }
@@ -413,11 +441,20 @@ function mouseOverNode(nodeid) {
   else{
     var ipopNodeQTip = ipopNodeInfo;
       ipopNodeQTip = ipopNodeQTip.replace("$nodeid",(nodeData.id).substring(0,7));
-      ipopNodeQTip = ipopNodeQTip.replace("$interfacename",nodeData.InterfaceName);
-      ipopNodeQTip = ipopNodeQTip.replace("$geoip",nodeData.GeoIP);
-      ipopNodeQTip = ipopNodeQTip.replace("$vip4",nodeData.VIP4);
-      ipopNodeQTip = ipopNodeQTip.replace("$prefixlen",nodeData.IP4PrefixLen);
       ipopNodeQTip = ipopNodeQTip.replace("$mac",nodeData.MAC);
+      ipopNodeQTip = ipopNodeQTip.replace("$interfacename",nodeData.InterfaceName);
+      if(nodeData.VIP4 != undefined)	 
+      	ipopNodeQTip = ipopNodeQTip.replace("$vip4",nodeData.VIP4);
+      else
+        ipopNodeQTip = ipopNodeQTip.replace("$vip4","-");
+      
+      if(nodeData.IP4PrefixLen != undefined)
+        ipopNodeQTip = ipopNodeQTip.replace("$prefixlen",nodeData.IP4PrefixLen);
+      
+      if(nodeData.GeoIP != undefined)	 
+      	ipopNodeQTip = ipopNodeQTip.replace("$geoip",nodeData.GeoIP);
+      else
+        ipopNodeQTip = ipopNodeQTip.replace("$geoip","-");      
     return ipopNodeQTip;
 
   }
@@ -427,12 +464,23 @@ function mouseClickNode(nodeid)
 {
   nodeData = cy.getElementById(nodeid).data()
   var ipopNodePanel = ipopNodeInfo;
-      ipopNodePanel = ipopNodePanel.replace("$nodeid",nodeData.id.substring(0,20));
-      ipopNodePanel = ipopNodePanel.replace("$interfacename",nodeData.InterfaceName);
-      ipopNodePanel = ipopNodePanel.replace("$geoip",nodeData.GeoIP);
-      ipopNodePanel = ipopNodePanel.replace("$vip4",nodeData.VIP4);
-      ipopNodePanel = ipopNodePanel.replace("$prefixlen",nodeData.IP4PrefixLen);
+      ipopNodePanel = ipopNodePanel.replace("$nodeid",nodeData.id.substring(0,7));
       ipopNodePanel = ipopNodePanel.replace("$mac",nodeData.MAC);
+      ipopNodePanel = ipopNodePanel.replace("$interfacename",nodeData.InterfaceName);
+      if(nodeData.VIP4 != undefined)	 
+      	ipopNodePanel = ipopNodePanel.replace("$vip4",nodeData.VIP4);
+      else
+        ipopNodePanel = ipopNodePanel.replace("$vip4","-");
+      
+      if(nodeData.IP4PrefixLen != undefined) 
+        ipopNodePanel = ipopNodePanel.replace("$prefixlen",nodeData.IP4PrefixLen);
+      else
+        ipopNodePanel = ipopNodePanel.replace("$prefixlen","-"); 
+      
+      if(nodeData.GeoIP != undefined)	 
+      	ipopNodePanel = ipopNodePanel.replace("$geoip",nodeData.VIP4);
+      else
+        ipopNodePanel = ipopNodePanel.replace("$geoip","-"); 
     return ipopNodePanel;
 }
 
@@ -443,17 +491,22 @@ function linkMetrics(buttonid)
 
   nodeid = buttonid.substr(8);
   connectedLinks = cy.nodes('#'+nodeid).connectedEdges().map(function( ele ){
-                                                                return ele.data('id');
+                                                                if(ele.data('source') == nodeid)
+                                                                    return ele.data('id');
                                                             });
   var linkMetricsDialog = "";
   var allLinkMetrics = "";
   for (var index in connectedLinks){
-    linkData = cy.getElementById(connectedLinks[index]).data()
+    if(connectedLinks[index] == undefined){
+       
+       continue;
+    }
+    linkData = cy.getElementById(connectedLinks[index]).data();
+
     var eachLinkMetrics = linkMetricsInfo;
-        eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source.substring(0,20));
-        eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target.substring(0,20));
+        eachLinkMetrics = eachLinkMetrics.replace("$source",linkData.source);
+        eachLinkMetrics = eachLinkMetrics.replace("$target",linkData.target);
         eachLinkMetrics = eachLinkMetrics.replace("$icerole",linkData.IceRole);
-        eachLinkMetrics = eachLinkMetrics.replace("$type",linkData.Type);
         eachLinkMetrics = eachLinkMetrics.replace("$remaddr",linkData.rem_addr);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_bytes_second",linkData.sent_bytes_second);
         eachLinkMetrics = eachLinkMetrics.replace("$sent_total_bytes",linkData.sent_total_bytes);
@@ -468,7 +521,7 @@ function linkMetrics(buttonid)
         eachLinkMetrics = eachLinkMetrics.replace("$timeout",linkData.timeout);
         eachLinkMetrics = eachLinkMetrics.replace("$rtt",linkData.rtt);
 
-    allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+linkData.id.substring(0,20)+"</section>"+eachLinkMetrics+"</section>";
+    allLinkMetrics += "<section class='eachLinkInfo'><section class='linkID'>"+(linkData.id).split("_")[0]+"</section>"+eachLinkMetrics+"</section>";
   }
   linkMetricsDialog += "<section id='linkMetricsDialog'><section id='linkMetricsDialogHeading'><button type='button' class='close' data-target='#linkMetricsDialog' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Link Metrics</section><section id='linkMetricsDialogBody'>"+allLinkMetrics+"</section>";
 

@@ -13,7 +13,7 @@ CONTAINER_CONFIG = {
 }
 
 COLLECTOR_CONFIG = {
-    "flush_duration": 15, # in seconds
+    "flush_duration": 30, # in seconds
     "mongo": {
         "host": "localhost",
         "port": 27017,
