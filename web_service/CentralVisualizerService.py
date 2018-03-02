@@ -188,9 +188,9 @@ class CentralVisualizerService(object):
                     new_doc["Links"][overlayid][nodeid] = {}
                 
                 tempResponse = self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]))
-                response_msg[overlayid]["removed"].update(tempResponse["removed"])
-                response_msg[overlayid]["added"].update(tempResponse["added"])
-                response_msg[overlayid]["modified"].update(tempResponse["modified"])
+                response_msg[overlayid]["removed"][nodeid] = tempResponse["removed"]
+                response_msg[overlayid]["added"][nodeid] = tempResponse["added"]
+                response_msg[overlayid]["modified"][nodeid] = tempResponse["modified"]
 
         self._logger.debug('The server response for links in overlay {} request: {}'.format(overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))

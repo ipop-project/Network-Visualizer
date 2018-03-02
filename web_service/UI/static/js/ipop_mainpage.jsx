@@ -195,4 +195,4 @@ class LayoutControls extends React.Component {
 
 ReactDOM.render(<LayoutControls />, document.getElementById('LayoutControls'));
 
-setInterval(updateGraph,15000);
+setInterval(updateGraph,30000);
