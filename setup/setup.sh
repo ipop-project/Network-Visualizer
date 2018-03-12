@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo apt-get install curl
 sudo apt-get install python2.7
 sudo apt-get install python-pip
 sudo apt-get install -y mongodb
