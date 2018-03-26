@@ -90,7 +90,6 @@ class CollectorServiceInstance(object):
                 req_data[ovrl_id]["LinkManager"][node_id]["NodeData"]
             node_data = {
                 "InterfaceName": req_node_data["TapName"],
-                #"GeoIP": req_node_data["GeoIP"],
                 "VIP4": req_node_data["VIP4"],
                 "IP4PrefixLen": req_node_data["IP4PrefixLen"],
                 "MAC": req_node_data["MAC"]
@@ -131,6 +130,14 @@ class CollectorServiceInstance(object):
                     link_data["Status"] = req_link_data["Status"]
 
                 self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
+
+            # Process data for arbitrary modules now that we are done
+            # processing data for LinkManager
+            for mod_name in req_data[ovrl_id]:
+                if mod_name != "LinkManager":
+                    self.data_held[mod_name][ovrl_id][node_id] = \
+                        req_data[ovrl_id][mod_name]
+
         self._data_held_lock.release()
 
         return "Success"
