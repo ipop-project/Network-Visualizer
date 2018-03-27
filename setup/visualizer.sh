@@ -16,6 +16,7 @@ function start()
 {
     source ./venv/bin/activate
     nohup python3 ./web_service/DeploymentServer.py 2>nohup.err 1>/dev/null &
+    deactivate
 }
 
 function stop()
