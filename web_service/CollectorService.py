@@ -135,6 +135,8 @@ class CollectorServiceInstance(object):
             # processing data for LinkManager
             for mod_name in req_data[ovrl_id]:
                 if mod_name != "LinkManager":
+                    if mod_name not in self.data_held:
+                        self.data_held[mod_name] = defaultdict(dict)
                     self.data_held[mod_name][ovrl_id][node_id] = \
                         req_data[ovrl_id][mod_name]
 
