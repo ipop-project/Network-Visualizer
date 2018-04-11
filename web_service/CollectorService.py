@@ -1,4 +1,3 @@
-import sys
 import time
 import logging
 import datetime
@@ -14,10 +13,10 @@ class CollectorServiceInstance(object):
         self._config_dict = config_dict
 
         collector_mongo = \
-                MongoClient("mongodb://{}:{}".format(
-                        self._config_dict["mongo"]["host"],
-                        self._config_dict["mongo"]["port"])
-                )
+            MongoClient("mongodb://{}:{}".format(
+                self._config_dict["mongo"]["host"],
+                self._config_dict["mongo"]["port"])
+            )
         self._db = collector_mongo[self._config_dict["mongo"]["dbname"]]
         self._data_held_lock = threading.Lock()
 
@@ -29,14 +28,14 @@ class CollectorServiceInstance(object):
         self.flush_duration = self._config_dict["flush_duration"]
 
         self._logger = \
-                logging.getLogger("network_visualizer.collector_service")
+            logging.getLogger("network_visualizer.collector_service")
 
     def _reset_data_held(self):
         self.data_held = {
             "Overlays": dict(),
             "Nodes": defaultdict(dict),
             "Links": defaultdict(lambda:
-                     defaultdict(lambda: defaultdict(dict)))
+                                 defaultdict(lambda: defaultdict(dict)))
         }
         self._link_ids = defaultdict(set)
 
@@ -158,9 +157,10 @@ class CollectorServiceInstance(object):
                 self.data_held["_id"] = \
                         datetime.datetime.utcnow().replace(microsecond=0)
                 self._logger.debug(
-                    "Beginning mongo dump on document {}".format(self.data_held))
+                    "Beginning mongo dump on document {}"
+                    .format(self.data_held))
                 self._db[self._config_dict["mongo"]["collection_name"]] \
-                        .insert_one(self.data_held)
+                    .insert_one(self.data_held)
                 self._logger.debug("Mongo dump successful")
 
                 self._reset_data_held()
