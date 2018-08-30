@@ -91,9 +91,9 @@ class CollectorServiceInstance(object):
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
             # Add/update data link data for the reporting node
-            for link_id in req_data[ovrl_id]["LinkManager"][node_id]["Links"]:
+            for link_id in req_data[ovrl_id]["LinkManager"][node_id]:
                 req_link_data = \
-                    req_data[ovrl_id]["LinkManager"][node_id]["Links"][link_id]
+                    req_data[ovrl_id]["LinkManager"][node_id][link_id]
 
                 link_data = {
                     "InterfaceName": req_link_data["TapName"],
