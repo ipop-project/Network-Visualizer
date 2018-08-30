@@ -55,7 +55,7 @@ class CollectorServiceInstance(object):
         # NOTE request is instantiated when this method is registered
         # as a view_func in a flask container
         req = request.json
-        req_data = req["Data"]
+        req_data = req["VizData"]
 
         self._data_held_lock.acquire()
         for ovrl_id in req_data:
@@ -84,18 +84,9 @@ class CollectorServiceInstance(object):
             self._logger.debug(
                 "Updating node data for node_id {}".format(node_id))
 
-            # Add/update node data for the reporting node
-            req_node_data = \
-                req_data[ovrl_id]["LinkManager"][node_id]["NodeData"]
-            node_data = {
-                "InterfaceName": req_node_data["TapName"],
-                "VIP4": req_node_data["VIP4"],
-                "IP4PrefixLen": req_node_data["IP4PrefixLen"],
-                "MAC": req_node_data["MAC"]
-            }
             # Add the optional human-readable node name (if provided)
             if "NodeName" in req:
-                node_data["NodeName"] = req["NodeName"]
+                node_data = {"NodeName": req["NodeName"]}
 
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
@@ -103,10 +94,14 @@ class CollectorServiceInstance(object):
             for link_id in req_data[ovrl_id]["LinkManager"][node_id]["Links"]:
                 req_link_data = \
                     req_data[ovrl_id]["LinkManager"][node_id]["Links"][link_id]
+
                 link_data = {
+                    "InterfaceName": req_link_data["TapName"],
+                    "MAC": req_link_data["MAC"],
                     "SrcNodeId": node_id,
                     "TgtNodeId": req_link_data["PeerId"],
                 }
+                link_data.update(req_data[ovrl_id]["Topology"][link_id])
 
                 # Increment link counter in overlay if we did not have its data
                 # for ovrl_id (meaning it is new in this overlay)
@@ -115,9 +110,7 @@ class CollectorServiceInstance(object):
                     self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
 
                 if "Stats" in req_link_data and req_link_data["Stats"]:
-                    link_stats = req_link_data["Stats"]
-                    for stat_name in link_stats:
-                        link_data[stat_name] = link_stats[stat_name]
+                    link_data["Stats"] = req_link_data["Stats"]
 
                 if "IceRole" in req_link_data:
                     link_data["IceRole"] = req_link_data["IceRole"]
