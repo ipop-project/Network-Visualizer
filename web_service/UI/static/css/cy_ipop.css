@@ -16,7 +16,7 @@ body {
   top: 0;
   bottom: 0;
   position: fixed;
-  width: 235px;
+  width: 20%;
   padding-left: 10px;
   padding-right: 10px;
   background-color: #3a3a3a;
@@ -54,7 +54,7 @@ body {
 .OverlayListPanel {
   margin-top:15px;
   padding: 5px;
-  width: 210px; 
+  width: 100%; 
   background: #646464;
   border: 1px solid #808080;
   border-radius: 3px;
@@ -62,7 +62,7 @@ body {
 }
 
 #overlay-form-control {
-  width: 180px;
+  width: 100%;
   background: #f5f5f5;
   border-radius: 3px;
   border: 1px solid #808080;
@@ -76,11 +76,11 @@ body {
 }
 
 .leftColumn {
-  width: 50%;
+  width: 60%;
 }
 
 .rightColumn {
-  width: 50%;
+  width: 40%;
 }
 
 .qtip-bootstrap .qtip-content {
@@ -93,7 +93,7 @@ body {
   margin-top: 10px;
   margin-bottom: 10px;
   border-radius: 3px;
-  width: 210px;
+  width: 100%;
   background-color: #505050;
   border: 1px solid #808080;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.32);
