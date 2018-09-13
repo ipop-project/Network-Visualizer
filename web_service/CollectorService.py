@@ -91,37 +91,42 @@ class CollectorServiceInstance(object):
             self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
             # Add/update data link data for the reporting node
-            for link_id in req_data[ovrl_id]["LinkManager"][node_id]:
-                req_link_data = \
-                    req_data[ovrl_id]["LinkManager"][node_id][link_id]
+            if "LinkManager" in req_data[ovrl_id] \
+                    and req_data[ovrl_id]["LinkManager"]:
+                link_manager_data = req_data[ovrl_id]["LinkManager"]
 
-                link_data = {
-                    "InterfaceName": req_link_data["TapName"],
-                    "MAC": req_link_data["MAC"],
-                    "SrcNodeId": node_id,
-                    "TgtNodeId": req_link_data["PeerId"],
-                }
-                link_data.update(req_data[ovrl_id]["Topology"][link_id])
+                for link_id in link_manager_data[node_id]:
+                    req_link_data = \
+                        link_manager_data[node_id][link_id]
 
-                # Increment link counter in overlay if we did not have its data
-                # for ovrl_id (meaning it is new in this overlay)
-                if link_id not in self._link_ids[ovrl_id]:
-                    self._link_ids[ovrl_id].add(link_id)
-                    self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
+                    link_data = {
+                        "InterfaceName": req_link_data["TapName"],
+                        "MAC": req_link_data["MAC"],
+                        "SrcNodeId": node_id,
+                        "TgtNodeId": req_link_data["PeerId"],
+                    }
+                    link_data.update(req_data[ovrl_id]["Topology"][link_id])
 
-                if "Stats" in req_link_data and req_link_data["Stats"]:
-                    link_data["Stats"] = req_link_data["Stats"]
+                    # Increment link counter in overlay if we did not have its
+                    # data for ovrl_id (meaning it is new in this overlay)
+                    if link_id not in self._link_ids[ovrl_id]:
+                        self._link_ids[ovrl_id].add(link_id)
+                        self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
 
-                if "IceRole" in req_link_data:
-                    link_data["IceRole"] = req_link_data["IceRole"]
+                    if "Stats" in req_link_data and req_link_data["Stats"]:
+                        link_data["Stats"] = req_link_data["Stats"]
 
-                if "Type" in req_link_data:
-                    link_data["Type"] = req_link_data["Type"]
+                    if "IceRole" in req_link_data:
+                        link_data["IceRole"] = req_link_data["IceRole"]
 
-                if "Status" in req_link_data:
-                    link_data["Status"] = req_link_data["Status"]
+                    if "Type" in req_link_data:
+                        link_data["Type"] = req_link_data["Type"]
 
-                self.data_held["Links"][ovrl_id][node_id][link_id] = link_data
+                    if "Status" in req_link_data:
+                        link_data["Status"] = req_link_data["Status"]
+
+                    self.data_held["Links"][ovrl_id][node_id][link_id] = \
+                        link_data
 
             # Process data for arbitrary modules now that we are done
             # processing data for LinkManager
