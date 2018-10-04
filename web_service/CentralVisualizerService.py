@@ -20,13 +20,14 @@ class CentralVisualizerService(object):
                         }
         return response_msg
 
-    def _find_diff_between_intervals(self,new_doc,old_doc,requested_interval):
+    def _find_diff_between_intervals(self,new_doc,old_doc,requested_interval,
+                                     is_links=False):
         added = { key : new_doc[key] for key in set(new_doc) - set(old_doc) }
         removed = { key : old_doc[key] for key in set(old_doc) - set(new_doc) }
         existing = list(set(new_doc) - set(added))
         modified ={}
         for key in existing:
-            if frozenset(new_doc[key].items()) != frozenset(old_doc[key].items()) :
+            if is_links or frozenset(new_doc[key].items()) != frozenset(old_doc[key].items()) :
                 modified[key] = new_doc[key]
 
         response_msg = {
@@ -44,7 +45,7 @@ class CentralVisualizerService(object):
         return resp
 
     #route('/IPOP/intervals', methods=['GET'])
-    def get_intervals(self):     
+    def get_intervals(self):
         start_time = datetime.strptime(request.args.get('start') , "%Y-%m-%dT%H:%M:%S")
         end_time = datetime.strptime(request.args.get('end') , "%Y-%m-%dT%H:%M:%S")
         interval_numbers = []
@@ -148,11 +149,11 @@ class CentralVisualizerService(object):
     def get_links_in_an_overlay(self,overlayid):
         current_state = request.args.get('current_state')
         requested_interval = datetime.strptime(request.args.get('interval') , "%Y-%m-%dT%H:%M:%S")
-        
+
         if current_state == "True":
             self._logger.debug('Request received for all links in overlay {} at {}'.format(overlayid,requested_interval))
             current_doc = self._mongo_data.find_one({"$query":{"_id": {"$lte": requested_interval}},"$orderby":{"_id":-1}},{"_id":1, "Links."+overlayid:1})
-            if current_doc == None: current_doc = {"_id":"", "Links":{ overlayid:{} }}    
+            if current_doc == None: current_doc = {"_id":"", "Links":{ overlayid:{} }}
             elif current_doc["Links"] == {}: current_doc["Links"][overlayid] = {}
             response = self._get_current_state(current_doc["Links"][overlayid],str(current_doc["_id"]))
             response_msg = {
@@ -164,11 +165,11 @@ class CentralVisualizerService(object):
         else:
             self._logger.debug('Request received for updates in links in overlay {} at {}'.format(overlayid,requested_interval))
             new_doc = self._mongo_data.find_one({"$query":{"_id": {"$lte": requested_interval}},"$orderby":{"_id":-1}},{"_id":1, "Links."+overlayid:1})
-            if new_doc == None: new_doc = {"_id":"", "Links":{ overlayid:{} }}    
+            if new_doc == None: new_doc = {"_id":"", "Links":{ overlayid:{} }}
             elif new_doc["Links"] == {}: new_doc["Links"][overlayid] = {}
-            
+
             old_doc = self._mongo_data.find_one({"$query":{"_id": {"$lt": new_doc["_id"]}},"$orderby":{"_id":-1}},{"_id":1, "Links."+overlayid:1})
-            if old_doc == None: old_doc = {"_id":"", "Links":{ overlayid:{} }}    
+            if old_doc == None: old_doc = {"_id":"", "Links":{ overlayid:{} }}
             elif old_doc["Links"] == {}: old_doc["Links"][overlayid] = {}
 
             allNodes = (set(new_doc["Links"][overlayid]) | (set(old_doc["Links"][overlayid])-set(new_doc["Links"][overlayid])))
@@ -184,10 +185,20 @@ class CentralVisualizerService(object):
             for nodeid in allNodes:
                 if nodeid not in old_doc["Links"][overlayid]:
                     old_doc["Links"][overlayid][nodeid] = {}
+                else:
+                    node_links = old_doc["Links"][overlayid][nodeid]
+                    for link_id in node_links:
+                        old_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
                 if nodeid not in new_doc["Links"][overlayid]:
                     new_doc["Links"][overlayid][nodeid] = {}
-                
-                tempResponse = self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]))
+                else:
+                    node_links = new_doc["Links"][overlayid][nodeid]
+                    for link_id in node_links:
+                        new_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
+
+                tempResponse =
+                self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]),
+                                                 is_links=True)
                 response_msg[overlayid]["removed"][nodeid] = tempResponse["removed"]
                 response_msg[overlayid]["added"][nodeid] = tempResponse["added"]
                 response_msg[overlayid]["modified"][nodeid] = tempResponse["modified"]
