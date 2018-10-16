@@ -52,90 +52,96 @@ class CollectorServiceInstance(object):
                               " SIGINT/SIGTERM!")
             return abort(500)
 
-        # NOTE request is instantiated when this method is registered
-        # as a view_func in a flask container
-        req = request.json
-        req_data = req["VizData"]
+        try:
+            # NOTE request is instantiated when this method is registered
+            # as a view_func in a flask container
+            req = request.json
+            req_data = req["VizData"]
 
-        self._data_held_lock.acquire()
-        for ovrl_id in req_data:
-            self._logger.debug("Processing data for overlay_id"
-                               " {}".format(ovrl_id))
+            self._data_held_lock.acquire()
+            for ovrl_id in req_data:
+                self._logger.debug("Processing data for overlay_id"
+                                   " {}".format(ovrl_id))
 
-            # Initialise data for an overlay
-            if ovrl_id not in self.data_held["Overlays"]:
-                ovrl_init_data = {
-                    "NumNodes": 0,
-                    "NumLinks": 0,
-                    "Name": "",
-                }
-                self.data_held["Overlays"][ovrl_id] = ovrl_init_data
-
-            # Increment node counter in overlay if we did not have its data
-            # for ovrl_id (meaning it is new in this overlay)
-            # NOTE! This must be done before self.data_held["Nodes"] is
-            # updated with node_data as it will add the key ovrl_id causing
-            # this test to not behave as desired
-            if node_id not in self.data_held["Nodes"][ovrl_id]:
-                self.data_held["Overlays"][ovrl_id]["NumNodes"] += 1
-
-            # TODO handle removal of a node within an interval
-
-            self._logger.debug(
-                "Updating node data for node_id {}".format(node_id))
-
-            # Add the optional human-readable node name (if provided)
-            if "NodeName" in req:
-                node_data = {"NodeName": req["NodeName"]}
-
-            self.data_held["Nodes"][ovrl_id][node_id] = node_data
-
-            # Add/update data link data for the reporting node
-            if "LinkManager" in req_data[ovrl_id] \
-                    and req_data[ovrl_id]["LinkManager"]:
-                link_manager_data = req_data[ovrl_id]["LinkManager"]
-
-                for link_id in link_manager_data[node_id]:
-                    req_link_data = \
-                        link_manager_data[node_id][link_id]
-
-                    link_data = {
-                        "InterfaceName": req_link_data["TapName"],
-                        "MAC": req_link_data["MAC"],
-                        "SrcNodeId": node_id,
-                        "TgtNodeId": req_link_data["PeerId"],
+                # Initialise data for an overlay
+                if ovrl_id not in self.data_held["Overlays"]:
+                    ovrl_init_data = {
+                        "NumNodes": 0,
+                        "NumLinks": 0,
+                        "Name": "",
                     }
-                    link_data.update(req_data[ovrl_id]["Topology"][link_id])
+                    self.data_held["Overlays"][ovrl_id] = ovrl_init_data
 
-                    # Increment link counter in overlay if we did not have its
-                    # data for ovrl_id (meaning it is new in this overlay)
-                    if link_id not in self._link_ids[ovrl_id]:
-                        self._link_ids[ovrl_id].add(link_id)
-                        self.data_held["Overlays"][ovrl_id]["NumLinks"] += 1
+                # Increment node counter in overlay if we did not have its data
+                # for ovrl_id (meaning it is new in this overlay)
+                # NOTE! This must be done before self.data_held["Nodes"] is
+                # updated with node_data as it will add the key ovrl_id causing
+                # this test to not behave as desired
+                if node_id not in self.data_held["Nodes"][ovrl_id]:
+                    self.data_held["Overlays"][ovrl_id]["NumNodes"] += 1
 
-                    if "Stats" in req_link_data and req_link_data["Stats"]:
-                        link_data["Stats"] = req_link_data["Stats"]
+                # TODO handle removal of a node within an interval
 
-                    if "IceRole" in req_link_data:
-                        link_data["IceRole"] = req_link_data["IceRole"]
+                self._logger.debug(
+                    "Updating node data for node_id {}".format(node_id))
 
-                    if "Type" in req_link_data:
-                        link_data["Type"] = req_link_data["Type"]
+                # Add the optional human-readable node name (if provided)
+                if "NodeName" in req:
+                    node_data = {"NodeName": req["NodeName"]}
 
-                    if "Status" in req_link_data:
-                        link_data["Status"] = req_link_data["Status"]
+                self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
-                    self.data_held["Links"][ovrl_id][node_id][link_id] = \
-                        link_data
+                # Add/update data link data for the reporting node
+                if "LinkManager" in req_data[ovrl_id] \
+                        and req_data[ovrl_id]["LinkManager"]:
+                    link_manager_data = req_data[ovrl_id]["LinkManager"]
 
-            # Process data for arbitrary modules now that we are done
-            # processing data for LinkManager
-            for mod_name in req_data[ovrl_id]:
-                if mod_name != "LinkManager":
-                    if mod_name not in self.data_held:
-                        self.data_held[mod_name] = defaultdict(dict)
-                    self.data_held[mod_name][ovrl_id][node_id] = \
-                        req_data[ovrl_id][mod_name]
+                    for link_id in link_manager_data[node_id]:
+                        req_link_data = \
+                            link_manager_data[node_id][link_id]
+
+                        link_data = {
+                            "InterfaceName": req_link_data["TapName"],
+                            "MAC": req_link_data["MAC"],
+                            "SrcNodeId": node_id,
+                            "TgtNodeId": req_link_data["PeerId"],
+                        }
+                        link_data\
+                            .update(req_data[ovrl_id]["Topology"][link_id])
+
+                        # Increment link counter in overlay if we did not have
+                        # its data for ovrl_id (meaning it is new in this
+                        # overlay)
+                        if link_id not in self._link_ids[ovrl_id]:
+                            self._link_ids[ovrl_id].add(link_id)
+                            self.data_held["Overlays"][ovrl_id]["NumLinks"] \
+                                += 1
+
+                        if "Stats" in req_link_data and req_link_data["Stats"]:
+                            link_data["Stats"] = req_link_data["Stats"]
+
+                        if "IceRole" in req_link_data:
+                            link_data["IceRole"] = req_link_data["IceRole"]
+
+                        if "Type" in req_link_data:
+                            link_data["Type"] = req_link_data["Type"]
+
+                        if "Status" in req_link_data:
+                            link_data["Status"] = req_link_data["Status"]
+
+                        self.data_held["Links"][ovrl_id][node_id][link_id] = \
+                            link_data
+        except KeyError as e:
+            self._logger.exception(e)
+
+        # Process data for arbitrary modules now that we are done
+        # processing data for LinkManager
+        for mod_name in req_data[ovrl_id]:
+            if mod_name != "LinkManager":
+                if mod_name not in self.data_held:
+                    self.data_held[mod_name] = defaultdict(dict)
+                self.data_held[mod_name][ovrl_id][node_id] = \
+                    req_data[ovrl_id][mod_name]
 
         self._data_held_lock.release()
 
