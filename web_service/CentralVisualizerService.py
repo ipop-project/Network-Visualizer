@@ -196,7 +196,7 @@ class CentralVisualizerService(object):
                     for link_id in node_links:
                         new_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
 
-                tempResponse =
+                tempResponse = \
                 self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]),
                                                  is_links=True)
                 response_msg[overlayid]["removed"][nodeid] = tempResponse["removed"]
