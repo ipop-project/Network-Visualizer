@@ -8,38 +8,38 @@ var mouseOverNodeInfo = "<section class='InfoPanel'><section class='leftColumn'>
 var serverip = location.host;
 
 var cy = cytoscape({
-                    container: document.getElementById('topology'),
-                    layout: {
-                            name: 'circle'
-                            },
-                    style: [
-                            {
-                              selector: 'node',
-                              style: {
-                                    "width":"3.75em",
-                                    "height":"3.75em",
-                                    "label": "data(label)",
-                                    "text-valign": "center",
-                                    "text-outline-width": "2",
-                                    "text-outline-color": 'data(nodeColor)',
-                                    "min-zoomed-font-size": "1.5em",
-                                    "background-color": "data(nodeColor)",
-                                    "color": "#292b2d",
-                                  }
-                            },
-                            {
-                              selector: 'edge',
-                              style: {
-                                    // "line-color": "data(edgeColor)",
-                                    "width":"0.2em"
-                              }
-                            }
-                           ],
-                    zoom: 1.1,
-                    minZoom: 0.1,
-                    maxZoom: 2,
-                    wheelSensitivity: 0.2
-                  });
+    container: document.getElementById('topology'),
+    layout: {
+            name: 'circle'
+            },
+    style: [
+            {
+              selector: 'node',
+              style: {
+                    "width":"3.75em",
+                    "height":"3.75em",
+                    "label": "data(label)",
+                    "text-valign": "center",
+                    "text-outline-width": "2",
+                    "text-outline-color": 'data(nodeColor)',
+                    "min-zoomed-font-size": "1.5em",
+                    "background-color": "data(nodeColor)",
+                    "color": "#292b2d",
+                  }
+            },
+            {
+              selector: 'edge',
+              style: {
+                    // "line-color": "data(edgeColor)",
+                    "width":"0.2em"
+              }
+            }
+            ],
+    zoom: 1.1,
+    minZoom: 0.1,
+    maxZoom: 2,
+    wheelSensitivity: 0.2
+  });
 
 function buildOverlaysGraph()
 {
@@ -101,23 +101,23 @@ function buildNetworkTopology(overlayid,intervalNo)
         });
       }
 
-      console.log(cy);
-      console.log("Test");
+      // console.log(cy);
       cy.makeLayout({name:'circle'}).run();
       for (nodeid in linkData["0"][overlayid]["current_state"]) {
-
+        console.log('For node ', nodeid);
+        console.log('links = ', linkData["0"][overlayid]["current_state"][nodeid]);
         for (linkid in linkData["0"][overlayid]["current_state"][nodeid]){
-          console.log('MAC = ', linkData["0"][overlayid]["current_state"][nodeid][linkid]["MAC"]);
+          console.log('linkid = ', linkid);
           var cyData = {
-              InterfaceName: linkData["0"][overlayid]["current_state"][nodeid][linkid]["InterfaceName"],
-              IP4PrefixLen: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IP4PrefixLen"],
-              MAC: linkData["0"][overlayid]["current_state"][nodeid][linkid]["MAC"],
-              id: linkid + "_" + linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
-              source: linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
-              target: linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"],
-              IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
-              Type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"]
-              // edgeColor: findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"] , linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"])
+            id: linkid + "_" + linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
+            InterfaceName: linkData["0"][overlayid]["current_state"][nodeid][linkid]["InterfaceName"],
+            IP4PrefixLen: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IP4PrefixLen"],
+            MAC: linkData["0"][overlayid]["current_state"][nodeid][linkid]["MAC"],
+            source: linkData["0"][overlayid]["current_state"][nodeid][linkid]["SrcNodeId"],
+            target: linkData["0"][overlayid]["current_state"][nodeid][linkid]["TgtNodeId"],
+            IceRole: linkData["0"][overlayid]["current_state"][nodeid][linkid]["IceRole"],
+            Type: linkData["0"][overlayid]["current_state"][nodeid][linkid]["Type"]
+            // edgeColor: findEdgeColor(linkData["0"][overlayid]["current_state"][nodeid][linkid]["rem_type"] , linkData["0"][overlayid]["current_state"][nodeid][linkid]["local_type"])
           };
           for (let stat in linkData["0"][overlayid]["current_state"][nodeid][linkid]["Stats"]){
             if(linkData["0"][overlayid]["current_state"][nodeid][linkid]["Stats"][stat]["best_conn"]){
@@ -151,6 +151,7 @@ function updateGraph()
   var intervalNo = new Date().toISOString().split(".")[0];
   if(cy.nodes().allAre('[type = "Overlay"]')){
     $.getJSON("http://"+serverip+"/IPOP/overlays?interval="+intervalNo, function(data,status) {
+      console.log('In update graph data = ', data);
       if (status == "error") throw error;
       var overlayDropdown = "";
       for (overlay in data["added"]) {
@@ -416,6 +417,7 @@ cy.on('click','node',function(event){
   }
   else{
     if(document.getElementById('infoPanel_'+event.target.id()) == null){
+      console.log('event.target.id() = ', event.target.id())
       $('#config').append("<section class='NodeInfoPanel' id='infoPanel_"+event.target.id()+"'><section class='NodeInfoPanelHeading' onclick='$(this).parent().find(\".collapse\").toggleClass(\"show\")' ><article>"+event.target._private.data.Name+"<button type='button' class='close' data-target='#infoPanel_"+event.target.id()+"' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button></section><section id='#info_"+event.target.id()+"'  class='NodeInfoPanelBody collapse' >"+mouseClickNode(event.target.id())+"</div></section>");
     }
   }
@@ -479,7 +481,7 @@ function mouseOverNode(nodeid) {
 function mouseClickNode(nodeid)
 {
   nodeData = cy.getElementById(nodeid).data()
-  console.log('This is nodeData onclick :', nodeData);
+  console.log('For nodeid = ', nodeid);
   connectedLinks = cy.nodes('#'+nodeid).connectedEdges().map(function( ele ){
                                                                 if(ele.data('source') == nodeid)
                                                                     return ele.data('id');
@@ -487,7 +489,7 @@ function mouseClickNode(nodeid)
 
   var allLinkMetrics = "";
 
-  console.log('connected links = ', connectedLinks);
+  console.log('connected links is =', connectedLinks);
   for (var index in connectedLinks){
     if(connectedLinks[index] == undefined){
     continue;
