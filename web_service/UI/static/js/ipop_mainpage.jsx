@@ -175,8 +175,7 @@ class LayoutControls extends React.Component {
   render() {
     return (
       <div>
-        <Button className = "btn btn-primary" onClick={() => this.setState({ open: !this.state.open })}>
-        <span className = "fa fa-wrench"></span>
+        <Button className = "btn btn-primary fa fa-wrench" onClick={() => this.setState({ open: !this.state.open })}>
         </Button>
         <Collapse in={this.state.open} id='ControlsCollapse'>
           <div>
