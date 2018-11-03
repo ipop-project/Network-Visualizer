@@ -1,5 +1,5 @@
 var overlayNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>ID&nbsp;</div><div>Nodes</div><div>Links</div></section><section id='rightColumn'><div>&nbsp;$overlayid</div><div>&nbsp;$numnodes</div><div>&nbsp;$numlinks</div></section></section>"
-var mouseOverNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>Node ID&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div></section>"
+var mouseOverNodeInfo = "<section class='InfoPanel'><section class='leftColumn'><div>Node ID&nbsp;</div><div>IPv4&nbsp;</div></section><section id='rightColumn'><div>&nbsp;$nodeid</div><div>&nbsp;$ipAddress</div></section>"
 var serverip = location.host;
 
 var cy = cytoscape({
@@ -85,6 +85,7 @@ function buildNetworkTopology(overlayid,intervalNo)
         data: {
           id: nodeid,
           Name: nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],
+          ipAddress: nodeData["0"][overlayid]["current_state"][nodeid]["IP4"],
           intervalNo: nodeData["0"]["intervalNo"],
           label: nodeData["0"][overlayid]["current_state"][nodeid]["NodeName"],
           nodeColor: "red",
@@ -206,6 +207,7 @@ function updateGraph()
             data: {
               id: nodeid,
               Name: nodeData["0"][overlayid]["added"][nodeid]["NodeName"],
+              ipAddress: nodeData["0"][overlayid]["added"][nodeid]["IP4"],
               intervalNo: nodeData["0"]["intervalNo"],
               label: nodeData["0"][overlayid]["added"][nodeid]["NodeName"],
               nodeColor: "red",
@@ -221,6 +223,7 @@ function updateGraph()
             nodeData["0"][overlayid]["modified"][nodeid]["NodeName"] = nodeid;
         cy.getElementById(nodeid).data({
           id: nodeid,
+          ipAddress: nodeData["0"][overlayid]["modified"][nodeid]["IP4"],
           intervalNo: nodeData["0"]["intervalNo"],
           label: nodeData["0"][overlayid]["modified"][nodeid]["NodeName"],
           nodeColor: "red",
@@ -474,6 +477,7 @@ function mouseOverNode(nodeid) {
   else{
     var mouseOverNodeQTip = mouseOverNodeInfo;
       mouseOverNodeQTip = mouseOverNodeQTip.replace("$nodeid",(nodeData.id).substring(0,10));
+      mouseOverNodeQTip = mouseOverNodeQTip.replace("$ipAddress",(nodeData.ipAddress));
     return mouseOverNodeQTip;
 
   }
