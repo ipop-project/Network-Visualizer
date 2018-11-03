@@ -86,8 +86,13 @@ class CollectorServiceInstance(object):
                     "Updating node data for node_id {}".format(node_id))
 
                 # Add the optional human-readable node name (if provided)
+                node_data = dict()
                 if "NodeName" in req:
-                    node_data = {"NodeName": req["NodeName"]}
+                    node_data["NodeName"] = req["NodeName"]
+
+                if "BridgeController" in req_data[ovrl_id]:
+                    node_data["IP4"] = \
+                            req_data[ovrl_id]["BridgeController"]["IP4"]
 
                 self.data_held["Nodes"][ovrl_id][node_id] = node_data
 
