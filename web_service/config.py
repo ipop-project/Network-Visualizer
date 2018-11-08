@@ -5,8 +5,8 @@ CONTAINER_CONFIG = {
     "template_folder": "UI/templates",
     "static_folder": "UI/static",
     "logging": {
-        "console_level": "DEBUG",
-        "rot_fh_level": "WARN",
+        "console_level": "WARN",
+        "rot_fh_level": "INFO",
         "rot_fh_count": 5,
         "rot_fh_max_file_size": 2097152,  # in bytes
         "rot_fh_fname": "network_visualizer.log"

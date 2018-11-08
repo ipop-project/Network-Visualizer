@@ -76,7 +76,7 @@ class CentralVisualizerService(object):
             if old_doc == None : old_doc = {"_id":"", "Overlays":{}}
             response_msg = self._find_diff_between_intervals(new_doc["Overlays"],old_doc["Overlays"],str(new_doc["_id"]))
 
-        self._logger.debug('The server response for Overlays request: {}'.format(response_msg))
+        self._logger.info('The server response for Overlays request: {}'.format(response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
         return resp
@@ -119,7 +119,7 @@ class CentralVisualizerService(object):
                             "updateOffset": response["updateOffset"]
                           }
 
-        self._logger.debug('The server response for nodes in overlay {} request: {}'.format(overlayid,response_msg))
+        self._logger.info('The server response for nodes in overlay {} request: {}'.format(overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
         return resp
@@ -140,7 +140,7 @@ class CentralVisualizerService(object):
                         "intervalNo": str(new_doc["_id"])
                       }
 
-        self._logger.debug('The server response for the node {} in overlay {} request: {}'.format(nodeid,overlayid,response_msg))
+        self._logger.info('The server response for the node {} in overlay {} request: {}'.format(nodeid,overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
         return resp
@@ -203,7 +203,7 @@ class CentralVisualizerService(object):
                 response_msg[overlayid]["added"][nodeid] = tempResponse["added"]
                 response_msg[overlayid]["modified"][nodeid] = tempResponse["modified"]
 
-        self._logger.debug('The server response for links in overlay {} request: {}'.format(overlayid,response_msg))
+        self._logger.info('The server response for links in overlay {} request: {}'.format(overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
         return resp
@@ -253,7 +253,7 @@ class CentralVisualizerService(object):
                             "updateOffset": response["updateOffset"]
                           }
 
-        self._logger.debug('The server response for links from node {} in overlay {} request: {}'.format(nodeid,overlayid,response_msg))
+        self._logger.info('The server response for links from node {} in overlay {} request: {}'.format(nodeid,overlayid,response_msg))
         resp = make_response(json.dumps(response_msg))
         resp.headers['Content-Type'] = "application/json"
         return resp
