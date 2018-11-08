@@ -188,13 +188,20 @@ class CentralVisualizerService(object):
                 else:
                     node_links = old_doc["Links"][overlayid][nodeid]
                     for link_id in node_links:
-                        old_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
+                        if "Stats" in node_links[link_id]:
+                            old_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
+                        else:
+                            old_doc["Links"][overlayid][nodeid][link_id]["Stats"] = ()
+
                 if nodeid not in new_doc["Links"][overlayid]:
                     new_doc["Links"][overlayid][nodeid] = {}
                 else:
                     node_links = new_doc["Links"][overlayid][nodeid]
                     for link_id in node_links:
-                        new_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
+                        if "Stats" in node_links[link_id]:
+                            new_doc["Links"][overlayid][nodeid][link_id]["Stats"] = tuple(node_links[link_id]["Stats"])
+                        else:
+                            new_doc["Links"][overlayid][nodeid][link_id]["Stats"] = ()
 
                 tempResponse = \
                 self._find_diff_between_intervals(new_doc["Links"][overlayid][nodeid],old_doc["Links"][overlayid][nodeid],str(new_doc["_id"]),
