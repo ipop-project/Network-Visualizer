@@ -44,8 +44,8 @@ class CollectorServiceInstance(object):
         Serves the PUT request from the OverlayVisualizer controller module
         """
 
-        self._logger.debug("Received request {} for node_id"
-                           " {}".format(request.json, node_id))
+        self._logger.info("Received request {} for node_id"
+                          " {}".format(request.json, node_id))
 
         if self.intr_or_term:
             self._logger.warn("Rejecting request with a 500 because of"
@@ -86,8 +86,13 @@ class CollectorServiceInstance(object):
                     "Updating node data for node_id {}".format(node_id))
 
                 # Add the optional human-readable node name (if provided)
+                node_data = dict()
                 if "NodeName" in req:
-                    node_data = {"NodeName": req["NodeName"]}
+                    node_data["NodeName"] = req["NodeName"]
+
+                if "BridgeController" in req_data[ovrl_id]:
+                    node_data["IP4"] = \
+                            req_data[ovrl_id]["BridgeController"]["IP4"]
 
                 self.data_held["Nodes"][ovrl_id][node_id] = node_data
 

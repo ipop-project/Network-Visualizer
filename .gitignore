@@ -58,6 +58,8 @@ target/
 
 log.txt
 error.log
+nohup.err
+network_visualizer.log*
 
 *.sln
 *.pyproj
