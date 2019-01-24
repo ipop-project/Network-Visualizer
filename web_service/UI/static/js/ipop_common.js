@@ -93,8 +93,12 @@ function buildNetworkTopology(overlayid,intervalNo)
         }
       });
     }
-
-    cy.makeLayout({name:'circle'}).run();
+    var lay_opt = {
+      name: 'circle',
+      clockwise: true,
+      sort:  function(a, b){return a.data('id').localeCompare(b.data('id'))}
+    }
+    cy.makeLayout(lay_opt).run();
     for (nodeid in linkData["0"][overlayid]["current_state"]) {
       for (linkid in linkData["0"][overlayid]["current_state"][nodeid]){
         var cyData = {
