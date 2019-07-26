@@ -12,11 +12,12 @@
     <link rel="stylesheet" href="/static/CSS/home.css">
     <link rel="stylesheet" href="/static/CSS/toggle_switch.css">
     <link rel="stylesheet" href="/static/CSS/menuBar.css">
+    <link rel="stylesheet" href="/static/CSS/iconsPage.css">
     <link rel="stylesheet" href="/static/CSS/TippyTheme/node.css">
     <link rel="stylesheet" href="/static/CSS/TippyTheme/edge.css">
     <link rel="stylesheet" href="/static/CSS/TippyTheme/nodeData.css">
-    <script src="/static/JavaScript/get_data.js"></script>
-    
+    <script src="/static/JavaScript/getData.js"></script>
+
     <script src="/min/tippy.js/umd/index.all.js"></script>
 
 
@@ -26,127 +27,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    <!-- <script src="https://unpkg.com/popper.js@1.14.7/dist/umd/popper.js"></script> -->
     <script src="/static/JavaScript/cytoscape-popper.js"></script>
-    <!-- <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.js"></script> -->
+
+  
 
     <title>IPOP Visualizer</title>
-    <style>
-        div.cp {
-            position: fixed;
-            top: 72px;
-            left: 72px;
-            height: 48px;
-
-        }
-
-        .speech-CP {
-            position: relative;
-            background: #213758;
-            border-radius: 6px 0px 0px 6px;
-            z-index: 200;
-        }
-
-        .speech-CP:after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            width: 0;
-            height: 0;
-            border: 27px solid transparent;
-            border-left-color: #213758;
-            border-right: 0;
-            margin-top: -27px;
-            margin-right: -27px;
-            z-index: 200;
-
-        }
-
-        .speech-borderCP {
-            position: relative;
-
-            background: #405B80;
-            border-radius: 6px 0px 0px 6px;
-            z-index: 101;
-            padding: 1px;
-            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-        }
-
-
-
-        .speech-borderCP:after {
-            content: "";
-            position: absolute;
-            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-
-            -moz-transform: rotate(-45deg);
-            -webkit-transform: rotate(-45deg);
-            right: -20;
-            top: 9;
-            width: 0;
-            height: 0;
-            border-width: 20px;
-            border-style: solid;
-            border-color: transparent #405B80 #405B80 transparent;
-            z-index: 100;
-        }
-
-        .nav {
-
-            list-style-type: none;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        .nav div {
-            display: inline-block;
-
-        }
-
-        .next {
-            background-color: #56C5BC;
-            border: 1px solid #38807A;
-            border-radius: 0px 6px 6px 0px;
-            left: 50px;
-            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-        }
-
-        .container {
-            position: relative;
-        }
-
-        .image {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            width: 100%;
-            opacity: 0;
-            transition: .3s ease;
-            background-color: red;
-        }
-
-        .container:hover .overlay {
-            opacity: 0.5;
-        }
-    </style>
 
 
 </head>
+<!-- First Page -->
 
-<body style="background-color:#101B2B; overflow:hidden; ">
+<body style="background-color:#101B2B; overflow:hidden;">
     <nav class="navbar" style="z-index: 50000">
         <a class="nav-link p-0" href="#">
             <img src="/static/icons/ipop_logo.png" alt="avatar image" height="35" width="35">
@@ -157,6 +49,7 @@
                     NETWORK VISUALIZER</a>
             </li>
         </ul>
+        <!-- Toggle switch -->
         <form class="form-inline my-2 my-lg-0 ml-auto">
             <div class="can-toggle demo-rebrand-2" style="right:125;">
                 <input id="toggle" type="checkbox">
@@ -176,14 +69,40 @@
 
     <div id="overlayShowUp" style="position: fixed;z-index: 9999999999"></div>
 
-
-
+    <div class="lds-default" id="loader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <!-- Calling page -->
     <div id="hoverDetail"></div>
     <div id="detail"></div>
     <div id="edgeDetail"></div>
     <div id="cy"></div>
-    <script src="/static/JavaScript/new_control.js"></script>
+    <script src="/static/JavaScript/visualizerSystem.js"></script>
+    <script>
+        /* show overlay ID on overlay's tag */
+        $(document).ready(function () {
+            $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
+                if (statusTxt == "success") {
+        
+                    $('#travel').hide();
+                } else {
+                    alert("Error: " + xhr.status + ": " + xhr.statusText);
+                }
+            });
+        });
 
+    </script>
 
 
 </body>

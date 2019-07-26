@@ -13,23 +13,10 @@ var BuildIPOPData = (function () {
   function getData() {
     return ipopData;
   }
-  function setOverlays(overlays) {
-    numNodes = overlays[overlayID].NumNodes;
-    numLinks = overlays[overlayID].NumLinks;
-  }
-  function setNodes(node) {
-    nodeIDList = Object.keys(node[overlayID]).sort();
-    nodeList = node[overlayID];
-  }
-
-  function setLinks(link) {
-    linkList = link[overlayID];
-    // alert(Object.keys(linkList).length);
-  }
 
   function getLinkIDListOf(nodeID) {
     linkIDList = Object.keys(linkList[nodeID]);
-    return linkIDList.sort();
+    return linkIDList;
   }
 
   function getLinkListOf(nodeID) {
@@ -38,19 +25,22 @@ var BuildIPOPData = (function () {
   }
 
   function constructor() {
-    this.setData = function (data) {
-      ipopData = data;
-      var overlays = ipopData.Overlays
-      overlayID = Object.keys(overlays)[0];     /* in version.1 we use the first overlays */
-      setOverlays(overlays);
-
-      var node = ipopData.Nodes
-      setNodes(node);
-
-      var link = ipopData.Links
-      setLinks(link);
-
-    };
+    this.setOverlayID = function (id) {
+      overlayID = id;
+    }
+    this.setOverlays = function(overlays) {
+      numNodes = overlays.NumNodes;
+      numLinks = overlays.NumLinks;
+    }
+    this.setNodes = function(node) {
+      nodeIDList = Object.keys(node).sort();
+      nodeList = node;
+    }
+  
+    this.setLinks = function(link) {
+      linkList = link;
+  
+    }
     this.getData = function () {            /* return All data */
       return getData();
     }

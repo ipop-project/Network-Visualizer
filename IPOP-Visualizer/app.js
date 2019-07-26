@@ -16,30 +16,30 @@ var newData = require("./public/JSON/new_ipop.json");
 var ipopData = require("./public/JSON/ipopData.json");
 
 app.get('/', function (req, res) { //use absolute path to html file
-    console.clear()
+
     res.sendFile(path.join(__dirname, '/public/HTML/ipop.html'));
 });
 
 app.get('/detail.html', function (req, res) { //use absolute path to html file
-    console.clear()
+
     res.sendFile(path.join(__dirname, '/public/HTML/detail.html'));
 });
 
 app.get('/edge_detail.html', function (req, res) { //use absolute path to html file
-    console.clear()
+  
     res.sendFile(path.join(__dirname, '/public/HTML/edge_detail.html'));
 });
 
 
 
 app.get('/ortherNodeDetail.html', function (req, res) { //use absolute path to html file
-    console.clear()
+
     res.sendFile(path.join(__dirname, '/public/HTML/ortherNodeDetail.html'));
 });
 
 
 app.get('/icons.html', function (req, res) { //use absolute path to html file
-    console.clear()
+
     res.sendFile(path.join(__dirname, '/public/HTML/icons.html'));
 });
 
@@ -58,6 +58,9 @@ app.get('/ipopData', (req, res) => {
 
 
 app.listen(port, function () { 
-    console.log('Server Start port: ' + port);
+    console.log("*********************************************");
+    console.log('IPOP Visualizer starts at port: ' + port);
+    console.log('To stop the IPOP Visualizer just enter ctrl + c');
+    console.log("*********************************************");
 });
-  
+

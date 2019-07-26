@@ -13,16 +13,17 @@
 </head>
 
 <body>
-
+    <!--Start Node Detail Bar -->
     <div class="fixed">
-        <div class="box" style="padding: 0">
+        <!-- Node Name Header -->
+        <div class="box" style="padding: 0 "> 
             <div class="row">
                 <dt class="col-sm-9" style="font-size: 22px;color:white;" id="nodeName">Renato01</dt>
                 <div id="cross" class="col-sm-3"><img src="/static/icons/cross.png"></div>
             </div>
 
         </div>
-
+        <!-- Hide and Show Info Botton -->
         <div class="box">
             <div class="row" style="padding-bottom: 5px">
                 <div class="col-sm-7" style="padding: 0;margin-top: auto;margin-bottom: auto;">
@@ -38,8 +39,8 @@
                     style="display: none; font-size:11px;border-radius: 11px;background-color:#405B80;color: white"> SHOW INFO
                 </button>
             </div>
-
         </div>
+        <!-- Node Spec Detail -->
         <div class="card border-0" style="margin-bottom: 0px;box-shadow: none;">
             <div class="card-body border-0" style="padding: 0px ;margin-bottom: 0px;box-shadow: none;" id="node1">
                 <p class="topic">Node ID</p>
@@ -59,11 +60,15 @@
                 <hr style="border-color:#405B80;">
             </div>
         </div>
+        <!-- Detail Connected Node -->
         <div>
+            <!-- Number of Connected Node-->
             <dt style="font-size: 22px;color:white;" id="connectedCount">Connected Node(5)</dt>
+            <!-- List of Connected Node -->
             <div id="otherNode">
                 <div id="warpper">
                     <div class="card border-0">
+                        <!-- Before Card Clicked -->
                         <div class="card-header text-left" style="border-radius: 6px;" id="card2_show">
                             <div class="box" style="padding: 0px;">
                                 <div class="row">
@@ -80,6 +85,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- After Card Clicked -->
                         <div class="card-header text-left " style="display: none; border-radius: 6px 6px 0px 0px;"
                             id="card2_hide">
                             <div class="box" style="padding: 0px;">
@@ -94,10 +100,9 @@
                                     <div class="col-sm-4" style="line-height: 10px ;margin-bottom:0; "><img
                                             src="/static/icons/upArrow.png"></div>
                                 </div>
-
                             </div>
-
                         </div>
+                        <!-- Detail Inside Connected Node (After Clicked)-->
                         <div class="card-body border-top-0" style=" display: none;" id="card2_body">
                             <div class="inner">
                                 <p class="topic">Node ID</p>
@@ -145,6 +150,7 @@
                                 <p class="data">1</p>
                             </div>
                         </div>
+                         <!--End Detail Inside Connected Node (After Clicked)-->
                     </div>
                 </div>
                 <br>
@@ -154,9 +160,10 @@
         </div>
 
     </div>
+    <!-- Stop Detail Bar -->
 
     <script>
-
+        // Arrow switching
         $(document).ready(function () {
             $("#card2_show,#card2_hide").click(function () {
                 if ($("#card2_show").is(":hidden")) {
@@ -170,11 +177,7 @@
                 }
             });
         });
-        $(document).ready(function () {
-            $("#hide_info").click(function () {
-                $("#node1").slideToggle("slow");
-            });
-        })
+
         $(document).ready(function () {
                 $("#hide_info,#show_info").click(function () {
                     if ($("#hide_info").is(":hidden")) {

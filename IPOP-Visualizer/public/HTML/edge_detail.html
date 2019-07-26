@@ -13,8 +13,9 @@
 </head>
 
 <body>
-
+    <!-- Start Edge Bar -->
     <div class="fixed">
+        <!-- Edge Name Header -->
         <div class="card border-0" style="box-shadow: none; margin-bottom: 8px;">
             <div class="card-body border-0" style="padding: 0px ;margin-bottom: 0px;box-shadow: none;">
                 <div class="row">
@@ -24,13 +25,18 @@
                 </div>
             </div>
         </div>
+        <!-- Detail Node between Sender and Receiver Botton-->
         <div class="row" style="padding: 0px 12px 11px 12px;">
+            <!-- Group Botton Sender and Receiver -->
             <div class="box-source-taget col-sm-11" style="padding: 0px 5px 0px 0px;">
-                <div class="speech-bubbleBorder2">
-                    <div class="speech-bubble3">
+                <!-- Sender botton -->
+                <!-- Boder botton -->
+                <div class="senderBorder">
+                    <!-- Box Sender Botton -->
+                    <div class="senderArrowAfter">
                         <div class="card border-0 " style="margin-bottom: 0px">
-                            <div class="card-header text-left border-0 speech-bubble"
-                                style="border-radius: 6px 6px 0 0;background-color: #56C5BC;box-shadow: none;"
+                            <!-- Before Sender Clicked -->
+                            <div class="card-header text-left border-0 senderBox"
                                 id="sourceNodeShow">
                                 <div class="box" style="padding: 0px;">
                                     <div class="row">
@@ -46,8 +52,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-header text-left border-0 bubbleBorder2"
-                                style="display: none; border-radius: 6px 6px 0 0;background-color: #56C5BC;box-shadow: none;"
+                            <!-- After Sender Clicked -->
+                            <div class="card-header text-left border-0 senderBoxAfter"
                                 id="sourceNodeHide">
                                 <div class="box" style="padding: 0px;">
                                     <div class="row">
@@ -64,6 +70,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Detail Node Sender -->
                             <div class="card-body border-top-0 border-bottom-0"
                                 style=" display: none;border-radius:0px;" id="sourceBody">
                                 <div class="inner" id="sourceData">
@@ -85,12 +92,13 @@
                             </div>
                         </div>
                     </div>
-
+                    <!-- End Box Sender Botton -->
                 </div>
+                <!-- End Boder botton -->
+                <!-- End Sender botton -->
                 
-                
-                <div class="card-header text-left "
-                    style="border-radius: 0px 0px 6px 6px;background-color: #9FC556;box-shadow: none;border-color: #5D7698;"
+                <!-- Before Receiver Clicked -->
+                <div class="card-header text-left receiverBox"
                     id="targetNodeShow">
                     <div class="box" style="padding: 0px;">
                         <div class="row">
@@ -109,8 +117,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-header text-left"
-                    style="display: none; border-radius: 0px;background-color: #9FC556;box-shadow: none;border-color: #5D7698;"
+                <!-- After Receiver Clicked -->
+                <div class="card-header text-left receiverBoxAfter"
                     id="targetNodeHide">
                     <div class="box" style="padding: 0px;">
                         <div class="row">
@@ -127,6 +135,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Detail Receiver -->
                 <div class="card-body border-top-0" style=" display: none;" id="targetBody">
                     <div class="inner" id="tgtData">
                         <p class="topic">Node ID</p>
@@ -147,11 +156,14 @@
                 </div>
 
             </div>
+            <!-- End Group Botton Sender and Receiver -->
             <!-- image swap -->
             <div class="col-sm-1 " style="line-height: 10px ;margin:auto;padding:0px;" id="swap-icon"><img
                     src="/static/icons/sort.png" style="width: 21px; height: 21px;transform: scaleX(-1) rotate(90deg);">
             </div>
         </div>
+        <!-- End Detail Node between Sender and Receiver Botton-->
+        <!-- Hide and Show Info Botton -->
         <div class="box">
             <div class="row" style="padding-bottom: 10px">
                 <div class="col-sm-7" style="padding: 0;margin-top: auto;margin-bottom: auto;">
@@ -168,7 +180,7 @@
                 </button>
             </div>
         </div>
-
+        <!-- Detail Between Sender and Receiver -->
         <div class="card border-0 " style="margin-bottom: 0px; " id="edgDet">
             <div class="card-body" style=" border-radius:0px;border-radius: 6px ">
                 <div class="inner">
@@ -218,11 +230,13 @@
                 </div>
             </div>
         </div>
+        <!-- End Detail Between Sender and Receiver -->
         <br><br>
     </div>
+    <!-- End Edge Bar -->
 
     <script>
-
+        // Arrow switching
         $(document).ready(function () {
             $("#sourceNodeShow,#sourceNodeHide").click(function () {
                 if ($("#sourceNodeShow").is(":hidden")) {

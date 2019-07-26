@@ -1,3 +1,4 @@
+/* Default Menu Bar */
 div.fixed {
     position: fixed;
     top: 56px;
@@ -12,7 +13,7 @@ div.fixed {
     overflow: scroll;
     z-index: 99999999;
 }
-
+/* Card Node Connected */
 .card-header {
     background-color: #5D7698;
     border: 3px solid #405B80;
@@ -23,36 +24,35 @@ div.fixed {
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
     border-radius: 6px;
 }
-
+/* Box spec list */
 .card {
     background-color: #213758;
     margin-bottom: 10px
 }
-
 .card-body {
     background-color: #213758;
     border: 3px solid #405B80;
     color: white !important;
 }
-
+/* Topic node */
 p.topic {
     color: #909BAC;
     line-height: 15px;
     font-size: 14px;
 }
-
+/* Text Default in Detail Bar */
 p.data {
     color: white;
     line-height: 27px;
     margin-top: -18px;
     font-size: 16px;
 }
-
+/* Padding Inside Card Connected Node */
 .inner {
     padding-left: 5px;
     padding-right: 15px;
 }
-
+/* Padding Box Inside Card Connected Node */
 .boxInner {
     position: relative;
     padding: 10px;
@@ -81,9 +81,7 @@ div.card-body {
     padding-left: 5px;
     padding-right: 5px;
 }
-
-div.card {}
-
+/* Scollbar Default in IPOP */
 /* width */
 
 ::-webkit-scrollbar {
@@ -107,72 +105,10 @@ div.card {}
 ::-webkit-scrollbar-thumb:hover {
     background: #405980;
 }
+/* End Scollbar Default in IPOP */
 
-.speech-bubble {
-    position: relative;
-    background: #56C5BC;
-    border-radius: 6px;
-}
-
-.speech-bubble:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 8px solid transparent;
-    border-top-color: #56C5BC;
-    border-bottom: 0;
-    margin-left: -8.2px;
-    margin-bottom: -8px;
-    z-index: 9999999;
-}
-
-.speech-bubble2 {
-    position: relative;
-    background: #9FC556;
-    border-radius: 6px;
-}
-
-.speech-bubble2:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 85%;
-    width: 0;
-    height: 0;
-    border: 8px solid transparent;
-    border-bottom-color: #9FC556;
-    border-top: 0;
-    margin-left: -8px;
-    margin-top: -8px;
-    z-index: 99999999;
-}
-
-.speech-bubble3 {
-    position: relative;
-    background: #213758;
-    border-radius: 6px;
-    padding-bottom:0px;
-}
-
-.speech-bubble3:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 8px solid transparent;
-    border-top-color: #213758;
-    border-bottom: 0;
-    margin-left: -8.2px;
-    margin-bottom: -8px;
-    z-index: 200;
-}
-
-.speech-bubbleBorder2 {
+/* Sender border box */
+.senderBorder {
     position: relative;
     background:  #5D7698;
     border-radius: 6px 6px 0px 0px;
@@ -180,8 +116,8 @@ div.card {}
     
     
 }
-
-.speech-bubbleBorder2:after {
+/* Arrow sender border box */
+.senderBorder:after {
  
     content: '';
     position: absolute;
@@ -197,166 +133,70 @@ div.card {}
     z-index: 100;
   
 }
-.speech-bubbleBorder3 {
-    position: relative;
-    background: #5D7698;
-    border-radius: 0px 0px 6px 6px;
-    padding: 1px ;
-
-    
-}
-
-.speech-bubbleBorder3:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 85%;
-    width: 0;
-    height: 0;
-    border: 9px solid transparent;
-    border-bottom-color: #5D7698;
-    border-top: 0;
-    margin-left: -9.9px;
-    margin-top: -9px;
-    margin-bottom: 0px;
-}
-div.cp {
-    position: fixed;
-    top: 72px;
-    left: 82px;
-    height: 48px;
-
-}
-
-.speech-CP {
+/* Arrow sender node clicked*/
+.senderArrowAfter {
     position: relative;
     background: #213758;
-    border-radius: 6px 0px 0px 6px;
-    z-index: 200;
+    border-radius: 6px;
+    padding-bottom:0px;
 }
-
-.speech-CP:after {
+/* Border source node clicked*/
+.senderArrowAfter:after {
     content: '';
     position: absolute;
-    right: 0;
-    top: 50%;
-    width: 0;
-    height: 0;
-    border: 24px solid transparent;
-    border-left-color: #213758;
-    border-right: 0;
-    margin-top: -24px;
-    margin-right: -24px;
-    z-index: 200;
-
-}
-
-.speech-borderCP {
-    position: relative;
-    background: #405B80;
-    border-radius: 6px 0px 0px 6px;
-    z-index: 101;
-    padding: 1px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-
-
-.speech-borderCP:after {
-    content: "";
-    position: absolute;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-    -moz-transform: rotate(-45deg);
-    -webkit-transform: rotate(-45deg);
-    right: -17;
-    top: 7.2;
-    width: 0;
-    height: 0;
-    border-width: 17.4px;
-    border-style: solid;
-    border-color: transparent #405B80 #405B80 transparent;
-    z-index: 100;
-}
-
-.nav {
-
-    list-style-type: none;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
-
-.nav div {
-    display: inline-block;
-
-}
-
-.next {
-    background-color: #56C5BC;
-    border: 1px solid #38807A;
-    border-radius: 0px 6px 6px 0px;
-    left: 50px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
-}
-
-.home {
-    position: fixed;
-    top: 65px;
-    left: 16px;
-
-    padding: 0px;
-}
-
-.refresh {
-    position: fixed;
-    top: 121px;
-    left: 16px;
-
-    padding: 0px;
-}
-
-.info {
-    position: fixed;
-    bottom: 16px;
-    left: 16px;
-}
-
-.image {
-    display: block;
-    /* width: 63px;
-    height: 63px; */
-    margin: 0px;
-    padding: 0px;
-}
-
-.overlay {
-    position: absolute;
-    border-radius: 8px;
-    top: 6;
     bottom: 0;
-    left: 8.8;
-
-    height: 50px;
-    width: 50px;
-    opacity: 0;
-    transition: .3s ease;
-    background-color: #405B80;
-
-    cursor: pointer;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-top-color: #213758;
+    border-bottom: 0;
+    margin-left: -8.2px;
+    margin-bottom: -8px;
+    z-index: 200;
 }
 
-.home:hover .overlay {
-    opacity: 0.3;
-   
-}
-
-.refresh:hover .overlay {
-    opacity: 0.3;
-}
-.overlayBox {
+/* Sender node box */
+.senderBox {
+    position: relative;
     background-color: #56C5BC;
-    border: 1px solid #38807A;
-    border-radius: 6px;
-
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.25);
+    border-radius: 6px 6px 0 0;
+    box-shadow: none;
 }
+/* Arrow Edge source node  */
+.senderBox:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-top-color: #56C5BC;
+    border-bottom: 0;
+    margin-left: -8.2px;
+    margin-bottom: -8px;
+    z-index: 9999999;
+}
+/* Sender box clicked */
+.senderBoxAfter{
+    display: none; 
+    border-radius: 4px 4px 0 0;
+    background-color: #56C5BC;
+    box-shadow: none;
+}
+/* Receiver Box */
+.receiverBox{
+    border-radius: 0px 0px 6px 6px;
+    background-color: #9FC556;
+    box-shadow: none;
+    border-color: #5D7698;
+}
+/* Receiver Box clicked */
+.receiverBoxAfter{
+    display: none; border-radius: 0px;
+    background-color: #9FC556;
+    box-shadow: none;
+    border-color: #5D7698;
+}
+
