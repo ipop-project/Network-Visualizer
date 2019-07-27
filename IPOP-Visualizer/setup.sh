@@ -2,9 +2,9 @@
 
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 
-sudo apt install nodejs
+sudo apt-get install -y nodejs
 
-npm install init
+npm init
 npm install express
 npm install tippy.js
 
