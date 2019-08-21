@@ -5,6 +5,7 @@ var serverIP;
 var allowOrigin;
 var url;
 
+
 /* request config from server */
 fetch(server_url).then(res => res.json())
     .then(data => {
