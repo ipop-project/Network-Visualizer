@@ -1,4 +1,16 @@
 
+    //$.get("/server_ip", data => {
+    //    //var dataObj = JSON.parse(data)
+    //    alert(data.server.ip)
+    //});
+
+const server_url = '/server_ip'
+
+$.getJSON(server_url)
+    .then(function (data) {
+        alert(data.server.ip) 
+    })
+
 var intervalNo = new Date().toISOString().split(".")[0];
 var serverIP = '34.209.33.166:5000';
 var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/

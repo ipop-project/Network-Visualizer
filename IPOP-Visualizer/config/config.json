@@ -1,0 +1,5 @@
+{"server" : {
+  "ip": "34.209.33.166:5000",
+  "allowOrigin": "https://cors-anywhere.herokuapp.com/"
+}
+}
