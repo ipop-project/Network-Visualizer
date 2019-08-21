@@ -1,20 +1,28 @@
+/* initial variable */
+const server_url = '/server_ip';
+var intervalNo = new Date().toISOString().split(".")[0];
+var serverIP;
+var allowOrigin;
+var url;
 
-    //$.get("/server_ip", data => {
-    //    //var dataObj = JSON.parse(data)
-    //    alert(data.server.ip)
-    //});
-
-const server_url = '/server_ip'
-
-$.getJSON(server_url)
-    .then(function (data) {
-        alert(data.server.ip) 
+/* request config from server */
+fetch(server_url).then(res => res.json())
+    .then(data => {
+        serverIP = data.server.ip;
+        allowOrigin = data.server.allowOrigin; /* you need to allow origin to get data from outside server*/
+        url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True';
+    })
+    .then(() => {
+        showAllOverlays();
+    })
+    .catch(err => {
+        alert(err);
     })
 
-var intervalNo = new Date().toISOString().split(".")[0];
-var serverIP = '34.209.33.166:5000';
-var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
-var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+//var intervalNo = new Date().toISOString().split(".")[0];
+//var serverIP = '34.209.33.166:5000';
+//var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
+//var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
 
 var showAllOverlays = function () {
    
@@ -115,7 +123,7 @@ async function requestIPOPData(overlayID) {
         });
 }
 
-showAllOverlays();
+//showAllOverlays();
 
 /* create graph */
 var createGraph = function (ipopObj) {
