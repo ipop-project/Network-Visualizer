@@ -30,7 +30,7 @@
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="/static/JavaScript/cytoscape-popper.js"></script>
 
-  
+
 
     <title>IPOP Visualizer</title>
 
@@ -68,6 +68,12 @@
     </nav>
 
     <div id="overlayShowUp" style="position: fixed;z-index: 9999999999"></div>
+  
+     <!-- landing page -->
+     <div class="container" style="top: 40%;left: 30%; position: fixed;z-index: 9999">
+        <div class="row" id="groupOfOverlays"  style=" margin: 0 auto;width: 80%;">
+        </div>
+    </div>
 
     <div class="lds-default" id="loader">
         <div></div>
@@ -94,7 +100,7 @@
         $(document).ready(function () {
             $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
                 if (statusTxt == "success") {
-        
+
                     $('#travel').hide();
                 } else {
                     alert("Error: " + xhr.status + ": " + xhr.statusText);
@@ -103,6 +109,8 @@
         });
 
     </script>
+
+  
 
 
 </body>
