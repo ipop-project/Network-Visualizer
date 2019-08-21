@@ -119,7 +119,6 @@ async function requestIPOPData(overlayID) {
         });
 }
 
-//showAllOverlays();
 
 /* create graph */
 var createGraph = function (ipopObj) {
