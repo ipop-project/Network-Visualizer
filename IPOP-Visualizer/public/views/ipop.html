@@ -20,6 +20,7 @@
 
     <script src="/min/tippy.js/umd/index.all.js"></script>
 
+
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -29,7 +30,10 @@
     <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
     <script src="/static/JavaScript/cytoscape-popper.js"></script>
 
+
+
     <title>IPOP Visualizer</title>
+
 
 </head>
 <!-- First Page -->
@@ -53,9 +57,9 @@
                     <div class="can-toggle__switch" data-checked="Map" data-unchecked="Topology"></div>
                 </label>
             </div>
-            <input class="form-control border-0"
-                style="margin-right: 25px;background-color: #192841;width: 250px;height: 35px" type="search"
-                placeholder="Search" aria-label="Search">
+            <input id="searchForm" class="form-control border-0"
+                   style="margin-right: 25px;background-color: #192841;width: 250px;height: 35px" type="search"
+                   placeholder="Search" aria-label="Search">
             <a class="nav-link p-0" href="#" style="margin-right: 15px">
                 <img src="/static/icons/filter.png" alt="avatar image">
             </a>
@@ -64,6 +68,12 @@
     </nav>
 
     <div id="overlayShowUp" style="position: fixed;z-index: 9999999999"></div>
+  
+     <!-- landing page -->
+     <div class="container" style="top: 40%;left: 30%; position: fixed;z-index: 9999">
+        <div class="row" id="groupOfOverlays"  style=" margin: 0 auto;width: 80%;">
+        </div>
+    </div>
 
     <div class="lds-default" id="loader">
         <div></div>
@@ -90,7 +100,7 @@
         $(document).ready(function () {
             $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
                 if (statusTxt == "success") {
-        
+
                     $('#travel').hide();
                 } else {
                     alert("Error: " + xhr.status + ": " + xhr.statusText);
@@ -99,6 +109,8 @@
         });
 
     </script>
+
+  
 
 
 </body>
