@@ -1,11 +1,29 @@
-
+/* initial variable */
+const server_url = '/server_ip';
 var intervalNo = new Date().toISOString().split(".")[0];
-var serverIP = '34.209.33.166:5000';
-var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
-var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
-var temp = '0'
+var serverIP;
+var allowOrigin;
+var url;
+var isUpdate = false;
+var allNodes;
+
+
+/* request config from server */
+fetch(server_url).then(res => res.json())
+    .then(data => {
+        serverIP = data.server.ip;
+        allowOrigin = data.server.allowOrigin; /* you need to allow origin to get data from outside server*/
+        url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True';
+    })
+    .then(() => {
+        showAllOverlays();
+    })
+    .catch(err => {
+        alert(err);
+    })
+
 var showAllOverlays = function () {
-   
+
     $.getJSON(url)
         .then(function (overlays, status) {
             if (status == "error") throw error;
@@ -14,18 +32,13 @@ var showAllOverlays = function () {
             $("#loader").hide();
             for (let index = 0; index < overlayIDList.length; index++) {
 
-                var html = '<a id="overlay' + index + '" class="cloudBtn" href="javascript:requestIPOPData(' + "'" + overlayIDList[index] + "'" + ')"><img border="0" class="cloudBtn" src="/static/icons/overlayIcon.svg" width="100" height="100"></img></a>'
+                var html = '<div class="col-md-3"  style="z-index: 9999999999;" ><div class="container" style="width: 210px;height: 200px;padding: 5;"><input id="layer-btn' + index + '" type="image"  src="/static/icons/overlayIcon.svg" style=" width:200 ;height:150;outline:none"><a href="#" class="btn card-layer" style="background-color: #213758;border: 3px solid #405b80;">' + overlayIDList[index] + '</a></div></div>';
+                $("#groupOfOverlays").append(html);
 
-                $("#overlayShowUp").append(html);
-
-                tippy('#overlay'+index, {
-                    content: overlayIDList[index],
-                    // trigger: 'manual',
-                    arrow: true,
-                    placement: 'bottom',
-                    sticky: true,
-                    theme: "node",
-                    duration: [0, 0]
+                $(document).ready(function () {
+                    $("#layer-btn" + index).click(function () {
+                        requestIPOPData(overlayIDList[index]);
+                    });
                 });
             }
         }).catch(function (error) {
@@ -34,23 +47,50 @@ var showAllOverlays = function () {
 }
 
 
-
 /* request data from server */
 async function requestIPOPData(overlayID) {
-    // alert(overlayID)
-    /*  old system */
+
+
+    $("#groupOfOverlays").hide();
+    $(".cloudBtn").hide();
+    $("#loader").show();
+    $("#cy").empty();
+
+    var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
+    var edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
+
+    /* update graph*/
+    if (isUpdate) {
+        intervalNo = new Date().toISOString().split(".")[0];
+        nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
+        edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
+        url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    }
+
+    /*************OLD SYSTEM*************/
     // let query;
-    // await $.get(`/newData?${query}`, data => {
+    // await $.get(`/ipopData?${query}`, overlays => {
+
     //     var ipopObj = new BuildIPOPData();
+    //     /* you can set data by another way */
+    //     /* in this case i just sleepy*/
 
-    //     ipopObj.setData(data.ipop);
+    //     ipopObj.setOverlayID(overlayID);
+    //     ipopObj.setOverlays(overlays.ipop['Overlays'][overlayID]);
+    //     ipopObj.setLinks(overlays.ipop['Links'][overlayID]);
+    //     ipopObj.setNodes(overlays.ipop['Nodes'][overlayID]);
 
+    //     /* show overlay ID on overlay's tag */
     //     $(document).ready(function () {
     //         $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
     //             if (statusTxt == "success") {
-    //                 $('#overLayID').show();
-    //                 $('#overLayID').html('Overlay: <strong>' + ipopObj.getOverlayID() + '</strong>');
+    //                 $('.overlayTag').show();
+    //                 $('#overLayID').html('Overlay: <strong>' + overlayID + '</strong>');
     //                 $('#travel').hide();
+    //                 $('.minus').show();
+    //                 $('.zoom').show();
+    //                 $('.info').show();
+
     //             } else {
     //                 alert("Error: " + xhr.status + ": " + xhr.statusText);
     //             }
@@ -59,14 +99,13 @@ async function requestIPOPData(overlayID) {
 
     //     createGraph(ipopObj);
     // });
-    ///////////////////////////////////
-    $(".cloudBtn").hide();
-    $("#loader").show();
+    /********END OF OLD SYSTEM*********/
+
     $.getJSON(url)
         .then(function (overlays, status) {
             if (status == "error") throw error;
-            $.getJSON(allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True").then(function (nodes) {
-                $.getJSON(allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True").then(function (links) {
+            $.getJSON(nodeURL).then(function (nodes) {
+                $.getJSON(edgeURL).then(function (links) {
 
                     var ipopObj = new BuildIPOPData();
                     /* you can set data by another way */
@@ -75,6 +114,7 @@ async function requestIPOPData(overlayID) {
                     ipopObj.setOverlays(overlays['current_state'][overlayID]);
                     ipopObj.setLinks(links[overlayID]['current_state']);
                     ipopObj.setNodes(nodes[overlayID]['current_state']);
+
 
                     /* show overlay ID on overlay's tag */
                     $(document).ready(function () {
@@ -86,7 +126,12 @@ async function requestIPOPData(overlayID) {
                                 $('.minus').show();
                                 $('.zoom').show();
                                 $('.info').show();
-                                
+
+                                $("#refresh").click(function () {
+                                    updateGraph(ipopObj.getOverlayID())
+                                });
+                                setTimeout(updateGraph, 3600000, ipopObj.getOverlayID());
+
                             } else {
                                 alert("Error: " + xhr.status + ": " + xhr.statusText);
                             }
@@ -103,7 +148,9 @@ async function requestIPOPData(overlayID) {
         });
 }
 
-showAllOverlays();
+
+// requestIPOPData("101000F") /* test when vm is down */
+/*showAllOverlays();*/
 
 /* create graph */
 var createGraph = function (ipopObj) {
@@ -120,7 +167,6 @@ var createGraph = function (ipopObj) {
         linkIDList.forEach((linkID) => {
             var tgtNodeID = ipopObj.getLinkListOf(nodeID)[linkID]["TgtNodeId"];
             var srcNodeID = ipopObj.getLinkListOf(nodeID)[linkID]["SrcNodeId"];
-            //alert("src "+ srcNodeID + " tgt "+ tgtNodeID + "link: " +linkID);
 
             if (ipopObj.getNodeIDList().includes(tgtNodeID)) {
                 var linkStr = '{ "data": { "id": "' + linkID + '", "source": "' + srcNodeID + '", "target": "' + tgtNodeID + '" } }'
@@ -186,35 +232,27 @@ var createGraph = function (ipopObj) {
     /******************************/
 
 
-    /* node Tippy */
-    var count = 1;
-    var placement = 'right';
-    var tippyList = {};
+    var allowTobuildTippy = true;
+    var buildTippyCondition = ipopObj.getNumNodes() > 50;
 
-    /* this is a code for set tippy position on web page*/
-    ipopObj.getNodeIDList().forEach((nodeID) => {
+    /* check condition */
+    if (buildTippyCondition) {
+        allowTobuildTippy = false;
+    }
 
-        var halfOflist = Math.ceil(ipopObj.getNodeIDList().length / 2) + 1;
-        if (count == 1) {
-            placement = 'top';
-        } else if (count == halfOflist) {
-            placement = 'left';    // actully it should be bottom
-        } else if (count > halfOflist) {
-            placement = 'left';
-        } else {
-            placement = 'right';
-        }
+    /* build Tippy*/
+    var tippyList = makeTippyAllNode(ipopObj, cy, allowTobuildTippy);
 
-        let nodeName = ipopObj.getNodeList()[nodeID]["NodeName"];
-        let nodeI = cy.getElementById(nodeID);
-        let tippyID = makeTippy(nodeI, nodeName, placement, false, 'node');
-        tippyList[nodeID] = tippyID;
-
-        /* fucntion to show tippy if you delete or comment that tippy will be gone*/
-        tippyID.show();
-        count++;
-    });
-
+    /* zoom and show tippy event */
+    if (buildTippyCondition) {
+        cy.on('zoom', function (e) {
+            // console.log(e.target._private.zoom);
+            $(".tippy-popper").remove();
+            if (e.target._private.zoom > 0.98) {
+                tippyList = makeTippyAllNode(ipopObj, cy, true);
+            }
+        });
+    }
 
     /* handdling any event when user mouseover on node */
     mouseOverEvent(ipopObj, cy);
@@ -222,6 +260,12 @@ var createGraph = function (ipopObj) {
     /* handdling any event when user click element on graph */
     clickEvent(ipopObj, cy, tippyList);
 
+    isUpdate = true;
+
+    allNodes = cy.nodes();
+
+    /* for see all nodes data */
+    console.log(allNodes);
 }
 
 
@@ -376,6 +420,7 @@ var mouseOverEvent = function (ipopObj, cy) {
     var nodeDataTippy = null;
 
     cy.on('mouseover', 'node', function (event) {
+
         let nodeID = event.target.id();
         let content1 = ' <div class="inner"  style="margin: auto;text-align:left;">';
         let lineContent = '<hr style="border-color:#405B80;margin-top: -6px;margin-bottom: 6px">';
@@ -429,6 +474,13 @@ var mouseOverEvent = function (ipopObj, cy) {
     });
 }
 
+/*  update graph on visualizer */
+var updateGraph = function (overlaysID) {
+
+    $(".tippy-popper").remove();
+
+    requestIPOPData(overlaysID);
+}
 
 /* draw color when select node */
 var nodeSelect = function (cy, objID, ipopObj) {
@@ -456,6 +508,47 @@ var edgeSelect = function (cy, objID, sourceID, targetID) {
     cy.style().selector('node[id=\"' + targetID + '\"]').style({ width: 36.37, height: 36.37, "background-color": "#9FC556" }).update();
     cy.style().selector('edge[id=\"' + objID + '\"]').style({ 'curve-style': 'haystack', 'line-color': '#56C5BC', 'z-index': "999999" }).update();
 };
+
+/*******************************************************This 3 function you can refactor it to be only 1 function ****************************************************************************** */
+/* function for make all node base on makeTippy*/
+var makeTippyAllNode = function (ipopObj, cy, allowTobuildTippy) {
+    var count = 1;
+    var placement = 'right';
+    var tippyList = {};
+    var tippyID;
+
+    /* this is a code for set tippy position on web page*/
+    ipopObj.getNodeIDList().forEach((nodeID) => {
+
+        var halfOflist = Math.ceil(ipopObj.getNodeIDList().length / 2) + 1;
+        if (count == 1) {
+            placement = 'top';
+        } else if (count == halfOflist) {
+            placement = 'left';    // actully it should be bottom
+        } else if (count > halfOflist) {
+            placement = 'left';
+        } else {
+            placement = 'right';
+        }
+
+        let nodeName = ipopObj.getNodeList()[nodeID]["NodeName"];
+        let nodeI = cy.getElementById(nodeID);
+        tippyID = makeTippy(nodeI, nodeName, placement, false, 'node');
+        tippyList[nodeID] = tippyID;
+
+
+        /* fucntion to show tippy if you delete or comment that tippy will be gone*/
+        if (allowTobuildTippy) {
+            tippyID.show();
+        }
+
+
+        count++;
+    });
+
+
+    return tippyList;
+}
 
 
 /* tippy is description when you hover node or edge */
@@ -494,6 +587,8 @@ var makeTippyNodeData = function (node, theme, htmlEle) {
         zIndex: 1000000
     });
 };
+
+/************************************************************************************************************************************* */
 
 var currentNodeDataAdding = function (nodeName, objID) {
     $("#nodeName").html(nodeName);
@@ -574,9 +669,9 @@ var ortherNodeDataAdding = function (ipopObj, objID) {
             tgtNodeData.push(ipopObj.getLinkListOf(objID)[tgtNodeList[index].linkId]["InterfaceName"]);
             tgtNodeData.push(ipopObj.getLinkListOf(objID)[tgtNodeList[index].linkId]["MAC"]);
 
-            if(ipopObj.getLinkListOf(objID)[tgtNodeList[index].linkId]["State"] == "CEStateConnected"){
+            if (ipopObj.getLinkListOf(objID)[tgtNodeList[index].linkId]["State"] == "CEStateConnected") {
                 tgtNodeData.push("Connected");
-            }else{
+            } else {
                 tgtNodeData.push("-");
             }
 
@@ -724,10 +819,10 @@ addLinkData = function (ipopObj, sourceID, objID) {
     tgtNodeData.push(bit7LinkID);
     tgtNodeData.push(ipopObj.getLinkListOf(sourceID)[objID]["InterfaceName"]);
     tgtNodeData.push(ipopObj.getLinkListOf(sourceID)[objID]["MAC"]);
-   
-    if(ipopObj.getLinkListOf(sourceID)[objID]["State"] == "CEStateConnected"){
+
+    if (ipopObj.getLinkListOf(sourceID)[objID]["State"] == "CEStateConnected") {
         tgtNodeData.push("Connected");
-    }else{
+    } else {
         tgtNodeData.push("-");
     }
 
@@ -803,5 +898,29 @@ var restageEvent = function (tippyID, nodeIdTippy, tippyList) {
     }
 
 }
+
+/* for search */
+$(document).ready(function () {
+    $('input[type="search"][class="form-control border-0"]').keypress(function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            let searchText = $('input[type="search"][class="form-control border-0"]').val();
+            if (allNodes != null) {
+                let searchTarget = cy.getElementById(searchText);
+                if (searchTarget != null) {
+                    searchTarget.trigger('click');
+                }
+                else {
+                    alert("Not Matching");
+                }
+            }
+            else {
+                    alert("Not Matching");
+            }
+            $('input[type="search"][class="form-control border-0"]').val("");
+            return false;
+        }
+    })
+})
 
 
