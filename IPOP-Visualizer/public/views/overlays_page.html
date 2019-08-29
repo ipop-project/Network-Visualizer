@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPOP Visualizer</title>
+
+    <!-- Bootstrap 4.3.1 -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- JS -->
+    <script src="/static/JavaScript/getData.js"></script>
+    <script src="/static/JavaScript/visualizerSystem.js"></script>
+
+    <!-- Cytoscape -->
+    <script src="/static/JavaScript/cytoscape-popper.js"></script>
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+
+    <!-- Tippy.js -->
+    <script src="/min/tippy.js/umd/index.all.js"></script>
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/node.css">
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/edge.css">
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/nodeData.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/CSS/main.css">
+    <link rel="stylesheet" href="/static/CSS/cytoscape_stlye.css">
+
+</head>
+
+<body>
+
+    <!-- header -->
+    <header class="navbar banner">
+        <img id="ipop-logo-img" src="static/icons/ipop_logo2x.png" alt="ipop-logo">
+        <a class="navbar-brand ipop-name" style="margin-left: 1rem" href="#">IPOP NETWORK VISUALIZER</a>
+
+        <form>
+            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+        </form>
+    </header>
+
+    <!-- show all network overlays -->
+    <main class="group-of-overlays">
+    </main>
+
+    <div id="cy"></div>
+
+</body>
+
+</html>

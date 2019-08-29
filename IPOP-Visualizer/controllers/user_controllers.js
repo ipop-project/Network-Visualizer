@@ -2,7 +2,7 @@ const path = require('path');
 
 exports.get_landing_page = (req, res) => {
     //console.log("1"+req.url);
-    res.sendFile(path.join(__dirname, '../public/views/ipop.html'));
+    res.sendFile(path.join(__dirname, '../public/views/overlays_page.html'));
 }
 
 exports.get_icons_page = (req, res) => {
@@ -29,4 +29,3 @@ exports.get_server_config = (req, res) => {
     var data = require('../config/config.json');
     res.json(data);
 }
-

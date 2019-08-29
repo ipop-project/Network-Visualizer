@@ -22,26 +22,28 @@ fetch(server_url).then(res => res.json())
         alert(err);
     })
 
-var showAllOverlays = function () {
+var showAllOverlays = function() {
 
     $.getJSON(url)
-        .then(function (overlays, status) {
+        .then(function(overlays, status) {
             if (status == "error") throw error;
             overlayIDList = Object.keys(overlays['current_state']);
 
-            $("#loader").hide();
+            // $("#loader").hide();
             for (let index = 0; index < overlayIDList.length; index++) {
 
-                var html = '<div class="col-md-3"  style="z-index: 9999999999;" ><div class="container" style="width: 210px;height: 200px;padding: 5;"><input id="layer-btn' + index + '" type="image"  src="/static/icons/overlayIcon.svg" style=" width:200 ;height:150;outline:none"><a href="#" class="btn card-layer" style="background-color: #213758;border: 3px solid #405b80;">' + overlayIDList[index] + '</a></div></div>';
-                $("#groupOfOverlays").append(html);
+                var overlay_card = '<div id = "overlay-card-' + index + '" class="card overlay-card"><img class="card-img-top overlay-card-img" src="/static/icons/overlayIcon.svg" alt="overlay-icon"><span class="badge overlay-card-badge">' + overlayIDList[index] + '</span></div>'
 
-                $(document).ready(function () {
-                    $("#layer-btn" + index).click(function () {
+                $(".group-of-overlays").append(overlay_card);
+
+                $(document).ready(function() {
+                    $("#overlay-card-" + index).click(function() {
                         requestIPOPData(overlayIDList[index]);
+                        // alert(overlayIDList)
                     });
                 });
             }
-        }).catch(function (error) {
+        }).catch(function(error) {
             alert(error);
         });
 }
@@ -50,11 +52,10 @@ var showAllOverlays = function () {
 /* request data from server */
 async function requestIPOPData(overlayID) {
 
-
-    $("#groupOfOverlays").hide();
-    $(".cloudBtn").hide();
-    $("#loader").show();
-    $("#cy").empty();
+    // $(".group-of-overlays").hide();
+    // $(".cloudBtn").hide();
+    // $("#loader").show();
+    // $("#cy").empty();
 
     var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
     var edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
@@ -102,10 +103,10 @@ async function requestIPOPData(overlayID) {
     /********END OF OLD SYSTEM*********/
 
     $.getJSON(url)
-        .then(function (overlays, status) {
+        .then(function(overlays, status) {
             if (status == "error") throw error;
-            $.getJSON(nodeURL).then(function (nodes) {
-                $.getJSON(edgeURL).then(function (links) {
+            $.getJSON(nodeURL).then(function(nodes) {
+                $.getJSON(edgeURL).then(function(links) {
 
                     var ipopObj = new BuildIPOPData();
                     /* you can set data by another way */
@@ -117,33 +118,34 @@ async function requestIPOPData(overlayID) {
 
 
                     /* show overlay ID on overlay's tag */
-                    $(document).ready(function () {
-                        $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
-                            if (statusTxt == "success") {
-                                $('.overlayTag').show();
-                                $('#overLayID').html('Overlay: <strong>' + overlayID + '</strong>');
-                                $('#travel').hide();
-                                $('.minus').show();
-                                $('.zoom').show();
-                                $('.info').show();
+                    // $(document).ready(function() {
+                    //     $("#overlayShowUp").load("/icons.html", function(responseTxt, statusTxt, xhr) {
+                    //         if (statusTxt == "success") {
+                    //             $('.overlayTag').show();
+                    //             $('#overLayID').html('Overlay: <strong>' + overlayID + '</strong>');
+                    //             $('#travel').hide();
+                    //             $('.minus').show();
+                    //             $('.zoom').show();
+                    //             $('.info').show();
 
-                                $("#refresh").click(function () {
-                                    updateGraph(ipopObj.getOverlayID())
-                                });
-                                setTimeout(updateGraph, 3600000, ipopObj.getOverlayID());
+                    //             $("#refresh").click(function() {
+                    //                 updateGraph(ipopObj.getOverlayID())
+                    //             });
+                    //             setTimeout(updateGraph, 3600000, ipopObj.getOverlayID());
 
-                            } else {
-                                alert("Error: " + xhr.status + ": " + xhr.statusText);
-                            }
-                        });
-                    });
+                    //         } else {
+                    //             alert("Error: " + xhr.status + ": " + xhr.statusText);
+                    //         }
+                    //     });
+                    // });
+
 
                     /* crate a graph on the website*/
-                    createGraph(ipopObj);
-
+                    // createGraph(ipopObj);
+                    alert("Overlay name : " + ipopObj.getOverlayID() + "\nNumber of nodes : " + ipopObj.getNumNodes())
                 })
             })
-        }).catch(function (error) {
+        }).catch(function(error) {
             alert(error);
         });
 }
@@ -153,7 +155,7 @@ async function requestIPOPData(overlayID) {
 /*showAllOverlays();*/
 
 /* create graph */
-var createGraph = function (ipopObj) {
+var createGraph = function(ipopObj) {
 
     let nodeList = [];
     let linkList = [];
@@ -181,8 +183,7 @@ var createGraph = function (ipopObj) {
     /* this is object to create a graph */
     var cy = window.cy = cytoscape({
         container: document.getElementById('cy'),
-        style: [
-            {
+        style: [{
                 selector: 'node',
                 style: {
                     // 'content': 'data(id)'
@@ -225,7 +226,7 @@ var createGraph = function (ipopObj) {
 
     /* wait loading graph */
     var layout = cy.layout({ name: 'circle' });
-    layout.pon('layoutstop').then(function (event) {
+    layout.pon('layoutstop').then(function(event) {
         $("#loader").hide();
     });
     layout.run();
@@ -245,7 +246,7 @@ var createGraph = function (ipopObj) {
 
     /* zoom and show tippy event */
     if (buildTippyCondition) {
-        cy.on('zoom', function (e) {
+        cy.on('zoom', function(e) {
             // console.log(e.target._private.zoom);
             $(".tippy-popper").remove();
             if (e.target._private.zoom > 0.98) {
@@ -270,11 +271,11 @@ var createGraph = function (ipopObj) {
 
 
 /* the event when you click on web page */
-var clickEvent = function (ipopObj, cy, tippyList) {
+var clickEvent = function(ipopObj, cy, tippyList) {
     var tippyID = null;
     var nodeIdTippy = null;
     var isClicked = true;
-    cy.on('click', function (event) {
+    cy.on('click', function(event) {
 
         if (event.target !== cy) {
             let objID = event.target.id();
@@ -304,8 +305,8 @@ var clickEvent = function (ipopObj, cy, tippyList) {
 
 
                 /* show edge's detail */
-                $(document).ready(function () {
-                    $("#edgeDetail").load("/edge_detail.html", function (responseTxt, statusTxt, xhr) {
+                $(document).ready(function() {
+                    $("#edgeDetail").load("/edge_detail.html", function(responseTxt, statusTxt, xhr) {
 
                         if (statusTxt == "success") {
                             $("#edgeDetail").show();
@@ -320,13 +321,13 @@ var clickEvent = function (ipopObj, cy, tippyList) {
                             addLinkData(ipopObj, sourceID, objID);
 
 
-                            $(document).ready(function () {
-                                $("#cross").click(function () {
+                            $(document).ready(function() {
+                                $("#cross").click(function() {
                                     location.reload();
                                     $("#edgeDetail").hide();
                                 });
 
-                                $("#swap-icon").click(function () {
+                                $("#swap-icon").click(function() {
 
                                     if (isClicked) {
                                         $("#sourceNode").html("");
@@ -373,12 +374,12 @@ var clickEvent = function (ipopObj, cy, tippyList) {
                 nodeIdTippy = objID;
                 tippyList[nodeIdTippy].set({ theme: 'edge' });
 
-                nodeSelect(cy, objID, ipopObj);     /* select node to show the node that it connect */
+                nodeSelect(cy, objID, ipopObj); /* select node to show the node that it connect */
 
 
-                $(document).ready(function () {
+                $(document).ready(function() {
                     $("#edgeDetail").html("");
-                    $("#detail").load("/detail.html", function (responseTxt, statusTxt, xhr) {
+                    $("#detail").load("/detail.html", function(responseTxt, statusTxt, xhr) {
 
                         if (statusTxt == "success") {
                             $("#detail").show();
@@ -386,8 +387,8 @@ var clickEvent = function (ipopObj, cy, tippyList) {
                             currentNodeDataAdding(nodeName, objID);
                             ortherNodeDataAdding(ipopObj, objID);
 
-                            $(document).ready(function () {
-                                $("#cross").click(function () {
+                            $(document).ready(function() {
+                                $("#cross").click(function() {
                                     location.reload();
                                     $("#detail").hide();
                                 });
@@ -416,10 +417,10 @@ var clickEvent = function (ipopObj, cy, tippyList) {
 }
 
 /* the event when you mouse Over on node in web page*/
-var mouseOverEvent = function (ipopObj, cy) {
+var mouseOverEvent = function(ipopObj, cy) {
     var nodeDataTippy = null;
 
-    cy.on('mouseover', 'node', function (event) {
+    cy.on('mouseover', 'node', function(event) {
 
         let nodeID = event.target.id();
         let content1 = ' <div class="inner"  style="margin: auto;text-align:left;">';
@@ -466,7 +467,7 @@ var mouseOverEvent = function (ipopObj, cy) {
         $("#hoverDetail").html("");
     });
 
-    cy.on('mouseout', 'node', function () {
+    cy.on('mouseout', 'node', function() {
         if (nodeDataTippy != null) {
             nodeDataTippy.destroy();
             nodeDataTippy = null;
@@ -475,7 +476,7 @@ var mouseOverEvent = function (ipopObj, cy) {
 }
 
 /*  update graph on visualizer */
-var updateGraph = function (overlaysID) {
+var updateGraph = function(overlaysID) {
 
     $(".tippy-popper").remove();
 
@@ -483,7 +484,7 @@ var updateGraph = function (overlaysID) {
 }
 
 /* draw color when select node */
-var nodeSelect = function (cy, objID, ipopObj) {
+var nodeSelect = function(cy, objID, ipopObj) {
     cy.style().selector('node').style({ width: 20, height: 20, 'background-color': '#4B6483' }).update();
     cy.style().selector('edge').style({ 'curve-style': 'haystack', 'line-color': '#4B6483', 'z-index': "0" }).update();
     cy.style().selector('node[id=\"' + objID + '\"]').style({ width: 36.37, height: 36.37, "background-color": "#9FC556" }).update();
@@ -501,7 +502,7 @@ var nodeSelect = function (cy, objID, ipopObj) {
 
 
 /* draw color when select edge */
-var edgeSelect = function (cy, objID, sourceID, targetID) {
+var edgeSelect = function(cy, objID, sourceID, targetID) {
     cy.style().selector('node').style({ width: 20, height: 20, 'background-color': '#4B6483' }).update();
     cy.style().selector('edge').style({ 'curve-style': 'haystack', 'line-color': '#4B6483', 'z-index': "0" }).update();
     cy.style().selector('node[id=\"' + sourceID + '\"]').style({ width: 36.37, height: 36.37, "background-color": "#9FC556" }).update();
@@ -511,7 +512,7 @@ var edgeSelect = function (cy, objID, sourceID, targetID) {
 
 /*******************************************************This 3 function you can refactor it to be only 1 function ****************************************************************************** */
 /* function for make all node base on makeTippy*/
-var makeTippyAllNode = function (ipopObj, cy, allowTobuildTippy) {
+var makeTippyAllNode = function(ipopObj, cy, allowTobuildTippy) {
     var count = 1;
     var placement = 'right';
     var tippyList = {};
@@ -524,7 +525,7 @@ var makeTippyAllNode = function (ipopObj, cy, allowTobuildTippy) {
         if (count == 1) {
             placement = 'top';
         } else if (count == halfOflist) {
-            placement = 'left';    // actully it should be bottom
+            placement = 'left'; // actully it should be bottom
         } else if (count > halfOflist) {
             placement = 'left';
         } else {
@@ -552,9 +553,9 @@ var makeTippyAllNode = function (ipopObj, cy, allowTobuildTippy) {
 
 
 /* tippy is description when you hover node or edge */
-var makeTippy = function (node, text, placement, isHide, theme) {
+var makeTippy = function(node, text, placement, isHide, theme) {
     return tippy(node.popperRef(), {
-        content: function () {
+        content: function() {
             var div = document.createElement('div');
             div.innerHTML = text;
             div.style.cssText = '';
@@ -573,9 +574,9 @@ var makeTippy = function (node, text, placement, isHide, theme) {
 };
 
 /* Tippy for describe node */
-var makeTippyNodeData = function (node, theme, htmlEle) {
+var makeTippyNodeData = function(node, theme, htmlEle) {
     return tippy(node.popperRef(), {
-        content: function () {
+        content: function() {
             return htmlEle;
         },
         trigger: 'manual',
@@ -590,7 +591,7 @@ var makeTippyNodeData = function (node, theme, htmlEle) {
 
 /************************************************************************************************************************************* */
 
-var currentNodeDataAdding = function (nodeName, objID) {
+var currentNodeDataAdding = function(nodeName, objID) {
     $("#nodeName").html(nodeName);
 
     let topic = ["Node ID", "State", "Location"];
@@ -611,7 +612,7 @@ var currentNodeDataAdding = function (nodeName, objID) {
 }
 
 
-var ortherNodeDataAdding = function (ipopObj, objID) {
+var ortherNodeDataAdding = function(ipopObj, objID) {
 
     var linkIDList = ipopObj.getLinkIDListOf(objID);
     var tgtNodeList = [];
@@ -637,7 +638,7 @@ var ortherNodeDataAdding = function (ipopObj, objID) {
 
     $("#connectedCount").html("Connected Node(" + tgtNodeList.length + ")");
 
-    $.get("/ortherNodeDetail.html", function (data) {
+    $.get("/ortherNodeDetail.html", function(data) {
         for (let index = 0; index < tgtNodeList.length; index++) {
 
             if (index == 0) {
@@ -738,9 +739,9 @@ var ortherNodeDataAdding = function (ipopObj, objID) {
 
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             for (let index = 0; index < tgtNodeList.length; index++) {
-                $("#show" + index + ",#hide" + index).click(function () {
+                $("#show" + index + ",#hide" + index).click(function() {
                     if ($("#show" + index).is(":hidden")) {
                         $("#hide" + index).hide();
                         $("#show" + index).show();
@@ -757,7 +758,7 @@ var ortherNodeDataAdding = function (ipopObj, objID) {
 }
 
 
-var addSorceNodeData = function (ipopObj, sourceID) {
+var addSorceNodeData = function(ipopObj, sourceID) {
 
     $('#sourceNameShow').html(ipopObj.getNodeList()[sourceID]['NodeName']);
     $('#sourceNameHide').html(ipopObj.getNodeList()[sourceID]['NodeName']);
@@ -784,7 +785,7 @@ var addSorceNodeData = function (ipopObj, sourceID) {
     $("#sourceData").html(htmlContent);
 }
 
-var addTargetNodeData = function (ipopObj, targetID) {
+var addTargetNodeData = function(ipopObj, targetID) {
 
     $('#tgtNameShow').html(ipopObj.getNodeList()[targetID]['NodeName']);
     $('#tgtNameHide').html(ipopObj.getNodeList()[targetID]['NodeName']);
@@ -809,7 +810,7 @@ var addTargetNodeData = function (ipopObj, targetID) {
 }
 
 
-addLinkData = function (ipopObj, sourceID, objID) {
+addLinkData = function(ipopObj, sourceID, objID) {
     let content1 = '<div class="card-body" style=" border-radius: 0px;border-radius: 6px " id="card2_body"><div class="inner">';
 
     let tgtNodeTopic = ["Tunnel ID", "Interface Name", "MAC", "State"];
@@ -886,7 +887,7 @@ addLinkData = function (ipopObj, sourceID, objID) {
 }
 
 /* restate of clickEvent */
-var restageEvent = function (tippyID, nodeIdTippy, tippyList) {
+var restageEvent = function(tippyID, nodeIdTippy, tippyList) {
     temp = null
 
     if (tippyID != null) {
@@ -900,8 +901,8 @@ var restageEvent = function (tippyID, nodeIdTippy, tippyList) {
 }
 
 /* for search */
-$(document).ready(function () {
-    $('input[type="search"][class="form-control border-0"]').keypress(function (event) {
+$(document).ready(function() {
+    $('input[type="search"][class="form-control border-0"]').keypress(function(event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             let searchText = $('input[type="search"][class="form-control border-0"]').val();
@@ -909,18 +910,14 @@ $(document).ready(function () {
                 let searchTarget = cy.getElementById(searchText);
                 if (searchTarget != null) {
                     searchTarget.trigger('click');
-                }
-                else {
+                } else {
                     alert("Not Matching");
                 }
-            }
-            else {
-                    alert("Not Matching");
+            } else {
+                alert("Not Matching");
             }
             $('input[type="search"][class="form-control border-0"]').val("");
             return false;
         }
     })
 })
-
-
