@@ -4,6 +4,7 @@ var serverIP = '34.209.33.166:5000';
 var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
 var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
 var isUpdate = false;
+var updateTime = null;
 
 var showAllOverlays = function () {
 
@@ -33,57 +34,23 @@ var showAllOverlays = function () {
 /* request data from server */
 async function requestIPOPData(overlayID) {
 
-
     $("#groupOfOverlays").hide();
     $(".cloudBtn").hide();
     $("#loader").show();
     $("#cy").empty();
 
-    var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
-    var edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
-
-    /* update graph*/
     if (isUpdate) {
         intervalNo = new Date().toISOString().split(".")[0];
-        nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
-        edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
         url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
     }
 
-    /*************OLD SYSTEM*************/
-    // let query;
-    // await $.get(`/ipopData?${query}`, overlays => {
+    alert("Oat" + intervalNo)
+    var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
+    var edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
 
-    //     var ipopObj = new BuildIPOPData();
-    //     /* you can set data by another way */
-    //     /* in this case i just sleepy*/
 
-    //     ipopObj.setOverlayID(overlayID);
-    //     ipopObj.setOverlays(overlays.ipop['Overlays'][overlayID]);
-    //     ipopObj.setLinks(overlays.ipop['Links'][overlayID]);
-    //     ipopObj.setNodes(overlays.ipop['Nodes'][overlayID]);
 
-    //     /* show overlay ID on overlay's tag */
-    //     $(document).ready(function () {
-    //         $("#overlayShowUp").load("/icons.html", function (responseTxt, statusTxt, xhr) {
-    //             if (statusTxt == "success") {
-    //                 $('.overlayTag').show();
-    //                 $('#overLayID').html('Overlay: <strong>' + overlayID + '</strong>');
-    //                 $('#travel').hide();
-    //                 $('.minus').show();
-    //                 $('.zoom').show();
-    //                 $('.info').show();
-
-    //             } else {
-    //                 alert("Error: " + xhr.status + ": " + xhr.statusText);
-    //             }
-    //         });
-    //     });
-
-    //     createGraph(ipopObj);
-    // });
-    /********END OF OLD SYSTEM*********/
-
+    let timeoutId = null;
     $.getJSON(url)
         .then(function (overlays, status) {
             if (status == "error") throw error;
@@ -111,9 +78,22 @@ async function requestIPOPData(overlayID) {
                                 $('.info').show();
 
                                 $("#refresh").click(function () {
-                                    updateGraph(ipopObj.getOverlayID())
+                                    if (timeoutId) {
+                                  
+                                        $("#refreshImage").attr("src","/static/icons/redRefresh.png");
+
+                                        clearTimeout(updateTime);
+                                        timeoutId = null;
+
+                                    }else{
+                                
+                                        $("#refreshImage").attr("src","/static/icons/Refresh.svg");
+
+                                        timeoutId = setTimeout(updateGraph, 0, ipopObj.getOverlayID());
+                                    }
                                 });
-                                setTimeout(updateGraph, 3600000, ipopObj.getOverlayID());
+
+                                timeoutId = setTimeout(updateGraph, 30000, ipopObj.getOverlayID());
 
                             } else {
                                 alert("Error: " + xhr.status + ": " + xhr.statusText);
