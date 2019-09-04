@@ -44,7 +44,6 @@ async function requestIPOPData(overlayID) {
         url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
     }
 
-    alert("Oat" + intervalNo)
     var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/nodes?interval=" + intervalNo + "&current_state=True";
     var edgeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + overlayID + "/links?interval=" + intervalNo + "&current_state=True";
 
