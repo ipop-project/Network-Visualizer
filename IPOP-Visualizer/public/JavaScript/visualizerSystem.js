@@ -81,7 +81,7 @@ async function requestIPOPData(overlayID) {
                                   
                                         $("#refreshImage").attr("src","/static/icons/redRefresh.png");
 
-                                        clearTimeout(updateTime);
+                                        clearTimeout(timeoutId);
                                         timeoutId = null;
 
                                     }else{
