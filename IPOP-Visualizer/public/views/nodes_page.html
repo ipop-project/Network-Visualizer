@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPOP Visualizer</title>
+
+    <!-- Bootstrap 4.3.1 -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- JS -->
+    <script src="/static/JavaScript/getData.js"></script>
+    <script src="/static/JavaScript/visualizerSystem.js"></script>
+
+    <!-- Cytoscape -->
+    <script src="/static/JavaScript/cytoscape-popper.js"></script>
+    <script src="/static/JavaScript/cytoscape.min.js"></script>
+
+    <!-- Tippy.js -->
+    <script src="/min/tippy.js/umd/index.all.js"></script>
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/node.css">
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/edge.css">
+    <link rel="stylesheet" href="/static/CSS/TippyTheme/nodeData.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../CSS/main.css">
+    <link rel="stylesheet" href="/static/CSS/cytoscape_stlye.css">
+
+</head>
+
+<body class="container-fluid " style="padding: 0;overflow-x: hidden;">
+
+    <!-- all icon -->
+    <div id="icon-hud">
+
+        <div class="row">
+            <button id="home-btn" class="btn"></button>
+        </div>
+        <div class="row">
+            <button id="refresh-btn" class="btn"></button>
+        </div>
+        <div class="row">
+            <button id="config-btn" class="btn option-btn" data-toggle="collapse" data-target="#config-card" aria-controls="config-card"></button>
+            <div class="card collapse" id="config-card">
+
+                <div class="card-body" id="config-card-body">
+
+                    <div class="input-group">
+
+                        <div class="zoom-option" id="min-zoom">
+                            <h3>Min Zoom</h3>
+                            <select class="custom-select" id="min-zoom-value">
+                                <option value="0.1">0.1</option>
+                                <option value="0.2" selected>0.2</option>
+                                <option value="0.3">0.3</option>
+                            </select>
+                        </div>
+
+                        <div class="zoom-option" id="max-zoom">
+                            <h3>Max Zoom</h3>
+                            <select class="custom-select" id="max-zoom-value">
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="3">3</option>
+                            </select>
+                        </div>
+
+                        <!-- <div class="zoom-option" id="sensitivity">
+                            <h3>Sensitivity</h3>
+                            <select class="custom-select" id="sensitivity-value">
+                                <option value="0.1" selected>0.1</option>
+                                <option value="1">1</option>
+                            </select>
+                        </div> -->
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <button id="info-btn" class="btn option-btn" data-toggle="collapse" data-target="#info-card" aria-controls="info-card"></button>
+            <div class="card collapse" id="info-card">
+
+                <div class="card-body" id="info-card-body">
+
+                    <table class="table-borderless">
+
+                        <th scope="col">Node</th>
+                        <th scope="col"></th>
+                        <th scope="col">Tunnel</th>
+                        <th scope="col"></th>
+                        <tr>
+                            <th scope="row">
+                                <div id="not-report-node"></div>
+                            </th>
+                            <td>Node not report data.</td>
+
+                            <th scope="row">
+                                <div id="successor-tunnel">
+
+                                </div>
+                            </th>
+                            <td>Successor</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <div id="not-have-tunnel-node">
+
+                                </div>
+                            </th>
+                            <td>Node not have a tunnel.</td>
+
+                            <th scope="row">
+                                <div id="long-distance-tunnel">
+
+                                </div>
+                            </th>
+                            <td>Long distance</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <div id="connected-overlay-node">
+
+                                </div>
+                            </th>
+                            <td>Node just connected to overlay.</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <button id="zoom-more-btn" class="btn"></button>
+        </div>
+
+        <div class="row">
+            <input id="zoom-slider-bar" type="range" min="0.2" max="2" step="0.1" value="0.2">
+        </div>
+
+        <div class="row">
+            <button id="zoom-less-btn" class="btn"></button>
+        </div>
+
+        <div id="zoom-value" class="row" style="color: white;">
+            zoom-value : 0
+        </div>
+
+        <div id="min-value" class="row" style="color: white;">
+            min-zoom : 0
+        </div>
+
+        <div id="max-value" class="row" style="color: white;">
+            max-zoom : 0
+        </div>
+
+        <!-- <div id="sen-value" class="row" style="color: white;">
+            sensitivity : 0
+        </div> -->
+
+    </div>
+
+
+
+
+</body>
+<script>
+    $(".option-btn").click(function() {
+        $('.collapse.show').collapse('hide');
+    });
+</script>
+
+</html>

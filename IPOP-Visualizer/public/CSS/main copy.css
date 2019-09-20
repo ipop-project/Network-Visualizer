@@ -1,0 +1,158 @@
+/* font size 22 17 16 14 11 */
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background-color: #101B2B;
+    overflow: hidden;
+}
+
+.navbar {
+    background-color: #213758;
+}
+
+#search-input {
+    width: 20%;
+    border: none;
+    background-color: #192841;
+}
+
+
+/* switch toggle */
+
+.mode-switch {
+    width: 15%;
+    border: none;
+    border: 1px solid #405B80;
+    background-color: #192841;
+    border-radius: 20px;
+    float: right;
+}
+
+.mode-switch .switch-btn {
+    font-weight: 600;
+    color: #fff;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border: none;
+}
+
+.mode-switch .switch-btn:hover {
+    border: none;
+}
+
+.mode-switch .switch-btn.active {
+    color: #192841;
+    border: 1px solid #0062cc;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    background-color: #56C5BC;
+    border: none;
+}
+
+.overlay-card {
+    float: left;
+    width: 10%;
+    border: none;
+    background: transparent;
+}
+
+.overlay-card:hover {
+    cursor: pointer;
+}
+
+.overlay-card-badge {
+    width: max-content;
+    margin: auto;
+    background-color: #213758;
+    border: 1px solid #405B80;
+    color: white;
+}
+
+.process-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: white;
+}
+
+#nodes-content {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.icon-bar {
+    position: absolute;
+    z-index: 1;
+}
+
+.icon {
+    position: relative;
+}
+
+.icon:hover {
+    cursor: pointer;
+}
+
+
+/* breadcrumb */
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#breadcrumbs-one {
+    margin-top: 2.75%;
+    border-radius: 5px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, .2);
+    overflow: hidden;
+}
+
+#breadcrumbs-one li {
+    float: left;
+}
+
+#breadcrumbs-one a {
+    padding: .7em 1em .7em 2em;
+    float: left;
+    text-decoration: none;
+    color: white;
+    position: relative;
+    background-color: #213758;
+}
+
+#breadcrumbs-one li:first-child a {
+    padding-left: 1em;
+    border-radius: 5px 0 0 5px;
+}
+
+#breadcrumbs-one a::after,
+#breadcrumbs-one a::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid;
+    right: -1em;
+}
+
+#breadcrumbs-one a::after {
+    z-index: 2;
+    border-left-color: #213758;
+}
+
+#breadcrumbs-one a::before {
+    border-left-color: #213758;
+    right: -1em;
+    z-index: 1;
+}
+
+#breadcrumbs-one a.current {
+    background-color: #56C5BC;
+    color: #101B2B;
+}
