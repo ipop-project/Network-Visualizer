@@ -110,7 +110,7 @@ var createGraph = function(ipopObj) {
     for (var i = 0; i < ipopObj.getNumNodes(); i++) {
 
         var nodeID = ipopObj.getNodeIDList()[i];
-        var jsonStr = '{ "data": { "id": "' + nodeID + '" },"grabbable": false,"selectable": true}';
+        var jsonStr = '{ "data": { "id": "' + nodeID + '" },"grabbable": true,"selectable": true}';
         var linkIDList = ipopObj.getLinkIDListOf(nodeID);
 
         /* build cytoscape node and link json */

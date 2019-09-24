@@ -357,7 +357,6 @@ var clickEvent = function(ipopObj, cy, tippyList) {
 
                 nodeSelect(cy, objID, ipopObj); /* select node to show the node that it connect */
 
-
                 $(document).ready(function() {
                     $("#edgeDetail").html("");
                     $("#detail").load("/detail.html", function(responseTxt, statusTxt, xhr) {
