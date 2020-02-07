@@ -1,0 +1,62 @@
+* {
+    font-family: 'Tahoma';
+    font-size: 18px;
+}
+
+#root {
+    width: 100vw;
+    height: 100vh;
+}
+
+.Header {
+    padding: 0.25%;
+    width: 100%;
+    height: 4%;
+    display: flex;
+    text-align: center;
+    background-color: #213758;
+    color: white;
+}
+
+.ipop_logo {
+    width: fit-content;
+    transform: translateY(9%)
+}
+
+.IPOPTitle {
+    margin-left: 0.5%;
+    width: fit-content;
+    transform: translateY(15%);
+}
+
+.ViewSelector {
+    flex: 1;
+}
+
+#ViewSelectorDropdown{
+    background-color: #101B2B;
+    border: transparent;
+}
+
+.Search {
+    width: 10%;
+}
+
+.SystemContent {
+    width: 100%;
+    height: 96%;
+    background-color: #101B2B;
+}
+
+.RightPane{
+    margin-top: 0.25%;
+    padding: 0.25%;
+    width: 100%;
+    background-color: #213758;
+    color: white;
+}
+
+.OverlayBtn{
+    width: 100%;
+}
+
