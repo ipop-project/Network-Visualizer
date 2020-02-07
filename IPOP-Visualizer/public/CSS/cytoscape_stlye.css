@@ -1,5 +1,0 @@
-/* makes sticky faster; disable if you want animated tippies */
-
-.tippy-popper {
-    transition: none !important;
-}
