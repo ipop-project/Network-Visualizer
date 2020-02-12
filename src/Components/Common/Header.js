@@ -1,35 +1,23 @@
-import React from 'react';
-import ipop_ic from '../../Images/Icons/ipop_ic.svg';
-import Form from 'react-bootstrap/Form';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
-
+import React from "react";
+import ipop_ic from "../../Images/Icons/ipop_ic.svg";
 
 class Header extends React.Component {
-
     render() {
-        return (<div className="Header">
-            <div className="ipop_logo">
-                <img src={ipop_ic} alt="ipop_ic"></img>
+        return <header className="row">
+            <img src={ipop_ic} alt="ipop_ic" />
+
+            <div id="ipopTitle" className="col-3">
+                <h6>IPOP NETWORK VISUALIZER</h6>
             </div>
-            <div className="IPOPTitle">
-                IPOP NETWORK VISUALIZER
+
+            <div id="viewSelector" className="col-6" style={{ textAlign: "center" }}>
+                
             </div>
-            <div className="ViewSelector">
-                <DropdownButton id="ViewSelectorDropdown" drop="right" title="Topology">
-                    <Dropdown.Item href="#" >Topology</Dropdown.Item>
-                    <Dropdown.Item href="#">Subgraph</Dropdown.Item>
-                    <Dropdown.Item href="#">Map</Dropdown.Item>
-                    <Dropdown.Item href="#">Log</Dropdown.Item>
-                    <Dropdown.Item href="#">Tunnel Utilization</Dropdown.Item>
-                    <Dropdown.Item href="#">Network Flow</Dropdown.Item>
-                </DropdownButton>
+
+            <div className="col">
+                
             </div>
-            <div className="Search">
-                <Form.Control type="Search" placeholder="Search..." />
-            </div>
-        </div>
-        )
+        </header>
     }
 }
 
