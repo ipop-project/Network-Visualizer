@@ -16,7 +16,7 @@ class Main extends React.Component {
         super(props);
         this.state = {
             overlays: [], overlaysObj: {}, selectedOverlay: false, selectedOverlayId: "",
-            isToggle: true, searchData: ""
+            isToggle: true
         }
     }
 
@@ -58,9 +58,6 @@ class Main extends React.Component {
                 })
             }
         }
-
-        console.log(this.state.searchData);
-        
     }
 
     // toggle overlay right panel
@@ -84,6 +81,7 @@ class Main extends React.Component {
     }
 
     renderGraphContent = (overlayId) => {
+        document.getElementById("searchBar").hidden = true;
         return <GraphContent selectedOverlay={overlayId} />;
     }
 
@@ -121,34 +119,38 @@ class Main extends React.Component {
         this.setState({ selectedOverlay: true, selectedOverlayId: overlayId })
     }
 
-
-    handleSearch = (e) => {
-        if (e.keyCode === 13) {
-            this.setState({ searchData: document.getElementById("search").value })
-        }
-    }
-
     render() {
         return (<div id="container" className="container-fluid">
 
-            <Header><input onKeyDown={this.handleSearch} id="search" type="search" placeholder="search"></input></Header>
+            <Header>
+                <Typeahead
+                    id="searchOverlay"
+                    onChange={(selected) => {
+                        this.selectOverlay(selected);
+                    }}
+                    options={this.state.overlays}
+                    selected={this.state.selected}
+                    selectHintOnEnter
+                    placeholder="Search overlay"
+                    renderMenuItemChildren={(option) => {
+                        return (
+                            <>
+                                <div className="resultLabel">
+                                    {option}
+                                </div>
+                                <small>Number of nodes : {this.state.overlaysObj['current_state'][option].NumNodes} Number of links : {this.state.overlaysObj['current_state'][option].NumLinks}</small><br />
+                            </>
+                        )
+                    }}
+                >
+                </Typeahead>
+            </Header>
 
             <button onClick={this.togglePanel} id="overlayRightPanelBtn" />
 
             <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white" }}>
                 {this.renderMainContent()}
             </div>
-
-            <Typeahead onChange={(selected) => {
-                this.setState({ searchData : selected });
-            }}
-                options={this.state.overlays}
-                selected={this.state.selected}
-                selectHintOnEnter
-                
-                >
-                    
-            </Typeahead>
 
         </div>)
     }

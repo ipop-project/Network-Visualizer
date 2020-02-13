@@ -66,7 +66,7 @@ class CreateGraphContents {
         }
 
         this.getLinkName = function (nodeID, linkID) {
-            return this.getLinkObj()[nodeID][linkID]["interfaceName"]
+            return this.getLinkObj()[nodeID][linkID]["InterfaceName"]
         }
 
         this.getLinkDetails = function (srcNode, linkID) {

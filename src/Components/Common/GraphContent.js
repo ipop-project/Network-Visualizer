@@ -5,6 +5,8 @@ import Card from "react-bootstrap/Card";
 import Cytoscape from 'react-cytoscapejs';
 import ViewSelector from "./ViewSelector";
 import CollapseButton from "./CollapseButton";
+import cytoscapeStyle from "./cytoscapeStyle.js";
+import { Typeahead } from "react-bootstrap-typeahead";
 import CreateGraphContents from "./CreateGraphContents";
 
 class GraphContent extends React.Component {
@@ -12,90 +14,77 @@ class GraphContent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            minZoom: 0.2, 
-            maxZoom: 2, 
-            zoom: 0.8, 
+            minZoom: 0.2,
+            maxZoom: 2,
+            zoom: 0.8,
             ipopData: null,
-            nodeConf: null, 
-            linkConf: null, 
-            dataReady: false, 
-            refresh: false, 
+            graphElement: [],
+            dataReady: false,
+            refresh: false,
             cytoscape: null,
             switchToggle: false,
-            sourceNode:null,
-            targetNode:null
+            nodeDetails: null,
+            linkDetails: null,
         }
     }
 
     zoomIn = () => {
-        if (this.state.zoom < this.state.maxZoom) {
-            this.setState(prevState => {
-                return { zoom: prevState.zoom + 0.1 }
-            })
-        }
-        this.state.cytoscape.zoom(this.state.zoom);
+        this.setState(prevState => {
+            return { zoom: prevState.zoom + 0.1 }
+        })
+
     }
 
     zoomOut = () => {
-        if (this.state.zoom > this.state.minZoom) {
-            this.setState(prevState => {
-                return { zoom: prevState.zoom - 0.1 }
-            })
-        }
-        this.state.cytoscape.zoom(this.state.zoom);
-    }
-
-    handleZoomSlider = (e) => {
-        var newZoom = e.target.value;
         this.setState(prevState => {
-            if (prevState.zoom > newZoom) {
-                return { zoom: prevState.zoom - (this.state.zoom - newZoom) };
-            }
-            else if (prevState.zoom < newZoom) {
-                return { zoom: prevState.zoom + (newZoom - this.state.zoom) }
-            }
+            return { zoom: prevState.zoom - 0.1 }
         })
     }
 
-    handleSearch = (e) => {
-        if (e.keyCode === 13) {
-            alert(document.getElementById("search").value)
+    handleZoomSlider = (e) => {
+        if(e.target.value>this.state.zoom){
+            console.log(parseFloat( e.target.value-this.state.zoom));
         }
     }
 
     componentDidMount() {
         this.fetchData();
-        ReactDOM.render(<ViewSelector />, document.getElementById("viewSelector"))
     }
 
     componentDidUpdate() {
-        if (this.state.dataReady) {
-            if (this.state.refresh) {
-                this.renderGraph(this.state.nodeConf, this.state.linkConf)
-            }
+        if (this.state.linkDetails !== null) {
+            this.renderLinkDetails()
+        }
+        if (this.state.cytoscape !== null) {
+            this.state.cytoscape.zoom(this.state.zoom)
+            document.getElementById("zoomSlider").value = (this.state.zoom)
         }
     }
 
-    renderNodeDetails = (e, ipop) => {
-        var connectedNodes = this.state.cytoscape.elements(e.target.incomers().intersection(e.target.outgoers()));
+    renderNodeDetails = () => {
 
-        var nodeDetails = ipop.getNodeDetails(e.target.id());
+        var sourceNode = this.state.nodeDetails.sourceNode;
+        var connectedNodes = this.state.nodeDetails.connectedNodes;
+
+        var ipop = this.state.ipopData;
 
         var rightPanelContent = <div>
-            <h5>{nodeDetails.nodeName}</h5>
+
+            <h5>{sourceNode.nodeName}</h5>
 
             <div className="DetailsLabel">Node ID</div>
-            {nodeDetails.nodeID}
+            {sourceNode.nodeID}
 
             <div className="DetailsLabel">State</div>
-            {nodeDetails.nodeState}
+            {sourceNode.nodeState}
 
             <div className="DetailsLabel">City/Country</div>
-            {nodeDetails.nodeLocation}
+            {sourceNode.nodeLocation}
+            <br /><br />
 
             <div id="connectedNode" style={{ overflow: "auto" }}>
                 {connectedNodes.map(connectedNode => {
-                    var connectedNodeDetail = ipop.findConnectedNodeDetails(nodeDetails.nodeID, connectedNode.id())
+                    var connectedNodeDetail = ipop.findConnectedNodeDetails(sourceNode.nodeID, connectedNode.id())
                     var connectedNodeBtn =
                         <CollapseButton key={ipop.getNodeName(connectedNode.id()) + "Btn"} id={ipop.getNodeName(connectedNode.id()) + "Btn"} name={ipop.getNodeName(connectedNode.id())}>
                             <div className="DetailsLabel">Node ID</div>
@@ -146,25 +135,11 @@ class GraphContent extends React.Component {
         ReactDOM.render(rightPanelContent, document.getElementById("rightPanelContent"))
     }
 
-    handleSwitch = () => {
-        this.setState(prevState => {
-            return { switchToggle: !prevState.switchToggle }
-        })
-    }
+    renderLinkDetails = () => {
 
-    renderLinkDetails = (e, ipop) => {
-        var linkDetails = ipop.getLinkDetails(e.target.data().source, e.target.data().linkID);
-
-        var sourceNodeDetails;
-        var targetNodeDetails;
-
-        if (this.state.switchToggle) {
-            sourceNodeDetails = ipop.getNodeDetails(e.target.data().target);
-            targetNodeDetails = ipop.getNodeDetails(e.target.data().source);
-        } else {
-            sourceNodeDetails = ipop.getNodeDetails(e.target.data().source);
-            targetNodeDetails = ipop.getNodeDetails(e.target.data().target);
-        }
+        var linkDetails = this.state.linkDetails.linkDetails;
+        var sourceNodeDetails = this.state.linkDetails.sourceNodeDetails;
+        var targetNodeDetails = this.state.linkDetails.targetNodeDetails;
 
         var linkContent = <div>
             <h5>{linkDetails.InterfaceName}</h5>
@@ -202,7 +177,7 @@ class GraphContent extends React.Component {
                 </div>
 
                 <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
-                    <button onClick={this.handleSwitch} id="switchBtn" />
+                    <button onClick={this.swap} id="switchBtn" />
                 </div>
 
             </div>
@@ -227,6 +202,7 @@ class GraphContent extends React.Component {
             {linkDetails.LocalAddress}
             <div className="DetailsLabel">Latency</div>
             {linkDetails.Latency}
+            <br /><br />
 
             <Card.Body className="transmissionCard">
                 Sent
@@ -248,80 +224,127 @@ class GraphContent extends React.Component {
         ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
     }
 
-    renderGraph = (nodeConf, linkConf) => {
-        var ipop = this.state.ipopData;
+    handleSwitch = () => {
+        this.setState(prevState => {
+            return { switchToggle: !prevState.switchToggle }
+        })
+    }
+
+    swap = () => {
+        console.log("swap");
+
+        var l = this.state.linkDetails.linkDetails;
+        var s = this.state.linkDetails.sourceNodeDetails;
+        var t = this.state.linkDetails.targetNodeDetails;
+
+        this.setState({ linkDetails: { "linkDetails": l, "sourceNodeDetails": t, "targetNodeDetails": s } })
+
+    }
+
+    setNodeDetails = (node) => {
+        var sourceNode = this.state.ipopData.getNodeDetails(node.data().id);
+
+        var connectedNodes = this.state.cytoscape.elements(node.incomers().union(node.outgoers())).filter((element) => {
+            return element.isNode();
+        });
+
+        this.setState({ nodeDetails: { "sourceNode": sourceNode, "connectedNodes": connectedNodes } })
+
+        this.renderNodeDetails();
+    }
+
+    setLinkDetails = (link) => {
+        var linkDetails = this.state.ipopData.getLinkDetails(link.data().source, link.data().id);
+
+        var sourceNodeDetails = this.state.ipopData.getNodeDetails(link.data().target);
+
+        var targetNodeDetails = this.state.ipopData.getNodeDetails(link.data().source);
+
+        this.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
+
+        this.renderLinkDetails();
+    }
+
+    renderGraph = () => {
         ReactDOM.render(<Cytoscape id="cy"
             cy={(cy) => {
+
                 this.cy = cy;
+
                 this.setState({ cytoscape: this.cy });
 
                 this.cy.zoom(this.state.zoom);
 
-                this.cy.center();
+                var that = this;
 
-                this.cy.panningEnabled(false)
+                this.cy.on("click", function (e) {
+                    console.log(e.target);
 
-                var renderNodeDetails = this.renderNodeDetails;
-                this.cy.on("click", "node", function (e) {
-                    renderNodeDetails(e, ipop);
+                    if (e.target.length !== undefined) {
+
+                        if (e.target.isNode()) {
+                            that.setNodeDetails(e.target);
+                        } else if (e.target.isEdge()) {
+                            that.setLinkDetails(e.target)
+                        }
+
+                    }
                 })
 
-                var renderLinkDetails = this.renderLinkDetails;
-                this.cy.on("click", "edge", function (e) {
-                    renderLinkDetails(e, ipop);
-                })
 
             }}
 
             elements={Cytoscape.normalizeElements({
-                nodes: nodeConf,
-                edges: linkConf
+                nodes: this.state.graphElement[0],
+                edges: this.state.graphElement[1]
             })}
 
-            stylesheet={[
-                {
-                    selector: 'node',
-                    style: {
-                        width: 36.37,
-                        height: 36.37,
-                        "background-color": "#9FC556",
-                        "label": "data(label)",
-                        "text-valign": "center",
-                        "text-outline-color": "#9FC556",
-                        "text-outline-width": "5%",
-                        "text-outline-opacity": "1"
-                    }
-
-                }, {
-                    selector: "node:selected",
-                    style: {
-                        width: 36.37,
-                        height: 36.37,
-                        "border-width": "50%",
-                        "border-color": "white",
-                        "border-opacity": "0.2",
-                        "background-color": "#9FC556"
-                    }
-                },
-                {
-                    selector: 'edge',
-                    style: {
-                        'curve-style': 'haystack',
-                        "line-color": "#56C5BC",
-                    }
-                }, {
-                    selector: "edge:selected",
-                    style: {
-                        "line-color": "white",
-                    }
-                }
-            ]}
+            stylesheet={cytoscapeStyle}
 
             style={{ width: window.innerWidth, height: window.innerHeight }}
 
             layout={{ name: "circle" }}
+
         />, document.getElementById("midArea"))
 
+        ReactDOM.render(<ViewSelector />, document.getElementById("viewSelector"));
+
+
+        ReactDOM.render(<Typeahead selectHintOnEnter id="searchGraphElement"
+            onChange={(selected) => {
+
+            }}
+            labelKey={(element) => { return (`${element.data().label}`); }}
+            filterBy={this.elementFilter}
+            options={this.state.cytoscape.elements().map(element => { return element; })}
+            selected={this.state.selected}
+            placeholder="Search node or tunnel"
+            renderMenuItemChildren={(element) => {
+                return (
+                    <>
+                        <div className="resultLabel">
+                            {element.data().label}
+                        </div>
+                        <small>ID : {element.data().id}</small>
+                    </>
+                )
+            }}
+
+        >
+        </Typeahead>, document.getElementById("searchOption"))
+    }
+
+    elementFilter = (element, props) => {
+        if (element.group === 'nodes') {
+            return (element.data().label.toLowerCase().indexOf(props.text.toLowerCase()) !== -1
+                ||
+                element.data().id.toLowerCase().indexOf(props.text.toLowerCase()) !== -1);
+        }
+        else {
+            return (element.data().label.toLowerCase().indexOf(props.text.toLowerCase()) !== -1
+                ||
+                element.data().id.toLowerCase().indexOf(props.text.toLowerCase()) !== -1);
+        }
     }
 
     fetchData = () => {
@@ -335,8 +358,8 @@ class GraphContent extends React.Component {
 
         var ipop = new CreateGraphContents();
         var nodeConf = [];
-        var targetConf, sourceConf;
         var linkConf = [];
+        var targetConf, sourceConf;
 
         fetch(nodeURL).then(res => res.json()).then(nodes => {
             fetch(linkURL).then(res => res.json()).then(links => {
@@ -350,23 +373,24 @@ class GraphContent extends React.Component {
                         sourceConf = ipop.getSourceNode(nodeID, linkID);
                         targetConf = ipop.getTargetNode(nodeID, linkID);
 
-                        linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","linkID":"${ipop.getLinkDetails(nodeID, linkID)["TunnelID"]}" ,"type":""} }`));
+                        linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${ipop.getLinkDetails(nodeID, linkID)["TunnelID"]}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}"} }`));
+
                     })
                 });
-                this.setState({ nodeConf: nodeConf, linkConf: linkConf })
+                this.setState({ graphElement: [nodeConf, linkConf] })
                 this.setState({ dataReady: true })
             }).then(() => {
-                this.renderGraph(this.state.nodeConf, this.state.linkConf)
+                this.renderGraph()
             })
         })
     }
 
     handleWheel = (e) => {
-        if (e.deltaY > 0) {
-            this.zoomOut();
-        } else {
-            this.zoomIn();
-        }
+        // if (e.deltaY > 0) {
+        //     this.zoomOut();
+        // } else {
+        //     this.zoomIn();
+        // }
     }
 
     render() {
@@ -387,8 +411,8 @@ class GraphContent extends React.Component {
                 <div>
                     <button onClick={this.zoomIn} id="plusBtn"></button>
                 </div>
-                <div id="zoomSlider">
-                    <input onChange={this.handleZoomSlider} type="range" min={this.state.minZoom} max={this.state.maxZoom} step="0.1" value={this.state.zoom}></input>
+                <div>
+                    <input id="zoomSlider" onChange={this.handleZoomSlider} type="range" min={this.state.minZoom} max={this.state.maxZoom} step="0.1"></input>
                 </div>
                 <div>
                     <button onClick={this.zoomOut} id="minusBtn"></button>
