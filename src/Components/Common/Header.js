@@ -14,8 +14,8 @@ class Header extends React.Component {
                 
             </div>
 
-            <div className="col">
-                
+            <div id="searchBar" className="col">
+                {this.props.children}
             </div>
         </header>
     }

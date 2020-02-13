@@ -4,8 +4,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Accordion from "react-bootstrap/Accordion";
 
 class CollapseButton extends React.Component {
+
     render() {
-        return (<Accordion className="overlayBtn" style={{ marginTop: "2.5%" }}>
+        return (<Accordion id={this.props.id} className="overlayBtn" style={{ marginBottom: "2.5%" }}>
             <Accordion.Toggle as={Card.Header} style={{ color: "white", background: "transparent", border: "transparent", outline: "none" }} eventKey={this.props.name}>
                 {this.props.name}
             </Accordion.Toggle>

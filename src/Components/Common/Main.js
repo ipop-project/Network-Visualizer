@@ -1,25 +1,28 @@
 import React from "react";
 import "../../CSS/Main.css";
 import Header from "./Header";
-import Overlays from "../Common/Overlays";
 import "react-tippy/dist/tippy.css";
 import { Tooltip } from "react-tippy";
 import RightPanel from "./RightPanel";
 import GraphContent from "./GraphContent";
+import Overlays from "../Common/Overlays";
 import "bootstrap/dist/css/bootstrap.min.css";
-import overlay_ic from "../../Images/Icons/overlay_ic.svg";
 import CollapseButton from "./CollapseButton";
+import overlay_ic from "../../Images/Icons/overlay_ic.svg";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentView: "topology", overlays: [], overlaysObj: {}, selectedOverlay: false, selectedOverlayId: "",
-            isToggle: true
+            overlays: [], overlaysObj: {}, selectedOverlay: false, selectedOverlayId: "",
+            isToggle: true, searchData: ""
         }
     }
 
     componentDidMount() {
+        //on init state.
+        //fetch overlay data.
         var intervalNo = new Date().toISOString().split(".")[0];
         var serverIP = '18.220.44.57:5000';
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
@@ -33,6 +36,31 @@ class Main extends React.Component {
             .catch(err => {
                 alert(err);
             })
+    }
+
+    componentDidUpdate() {
+        if (this.state.selectedOverlay === false) {
+
+            if (this.state.searchData !== "") {
+                this.state.overlays.forEach(overlay => {
+                    if (!overlay.match(this.state.searchData)) {
+                        document.getElementById(overlay).hidden = true;
+                        document.getElementById(overlay + "Btn").hidden = true;
+                    } else {
+                        document.getElementById(overlay).hidden = false;
+                        document.getElementById(overlay + "Btn").hidden = false;
+                    }
+                })
+            } else {
+                this.state.overlays.forEach(overlay => {
+                    document.getElementById(overlay).hidden = false;
+                    document.getElementById(overlay + "Btn").hidden = false;
+                })
+            }
+        }
+
+        console.log(this.state.searchData);
+        
     }
 
     // toggle overlay right panel
@@ -77,7 +105,6 @@ class Main extends React.Component {
 
     renderRightPanel = () => {
         return this.renderOverlayBtn();
-
     }
 
     renderOverlayBtn = () => {
@@ -94,15 +121,34 @@ class Main extends React.Component {
         this.setState({ selectedOverlay: true, selectedOverlayId: overlayId })
     }
 
+
+    handleSearch = (e) => {
+        if (e.keyCode === 13) {
+            this.setState({ searchData: document.getElementById("search").value })
+        }
+    }
+
     render() {
         return (<div id="container" className="container-fluid">
 
-            <Header />
+            <Header><input onKeyDown={this.handleSearch} id="search" type="search" placeholder="search"></input></Header>
+
             <button onClick={this.togglePanel} id="overlayRightPanelBtn" />
 
-            <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white"}}>
+            <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white" }}>
                 {this.renderMainContent()}
             </div>
+
+            <Typeahead onChange={(selected) => {
+                this.setState({ searchData : selected });
+            }}
+                options={this.state.overlays}
+                selected={this.state.selected}
+                selectHintOnEnter
+                
+                >
+                    
+            </Typeahead>
 
         </div>)
     }
