@@ -178,7 +178,7 @@ class GraphContent extends React.Component {
                 </div>
 
                 <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
-                    <button onClick={this.swap} id="switchBtn" />
+                    <button onClick={this.handleSwitch} id="switchBtn" />
                 </div>
 
             </div>
@@ -226,25 +226,50 @@ class GraphContent extends React.Component {
     }
 
     handleSwitch = () => {
-        this.setState(prevState => {
-            return { switchToggle: !prevState.switchToggle }
+        var that = this;
+        var promise = new Promise(function (resolve, reject) {
+            try {
+                that.setState(prevState => {
+                    return { switchToggle: !prevState.switchToggle }
+                })
+
+                resolve(true)
+            } catch{
+                reject(false)
+            }
         })
+
+        promise.then(function () {
+            that.swap()
+        }).catch(function (e) {
+
+        });
+
     }
 
     swap = () => {
-
-        if (this.state.currentSelectedElement.isEdge()) {
-            var linkDetails;
-            if (this.state.switchToggle) {
-                linkDetails = this.state.ipopData.getLinkDetails(this.state.currentSelectedElement.data().target, this.state.currentSelectedElement.data().id);
-            } else {
-                linkDetails = this.state.ipopData.getLinkDetails(this.state.currentSelectedElement.data().source, this.state.currentSelectedElement.data().id);
+        var that = this;
+        var linkDetails;
+        var promise = new Promise(function (resolve, reject) {
+            try {
+                if (that.state.switchToggle) {
+                    linkDetails = that.state.ipopData.getLinkDetails(that.state.currentSelectedElement.data().target, that.state.currentSelectedElement.data().id);
+                } else {
+                    linkDetails = that.state.ipopData.getLinkDetails(that.state.currentSelectedElement.data().source, that.state.currentSelectedElement.data().id);
+                }
+                resolve(linkDetails)
+            } catch{
+                reject(false)
             }
-            this.setState(prevState => {
-                return { switchToggle: !prevState.switchToggle, linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": prevState.linkDetails.targetNodeDetails, "targetNodeDetails": prevState.linkDetails.sourceNodeDetails } }
-            })
-        }
+        })
 
+        promise.then(function (linkDetails) {
+            that.setState(prevState => {
+                return { linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": prevState.linkDetails.targetNodeDetails, "targetNodeDetails": prevState.linkDetails.sourceNodeDetails } }
+            })
+        }).catch(function (e) {
+
+        })
 
     }
 
@@ -324,9 +349,7 @@ class GraphContent extends React.Component {
 
 
         ReactDOM.render(<Typeahead selectHintOnEnter id="searchGraphElement"
-            onChange={(selected) => {
-
-            }}
+            selectHintOnEnter
             labelKey={(element) => { return (`${element.data().label}`); }}
             filterBy={this.elementFilter}
             options={this.state.cytoscape.elements().map(element => { return element; })}
