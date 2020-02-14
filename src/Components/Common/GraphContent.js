@@ -25,6 +25,7 @@ class GraphContent extends React.Component {
             switchToggle: false,
             nodeDetails: null,
             linkDetails: null,
+            currentSelectedElement: null
         }
     }
 
@@ -42,8 +43,8 @@ class GraphContent extends React.Component {
     }
 
     handleZoomSlider = (e) => {
-        if(e.target.value>this.state.zoom){
-            console.log(parseFloat( e.target.value-this.state.zoom));
+        if (e.target.value > this.state.zoom) {
+            console.log(parseFloat(e.target.value - this.state.zoom));
         }
     }
 
@@ -231,13 +232,19 @@ class GraphContent extends React.Component {
     }
 
     swap = () => {
-        console.log("swap");
 
-        var l = this.state.linkDetails.linkDetails;
-        var s = this.state.linkDetails.sourceNodeDetails;
-        var t = this.state.linkDetails.targetNodeDetails;
+        if (this.state.currentSelectedElement.isEdge()) {
+            var linkDetails;
+            if (this.state.switchToggle) {
+                linkDetails = this.state.ipopData.getLinkDetails(this.state.currentSelectedElement.data().target, this.state.currentSelectedElement.data().id);
+            } else {
+                linkDetails = this.state.ipopData.getLinkDetails(this.state.currentSelectedElement.data().source, this.state.currentSelectedElement.data().id);
+            }
+            this.setState(prevState => {
+                return { switchToggle: !prevState.switchToggle, linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": prevState.linkDetails.targetNodeDetails, "targetNodeDetails": prevState.linkDetails.sourceNodeDetails } }
+            })
+        }
 
-        this.setState({ linkDetails: { "linkDetails": l, "sourceNodeDetails": t, "targetNodeDetails": s } })
 
     }
 
@@ -256,11 +263,15 @@ class GraphContent extends React.Component {
     setLinkDetails = (link) => {
         var linkDetails = this.state.ipopData.getLinkDetails(link.data().source, link.data().id);
 
+        var sourceNode = link.data().source;
+
+        var targetNode = link.data().target;
+
         var sourceNodeDetails = this.state.ipopData.getNodeDetails(link.data().target);
 
         var targetNodeDetails = this.state.ipopData.getNodeDetails(link.data().source);
 
-        this.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
+        this.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNode": sourceNode, "targetNode": targetNode, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
 
         this.renderLinkDetails();
     }
@@ -287,6 +298,8 @@ class GraphContent extends React.Component {
                         } else if (e.target.isEdge()) {
                             that.setLinkDetails(e.target)
                         }
+
+                        that.setState({ currentSelectedElement: e.target })
 
                     }
                 })

@@ -40,7 +40,6 @@ header{
 }
 
 #container{
-    position: absolute;
     width: 100vw;
     height: 94vh;
 }
@@ -52,6 +51,7 @@ header{
     color: white;
     height: 94vh;
     background-color: #101B2B;
+    
 }
 
 #midArea{
@@ -74,12 +74,19 @@ header{
     color: white;
     position: absolute;
     width: 24vw;
+    height: 100vh;
+    overflow-y: auto;
     right: 0;
     padding: 1%;
     margin-top: 0.05%;
     background-color: #213758;
     z-index: 1;
+    -ms-overflow-style: none;
 }
+
+#rightPanel::-webkit-scrollbar {
+    display: none;
+  }
 
 .transmissionCard{
     border-radius: 3px;
