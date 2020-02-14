@@ -25,7 +25,8 @@ class GraphContent extends React.Component {
             switchToggle: false,
             nodeDetails: null,
             linkDetails: null,
-            currentSelectedElement: null
+            currentSelectedElement: null,
+            searchInput: null
         }
     }
 
@@ -53,9 +54,6 @@ class GraphContent extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this.state.linkDetails !== null) {
-            this.renderLinkDetails()
-        }
         if (this.state.cytoscape !== null) {
             this.state.cytoscape.zoom(this.state.zoom)
             document.getElementById("zoomSlider").value = (this.state.zoom)
@@ -63,13 +61,14 @@ class GraphContent extends React.Component {
     }
 
     renderNodeDetails = () => {
+        console.log("redering node");
 
         var sourceNode = this.state.nodeDetails.sourceNode;
         var connectedNodes = this.state.nodeDetails.connectedNodes;
 
         var ipop = this.state.ipopData;
 
-        var rightPanelContent = <div>
+        var nodeContent = <div>
 
             <h5>{sourceNode.nodeName}</h5>
 
@@ -133,7 +132,7 @@ class GraphContent extends React.Component {
             </div>
 
         </div>
-        ReactDOM.render(rightPanelContent, document.getElementById("rightPanelContent"))
+        ReactDOM.render(nodeContent, document.getElementById("rightPanelContent"))
     }
 
     renderLinkDetails = () => {
@@ -226,6 +225,7 @@ class GraphContent extends React.Component {
     }
 
     handleSwitch = () => {
+
         var that = this;
         var promise = new Promise(function (resolve, reject) {
             try {
@@ -248,6 +248,7 @@ class GraphContent extends React.Component {
     }
 
     swap = () => {
+
         var that = this;
         var linkDetails;
         var promise = new Promise(function (resolve, reject) {
@@ -267,6 +268,8 @@ class GraphContent extends React.Component {
             that.setState(prevState => {
                 return { linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": prevState.linkDetails.targetNodeDetails, "targetNodeDetails": prevState.linkDetails.sourceNodeDetails } }
             })
+        }).then(function () {
+            that.renderLinkDetails();
         }).catch(function (e) {
 
         })
@@ -274,31 +277,58 @@ class GraphContent extends React.Component {
     }
 
     setNodeDetails = (node) => {
-        var sourceNode = this.state.ipopData.getNodeDetails(node.data().id);
+        console.log("setting node ");
+        var that = this;
+        var promise = new Promise(function (resolve, reject) {
+            try {
+                var sourceNode = that.state.ipopData.getNodeDetails(node.data().id);
 
-        var connectedNodes = this.state.cytoscape.elements(node.incomers().union(node.outgoers())).filter((element) => {
-            return element.isNode();
-        });
+                var connectedNodes = that.state.cytoscape.elements(node.incomers().union(node.outgoers())).filter((element) => {
+                    return element.isNode();
+                });
 
-        this.setState({ nodeDetails: { "sourceNode": sourceNode, "connectedNodes": connectedNodes } })
+                that.setState({ nodeDetails: { "sourceNode": sourceNode, "connectedNodes": connectedNodes } })
 
-        this.renderNodeDetails();
+                resolve(true)
+            } catch{
+                reject(false)
+            }
+        })
+
+        promise.then(function () {
+            that.renderNodeDetails();
+        }).catch(function () {
+
+        })
     }
 
     setLinkDetails = (link) => {
-        var linkDetails = this.state.ipopData.getLinkDetails(link.data().source, link.data().id);
+        var that = this;
+        var promise = new Promise(function (resolve, reject) {
+            try {
+                var linkDetails = that.state.ipopData.getLinkDetails(link.data().source, link.data().id);
 
-        var sourceNode = link.data().source;
+                var sourceNode = link.data().source;
 
-        var targetNode = link.data().target;
+                var targetNode = link.data().target;
 
-        var sourceNodeDetails = this.state.ipopData.getNodeDetails(link.data().target);
+                var sourceNodeDetails = that.state.ipopData.getNodeDetails(link.data().target);
 
-        var targetNodeDetails = this.state.ipopData.getNodeDetails(link.data().source);
+                var targetNodeDetails = that.state.ipopData.getNodeDetails(link.data().source);
 
-        this.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNode": sourceNode, "targetNode": targetNode, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
+                that.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNode": sourceNode, "targetNode": targetNode, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
 
-        this.renderLinkDetails();
+                resolve(true);
+            } catch{
+                reject(false);
+            }
+        })
+
+        promise.then(function () {
+            that.renderLinkDetails();
+        }).catch(function () {
+
+        })
     }
 
     renderGraph = () => {
@@ -314,21 +344,18 @@ class GraphContent extends React.Component {
                 var that = this;
 
                 this.cy.on("click", function (e) {
-                    console.log(e.target);
-
                     if (e.target.length !== undefined) {
-
                         if (e.target.isNode()) {
+                            console.log(`selected from clicked : ${JSON.stringify(e.target.data())}`);
                             that.setNodeDetails(e.target);
                         } else if (e.target.isEdge()) {
                             that.setLinkDetails(e.target)
                         }
-
-                        that.setState({ currentSelectedElement: e.target })
-
+                    } else {
+                    
                     }
+                    that.setState({ switchToggle: false, currentSelectedElement: e.target })
                 })
-
 
             }}
 
@@ -347,9 +374,13 @@ class GraphContent extends React.Component {
 
         ReactDOM.render(<ViewSelector />, document.getElementById("viewSelector"));
 
-
         ReactDOM.render(<Typeahead selectHintOnEnter id="searchGraphElement"
-            selectHintOnEnter
+
+            onChange={(selected) => {
+                if (selected[0] !== undefined) {
+                    selected[0].trigger("click");
+                }
+            }}
             labelKey={(element) => { return (`${element.data().label}`); }}
             filterBy={this.elementFilter}
             options={this.state.cytoscape.elements().map(element => { return element; })}
@@ -357,12 +388,13 @@ class GraphContent extends React.Component {
             placeholder="Search node or tunnel"
             renderMenuItemChildren={(element) => {
                 return (
-                    <>
+                    <div className="searchResult">
                         <div className="resultLabel">
                             {element.data().label}
                         </div>
                         <small>ID : {element.data().id}</small>
-                    </>
+                    </div>
+
                 )
             }}
 
