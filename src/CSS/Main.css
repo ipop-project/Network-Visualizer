@@ -1,16 +1,18 @@
 /* customize global */
-*{
+
+* {
     font-family: tahoma;
     font-size: 16px;
 }
 
-#root{
+#root {
     width: 100vw;
     height: 100vh;
 }
 
 /* customize Herder Tag */
-header{
+
+header {
     width: 100vw;
     height: 6vh;
     color: white;
@@ -18,63 +20,63 @@ header{
 }
 
 /* customize title name */
-#ipopTitle{
-    transform: translateY(20%);
-}
+
+#ipopTitle {}
 
 /* customize view selector */
-#viewSelector{
+
+#viewSelector {
     outline: none;
+    margin-top: auto;
     border-radius: 3px;
+    margin-bottom: auto;
+    padding-left: 20.5%;
 }
 
-/* customize search bar */
-#search{
-    width: 100%;
-    margin-bottom: 2%;
-    outline: none;
-    color: white;
-    border-radius: 3px;
-    border-color: #101B2B;
-    background-color: #101B2B;
-}
-
-#container{
+#container {
     width: 100vw;
     height: 94vh;
 }
 
 /* customize main content */
-#mainContent{
+
+#mainContent {
     position: fixed;
     width: 100vw;
     color: white;
     height: 94vh;
     background-color: #101B2B;
-    
 }
 
-#midArea{
+#midArea {
     margin: auto;
 }
 
+#searchBar{
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 /* customize overlay button */
-.overlay{
+
+.overlay {
     background: transparent;
     border: none;
     outline: none;
 }
 
-.overlay_ic{
+.overlay_ic {
     width: 75%;
 }
 
 /* customize right panel */
-#rightPanel{
+
+#rightPanel {
     color: white;
     position: absolute;
-    width: 24vw;
-    height: 100vh;
+    width: 25vw;
+    height: 100%;
     overflow-y: auto;
     right: 0;
     padding: 1%;
@@ -82,20 +84,21 @@ header{
     background-color: #213758;
     z-index: 1;
     -ms-overflow-style: none;
+    word-wrap: break-word;
 }
 
 #rightPanel::-webkit-scrollbar {
     display: none;
-  }
+}
 
-.transmissionCard{
+.transmissionCard {
     border-radius: 3px;
     border: solid #486186;
     background-color: #405B80;
     margin-bottom: 1%;
 }
 
-#overlayRightPanelBtn{
+#overlayRightPanelBtn {
     margin: 0.5%;
     right: 0;
     width: 30px;
@@ -108,105 +111,117 @@ header{
     z-index: 2;
 }
 
-.overlayBtn{
+.overlayBtn {
     border-radius: 3px;
     border: solid #486186;
     background-color: #405B80;
 }
 
-#leftTools{
+#leftTools {
+    width: fit-content;
     position: fixed;
-    height: 1000vh;
+    top: 11.5vh;
     z-index: 2;
 }
 
-.resultLabel{
+.resultLabel {
     font-weight: 700;
 }
 
-#midArea{
+#midArea {
     margin: 0;
     width: 100%;
     padding: 0;
 }
 
-#homeBtn{
-    width: 60px;
+/* @media only screen and (max-width:1980px,max-height:1080){
+
+} */
+
+.leftToolsBtn {
+    width: 55px;
     border: none;
-    height: 60px;
+    height: 55px;
     outline: none;
+}
+
+#homeBtn {
     background: url(../Images/Icons/home_ic.svg);
+    background-size: contain;
+    outline: none;
 }
 
-#refreshBtn{
-    width: 60px;
-    border: none;
-    height: 60px;
-    outline: none;
+#refreshBtn {
     background: url(../Images/Icons/refresh_ic.svg);
+    background-size: contain;
+    outline: none;
 }
 
-#infoBtn{
-    width: 60px;
-    border: none;
-    height: 60px;
-    outline: none;
+#infoBtn {
     background: url(../Images/Icons/info_ic.svg);
+    background-size: contain;
+    outline: none;
 }
 
-#configBtn{
-    width: 60px;
-    border: none;
-    height: 60px;
-    outline: none;
+#configBtn {
     background: url(../Images/Icons/config_ic.svg);
+    background-size: contain;
+    outline: none;
 }
 
-#plusBtn{
-    width: 60px;
-    border: none;
-    height: 60px;
-    outline: none;
+#plusBtn {
     background: url(../Images/Icons/plus_ic.svg);
-}
-
-#zoomSlider{
-}
-
-#zoomSlider input{
-
-}
-
-#minusBtn{
-    width: 60px;
-    border: none;
-    height: 60px;
+    background-size: contain;
     outline: none;
-    background: url(../Images/Icons/minus_ic.svg);
 }
 
-.DetailsLabel{
+#zoomSlider {
+    position: absolute;
+    margin-left: -13.5vh;
+    margin-top: 14.9vh;
+    transform: rotate(-90deg);
+    width: 35vh;
+}
+
+#minusBtn {
+    margin-top: 34vh;
+    background: url(../Images/Icons/minus_ic.svg);
+    background-size: contain;
+    outline: none;
+}
+
+.DetailsLabel {
     color: gray;
     font-size: 14px;
 }
 
-#switchBtn{
+#switchBtn {
     width: 30px;
-    height:30px;
+    height: 30px;
     border: none;
     outline: none;
     background: url(../Images/Icons/swap_ic.svg)no-repeat;
     background-size: cover;
 }
 
+.node_img{
+    width: 100%;
+}
 
+.tunnel_img{
+    width: 90%;
+}
 
+.popover{
+    width: fit-content;
+    max-width: unset;
+}
 
+#configContent{
+    width: 20vw;
+}
 
-
-
-
-
-
-
-
+#infoContent{
+    padding: 2%;
+    width: 20vw;
+}

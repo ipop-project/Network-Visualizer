@@ -4,17 +4,16 @@ import ipop_ic from "../../Images/Icons/ipop_ic.svg";
 class Header extends React.Component {
     render() {
         return <header className="row">
-            <img src={ipop_ic} alt="ipop_ic" />
 
             <div id="ipopTitle" className="col-3">
-                <h6>IPOP NETWORK VISUALIZER</h6>
+                <img src={ipop_ic} alt="ipop_ic" style={{ marginRight: "5%" }} /><label style={{ marginTop: "2%", marginBottom: "2%" }}>IPOP NETWORK VISUALIZER</label>
             </div>
 
-            <div id="viewSelector" className="col-6" style={{ textAlign: "center" }}>
-                
+            <div id="viewSelector" className="col-6">
+
             </div>
 
-            <div id="searchBar" className="col">
+            <div id="searchBar" className="col-3">
                 {this.props.children}
             </div>
         </header>

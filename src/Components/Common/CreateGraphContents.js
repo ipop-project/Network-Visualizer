@@ -44,7 +44,7 @@ class CreateGraphContents {
         }
 
         this.getNodeIDs = function () {
-            return Object.keys(this.getNodeObj());
+            return Object.keys(this.getNodeObj()).sort();
         }
 
         this.getNodeName = function (nodeID) {
@@ -62,7 +62,7 @@ class CreateGraphContents {
         }
 
         this.getLinkIDs = function (nodeID) {
-            return Object.keys(this.getLinkObj()[nodeID]);
+            return Object.keys(this.getLinkObj()[nodeID]).sort();
         }
 
         this.getLinkName = function (nodeID, linkID) {

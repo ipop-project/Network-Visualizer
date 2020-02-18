@@ -5,59 +5,46 @@ import Card from "react-bootstrap/Card";
 import Cytoscape from 'react-cytoscapejs';
 import ViewSelector from "./ViewSelector";
 import CollapseButton from "./CollapseButton";
+import Popover from "react-bootstrap/Popover";
 import cytoscapeStyle from "./cytoscapeStyle.js";
 import { Typeahead } from "react-bootstrap-typeahead";
 import CreateGraphContents from "./CreateGraphContents";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import connected_ic from "../../Images/Icons/connected_ic.svg"
+import no_tunnel_ic from "../../Images/Icons/no_tunnel_ic.svg"
+import not_reporting_ic from "../../Images/Icons/not_reporting_ic.svg"
+import longdistance_ic from "../../Images/Icons/longdistance_ic.svg"
+import ondemand_ic from "../../Images/Icons/ondemand_ic.svg"
+import static_ic from "../../Images/Icons/static_ic.svg"
+import successor_ic from "../../Images/Icons/successor_ic.svg"
+
+
 
 class GraphContent extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            minZoom: 0.2,
-            maxZoom: 2,
-            zoom: 0.8,
-            ipopData: null,
+            initMinZoom: 0.2,
+            initMaxZoom: 2,
+            // wheelSensitive:0.1,
+            ipop: null,
             graphElement: [],
             dataReady: false,
             refresh: false,
             cytoscape: null,
             switchToggle: false,
+            infoToggle: true,
+            configToggle: true,
             nodeDetails: null,
             linkDetails: null,
-            currentSelectedElement: null,
-            searchInput: null
-        }
-    }
-
-    zoomIn = () => {
-        this.setState(prevState => {
-            return { zoom: prevState.zoom + 0.1 }
-        })
-
-    }
-
-    zoomOut = () => {
-        this.setState(prevState => {
-            return { zoom: prevState.zoom - 0.1 }
-        })
-    }
-
-    handleZoomSlider = (e) => {
-        if (e.target.value > this.state.zoom) {
-            console.log(parseFloat(e.target.value - this.state.zoom));
+            currentSelectedElement: null
         }
     }
 
     componentDidMount() {
+        document.getElementById("overlayRightPanelBtn").click();
         this.fetchData();
-    }
-
-    componentDidUpdate() {
-        if (this.state.cytoscape !== null) {
-            this.state.cytoscape.zoom(this.state.zoom)
-            document.getElementById("zoomSlider").value = (this.state.zoom)
-        }
     }
 
     renderNodeDetails = () => {
@@ -66,7 +53,7 @@ class GraphContent extends React.Component {
         var sourceNode = this.state.nodeDetails.sourceNode;
         var connectedNodes = this.state.nodeDetails.connectedNodes;
 
-        var ipop = this.state.ipopData;
+        var ipop = this.state.ipop;
 
         var nodeContent = <div>
 
@@ -254,9 +241,9 @@ class GraphContent extends React.Component {
         var promise = new Promise(function (resolve, reject) {
             try {
                 if (that.state.switchToggle) {
-                    linkDetails = that.state.ipopData.getLinkDetails(that.state.currentSelectedElement.data().target, that.state.currentSelectedElement.data().id);
+                    linkDetails = that.state.ipop.getLinkDetails(that.state.currentSelectedElement.data().target, that.state.currentSelectedElement.data().id);
                 } else {
-                    linkDetails = that.state.ipopData.getLinkDetails(that.state.currentSelectedElement.data().source, that.state.currentSelectedElement.data().id);
+                    linkDetails = that.state.ipop.getLinkDetails(that.state.currentSelectedElement.data().source, that.state.currentSelectedElement.data().id);
                 }
                 resolve(linkDetails)
             } catch{
@@ -281,7 +268,7 @@ class GraphContent extends React.Component {
         var that = this;
         var promise = new Promise(function (resolve, reject) {
             try {
-                var sourceNode = that.state.ipopData.getNodeDetails(node.data().id);
+                var sourceNode = that.state.ipop.getNodeDetails(node.data().id);
 
                 var connectedNodes = that.state.cytoscape.elements(node.incomers().union(node.outgoers())).filter((element) => {
                     return element.isNode();
@@ -306,15 +293,15 @@ class GraphContent extends React.Component {
         var that = this;
         var promise = new Promise(function (resolve, reject) {
             try {
-                var linkDetails = that.state.ipopData.getLinkDetails(link.data().source, link.data().id);
+                var linkDetails = that.state.ipop.getLinkDetails(link.data().source, link.data().id);
 
                 var sourceNode = link.data().source;
 
                 var targetNode = link.data().target;
 
-                var sourceNodeDetails = that.state.ipopData.getNodeDetails(link.data().target);
+                var sourceNodeDetails = that.state.ipop.getNodeDetails(link.data().target);
 
-                var targetNodeDetails = that.state.ipopData.getNodeDetails(link.data().source);
+                var targetNodeDetails = that.state.ipop.getNodeDetails(link.data().source);
 
                 that.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNode": sourceNode, "targetNode": targetNode, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
 
@@ -337,32 +324,43 @@ class GraphContent extends React.Component {
 
                 this.cy = cy;
 
-                this.setState({ cytoscape: this.cy });
+                this.setState({ cytoscape: cy });
 
-                this.cy.zoom(this.state.zoom);
+                this.cy.maxZoom(this.state.initMaxZoom);
+                this.cy.minZoom(this.state.initMinZoom);
+                this.cy.zoom(0.8);
+                this.cy.center();
 
                 var that = this;
 
                 this.cy.on("click", function (e) {
-                    if (e.target.length !== undefined) {
+                    try {
+                        if (document.getElementById("rightPanel").hidden === true) {
+                            document.getElementById("overlayRightPanelBtn").click();
+                        }
                         if (e.target.isNode()) {
                             console.log(`selected from clicked : ${JSON.stringify(e.target.data())}`);
                             that.setNodeDetails(e.target);
                         } else if (e.target.isEdge()) {
                             that.setLinkDetails(e.target)
                         }
-                    } else {
-                    
+                    } catch {
+                        if (document.getElementById("rightPanelContent").childNodes.length > 0) {
+                            document.getElementById("overlayRightPanelBtn").click();
+                            ReactDOM.render(<></>, document.getElementById("rightPanelContent"))
+                        }
                     }
                     that.setState({ switchToggle: false, currentSelectedElement: e.target })
                 })
 
             }}
+            wheelSensitivity={0.1}
 
             elements={Cytoscape.normalizeElements({
                 nodes: this.state.graphElement[0],
                 edges: this.state.graphElement[1]
             })}
+
 
             stylesheet={cytoscapeStyle}
 
@@ -377,8 +375,15 @@ class GraphContent extends React.Component {
         ReactDOM.render(<Typeahead selectHintOnEnter id="searchGraphElement"
 
             onChange={(selected) => {
-                if (selected[0] !== undefined) {
+                try {
+                    if (this.state.currentSelectedElement !== null) {
+                        this.state.currentSelectedElement.unselect();
+                    }
+                    selected[0].select();
                     selected[0].trigger("click");
+                    this.setState({ switchToggle: false, currentSelectedElement: selected[0] })
+                } catch{
+
                 }
             }}
             labelKey={(element) => { return (`${element.data().label}`); }}
@@ -432,7 +437,7 @@ class GraphContent extends React.Component {
         fetch(nodeURL).then(res => res.json()).then(nodes => {
             fetch(linkURL).then(res => res.json()).then(links => {
                 ipop.init(this.props.selectedOverlay, nodes, links);
-                this.setState({ ipopData: ipop });
+                this.setState({ ipop: ipop });
             }).then(() => {
                 ipop.getNodeIDs().forEach(nodeID => {
                     nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}" ,"type":""} }`));
@@ -440,51 +445,191 @@ class GraphContent extends React.Component {
                     ipop.getLinkIDs(nodeID).forEach(linkID => {
                         sourceConf = ipop.getSourceNode(nodeID, linkID);
                         targetConf = ipop.getTargetNode(nodeID, linkID);
-
                         linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${ipop.getLinkDetails(nodeID, linkID)["TunnelID"]}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}"} }`));
-
                     })
                 });
+
                 this.setState({ graphElement: [nodeConf, linkConf] })
                 this.setState({ dataReady: true })
             }).then(() => {
-                this.renderGraph()
+                try {
+                    this.renderGraph()
+                } finally {
+                    this.state.cytoscape.elements().map(ele => {
+                        if (ele.isNode()) {
+                            return ele.ungrabify();
+                        } else {
+                            return ele.addClass(ele.data().type);
+                        }
+                    });
+                }
             })
         })
     }
 
+    handleRefresh = () => {
+        this.state.cytoscape.center()
+    }
+
+    zoomIn = () => {
+        var currentZoom = this.state.cytoscape.zoom();
+        this.state.cytoscape.zoom(currentZoom + 0.1);
+        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+    }
+
+    zoomOut = () => {
+        var currentZoom = this.state.cytoscape.zoom();
+        this.state.cytoscape.zoom(currentZoom - 0.1);
+        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+    }
+
+    handleZoomSlider = (e) => {
+        this.state.cytoscape.zoom(parseFloat(e.target.value));
+    }
+
     handleWheel = (e) => {
-        // if (e.deltaY > 0) {
-        //     this.zoomOut();
-        // } else {
-        //     this.zoomIn();
-        // }
+        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+    }
+
+    handleSetMinZoom = (e) => {
+        try {
+            this.state.cytoscape.minZoom(parseFloat(e.target.value));
+            document.getElementById("zoomSlider").min = parseFloat(e.target.value);
+        } finally {
+            if (this.state.cytoscape.zoom() < parseFloat(e.target.value)) {
+                this.state.cytoscape.zoom(parseFloat(e.target.value));
+            }
+        }
+    }
+
+    handleSetMaxZoom = (e) => {
+        try {
+
+            this.state.cytoscape.maxZoom(parseFloat(e.target.value));
+            document.getElementById("zoomSlider").max = parseFloat(e.target.value);
+        } finally {
+            if (this.state.cytoscape.zoom() > parseFloat(e.target.value)) {
+                this.state.cytoscape.zoom(parseFloat(e.target.value));
+            }
+        }
+    }
+
+    // handleSetZoomSensitive = (e) => {
+    //     this.setState({wheelSensitive:e.target.value});
+    // }
+
+    componentDidUpdate() {
     }
 
     render() {
         return <>
-            <div id="leftTools" className="col-1">
+            <div id="leftTools" className="col-3">
                 <div>
-                    <button id="homeBtn"></button>
+                    <button id="homeBtn" className="leftToolsBtn"></button>
                 </div>
                 <div>
-                    <button id="refreshBtn"></button>
+                    <button onClick={this.handleRefresh} id="refreshBtn" className="leftToolsBtn"></button>
                 </div>
                 <div>
-                    <button id="infoBtn"></button>
+                    <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
+                        <Popover>
+                            <Popover.Title as="h3">Element Description</Popover.Title>
+                            {/* <Card id="infoContent"> */}
+                            <Popover.Content id="infoContent">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colSpan={2}>Node</th>
+                                            <th colSpan={2}>Tunnel</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{ width: "5%", margin: "auto" }}><img className="node_img" src={connected_ic} alt="connected_node" /></td>
+                                            <td>Connected</td>
+                                            <td style={{ width: "15%" }}><img className="tunnel_img" src={longdistance_ic} alt="longdistance_tunnel" /></td>
+                                            <td>Longdistance</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ width: "5%" }}><img className="node_img" src={not_reporting_ic} alt="not_reporting_node" /></td>
+                                            <td>Not Reporting</td>
+                                            <td style={{ width: "15%" }}><img className="tunnel_img" src={ondemand_ic} alt="ondemand_tunnel" /></td>
+                                            <td>Ondemand</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ width: "5%" }}><img className="node_img" src={no_tunnel_ic} alt="no_tunnel_node" /></td>
+                                            <td>No Tunnels</td>
+                                            <td style={{ width: "15%" }}><img className="tunnel_img" src={static_ic} alt="static_tunnel" /></td>
+                                            <td>Static</td>
+                                        </tr>
+                                        <tr>
+                                            <td ></td>
+                                            <td></td>
+                                            <td style={{ width: "15%" }}><img className="tunnel_img" src={successor_ic} alt="successor_tnnel" /></td>
+                                            <td>Successor</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {/* </Card> */}
+                            </Popover.Content>
+                        </Popover>}>
+                        <button onClick={this.handleInfoToggle} id="infoBtn" className="leftToolsBtn"></button>
+                    </OverlayTrigger>
                 </div>
                 <div>
-                    <button id="configBtn"></button>
+                    <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
+                        <Popover>
+                            <Popover.Title as="h3">Configure</Popover.Title>
+                            <Popover.Content id="configContent">
+                                <div className="row">
+                                    <div className="col">
+                                        <label>Minimun zoom</label>
+                                    </div>
+                                    <div className="col">
+                                        <select onChange={this.handleSetMinZoom} id="minZoomSelector">
+                                            <option id="0.2">0.2</option>
+                                            <option id="1">1</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col">
+                                        <label>Maximum zoom</label>
+                                    </div>
+                                    <div className="col">
+                                        <select onChange={this.handleSetMaxZoom} id="maxZoomSelector">
+                                            <option>2</option>
+                                            <option>5</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                {/* <div className="row">
+                                    <div className="col">
+                                        <label>Zoom sensitivity</label>
+                                    </div>
+                                    <div className="col">
+                                        <select onChange={this.handleSetZoomSensitive} id="zoomSensitiveSelector">
+                                            <option>0.1</option>
+                                            <option>1</option>
+                                        </select>
+                                    </div>
+                                </div> */}
+                            </Popover.Content>
+                        </Popover>}>
+                        <button onClick={this.handleConfigToggle} id="configBtn" className="leftToolsBtn"></button>
+                    </OverlayTrigger>
                 </div>
                 <div>
-                    <button onClick={this.zoomIn} id="plusBtn"></button>
+                    <button onClick={this.zoomIn} id="plusBtn" className="leftToolsBtn"></button>
                 </div>
                 <div>
-                    <input id="zoomSlider" onChange={this.handleZoomSlider} type="range" min={this.state.minZoom} max={this.state.maxZoom} step="0.1"></input>
+                    <input id="zoomSlider" onChange={this.handleZoomSlider} type="range" min={this.state.initMinZoom}
+                        max={this.state.initMaxZoom} step={0.1} defaultValue={0.8}></input>
                 </div>
                 <div>
-                    <button onClick={this.zoomOut} id="minusBtn"></button>
+                    <button onClick={this.zoomOut} id="minusBtn" className="leftToolsBtn"></button>
                 </div>
+
             </div>
 
             <section onWheel={this.handleWheel} id="midArea" className="col-9">

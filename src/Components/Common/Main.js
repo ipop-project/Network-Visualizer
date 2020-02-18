@@ -1,6 +1,4 @@
 import React from "react";
-import "../../CSS/Main.css";
-import Header from "./Header";
 import "react-tippy/dist/tippy.css";
 import { Tooltip } from "react-tippy";
 import RightPanel from "./RightPanel";
@@ -10,6 +8,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CollapseButton from "./CollapseButton";
 import overlay_ic from "../../Images/Icons/overlay_ic.svg";
 import { Typeahead } from "react-bootstrap-typeahead";
+import Header from "./Header";
+import "../../CSS/Main.css";
 
 class Main extends React.Component {
     constructor(props) {
@@ -126,7 +126,11 @@ class Main extends React.Component {
                 <Typeahead
                     id="searchOverlay"
                     onChange={(selected) => {
-                        this.selectOverlay(selected);
+                        try {
+                            this.selectOverlay(selected[0]);
+                        } catch{
+
+                        }
                     }}
                     options={this.state.overlays}
                     selected={this.state.selected}
