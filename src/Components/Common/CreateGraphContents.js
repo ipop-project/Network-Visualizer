@@ -98,7 +98,7 @@ class CreateGraphContents {
                 if (this.getLinkObj()[srcNode][link]["TgtNodeId"] === tgtNode) {
                     // console.log("matched !!");
                     connectedNodeDetails = {
-                        "TunnelID": this.getLinkObj()[srcNode][link]["EdgeId"],
+                        "TunnelID": link,
                         "InterfaceName": this.getLinkObj()[srcNode][link]["InterfaceName"],
                         "MAC": this.getLinkObj()[srcNode][link]["MAC"],
                         "State": this.getLinkObj()[srcNode][link]["State"],

@@ -32,7 +32,7 @@ class GraphContent extends React.Component {
             graphElement: [],
             dataReady: false,
             refresh: false,
-            cytoscape: null,
+            // cytoscape: null,
             switchToggle: false,
             infoToggle: true,
             configToggle: true,
@@ -43,12 +43,13 @@ class GraphContent extends React.Component {
     }
 
     componentDidMount() {
+        document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
         document.getElementById("overlayRightPanelBtn").click();
         this.fetchData();
     }
 
     renderNodeDetails = () => {
-        console.log("redering node");
+        // console.log("redering node");
 
         var sourceNode = this.state.nodeDetails.sourceNode;
         var connectedNodes = this.state.nodeDetails.connectedNodes;
@@ -264,7 +265,7 @@ class GraphContent extends React.Component {
     }
 
     setNodeDetails = (node) => {
-        console.log("setting node ");
+        // console.log("setting node ");
         var that = this;
         var promise = new Promise(function (resolve, reject) {
             try {
@@ -299,9 +300,9 @@ class GraphContent extends React.Component {
 
                 var targetNode = link.data().target;
 
-                var sourceNodeDetails = that.state.ipop.getNodeDetails(link.data().target);
+                var sourceNodeDetails = that.state.ipop.getNodeDetails(link.data().source);
 
-                var targetNodeDetails = that.state.ipop.getNodeDetails(link.data().source);
+                var targetNodeDetails = that.state.ipop.getNodeDetails(link.data().target);
 
                 that.setState({ linkDetails: { "linkDetails": linkDetails, "sourceNode": sourceNode, "targetNode": targetNode, "sourceNodeDetails": sourceNodeDetails, "targetNodeDetails": targetNodeDetails } })
 
@@ -334,23 +335,38 @@ class GraphContent extends React.Component {
                 var that = this;
 
                 this.cy.on("click", function (e) {
+                    var selectedElement = e.target[0];
+                    var relatedElement;
+                    var notRelatedElement;
                     try {
+                        // console.log(e.target[0]===this.cy);
                         if (document.getElementById("rightPanel").hidden === true) {
                             document.getElementById("overlayRightPanelBtn").click();
                         }
-                        if (e.target.isNode()) {
-                            console.log(`selected from clicked : ${JSON.stringify(e.target.data())}`);
-                            that.setNodeDetails(e.target);
-                        } else if (e.target.isEdge()) {
-                            that.setLinkDetails(e.target)
+                        if (selectedElement.isNode()) {
+                            // console.log(`selected from clicked : ${JSON.stringify(e.target.data())}`);
+                            that.setNodeDetails(selectedElement);
+                            relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
+                            notRelatedElement = that.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
+                        } else if (selectedElement.isEdge()) {
+                            that.setLinkDetails(selectedElement)
+                            relatedElement = selectedElement.connectedNodes().union(selectedElement);
+                            notRelatedElement = that.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
                         }
+                        relatedElement.removeClass("hide")
+                        notRelatedElement.addClass("hide");
+
                     } catch {
-                        if (document.getElementById("rightPanelContent").childNodes.length > 0) {
+                        // console.log(e.target[0]===this.cy);
+                        if (e.target[0] === this.cy) {
                             document.getElementById("overlayRightPanelBtn").click();
                             ReactDOM.render(<></>, document.getElementById("rightPanelContent"))
+                            that.cy.elements().removeClass("hide");
                         }
                     }
+
                     that.setState({ switchToggle: false, currentSelectedElement: e.target })
+
                 })
 
             }}
@@ -388,7 +404,7 @@ class GraphContent extends React.Component {
             }}
             labelKey={(element) => { return (`${element.data().label}`); }}
             filterBy={this.elementFilter}
-            options={this.state.cytoscape.elements().map(element => { return element; })}
+            options={this.cy.elements().map(element => { return element; })}
             selected={this.state.selected}
             placeholder="Search node or tunnel"
             renderMenuItemChildren={(element) => {
@@ -404,7 +420,7 @@ class GraphContent extends React.Component {
             }}
 
         >
-        </Typeahead>, document.getElementById("searchOption"))
+        </Typeahead>, document.getElementById("searchBar"))
     }
 
     elementFilter = (element, props) => {
@@ -436,68 +452,76 @@ class GraphContent extends React.Component {
 
         fetch(nodeURL).then(res => res.json()).then(nodes => {
             fetch(linkURL).then(res => res.json()).then(links => {
+                console.log(links);
+
                 ipop.init(this.props.selectedOverlay, nodes, links);
                 this.setState({ ipop: ipop });
             }).then(() => {
                 ipop.getNodeIDs().forEach(nodeID => {
                     nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}" ,"type":""} }`));
-
                     ipop.getLinkIDs(nodeID).forEach(linkID => {
                         sourceConf = ipop.getSourceNode(nodeID, linkID);
                         targetConf = ipop.getTargetNode(nodeID, linkID);
-                        linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${ipop.getLinkDetails(nodeID, linkID)["TunnelID"]}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}"} }`));
+                        var linkColor;
+                        switch (ipop.getLinkDetails(nodeID, linkID).TunnelType) {
+                            case 'CETypeILongDistance':
+                                linkColor = '#5E4FA2';
+                                break;
+                            case 'CETypeLongDistance':
+                                linkColor = '#5E4FA2';
+                                break;
+                            case 'CETypePredecessor':
+                                linkColor = '#01665E';
+                                break;
+                            case 'CETypeSuccessor':
+                                linkColor = '#01665E';
+                                break;
+                            default: break;
+                        }
+                        linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${linkID}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}","color":"${linkColor}"} }`));
                     })
                 });
 
                 this.setState({ graphElement: [nodeConf, linkConf] })
                 this.setState({ dataReady: true })
             }).then(() => {
-                try {
-                    this.renderGraph()
-                } finally {
-                    this.state.cytoscape.elements().map(ele => {
-                        if (ele.isNode()) {
-                            return ele.ungrabify();
-                        } else {
-                            return ele.addClass(ele.data().type);
-                        }
-                    });
-                }
+                this.renderGraph()
             })
         })
     }
 
     handleRefresh = () => {
-        this.state.cytoscape.center()
+        this.cy.zoom(0.8);
+        this.cy.center();
     }
 
     zoomIn = () => {
-        var currentZoom = this.state.cytoscape.zoom();
-        this.state.cytoscape.zoom(currentZoom + 0.1);
-        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+        var currentZoom = this.cy.zoom();
+        this.cy.zoom(currentZoom + 0.1);
+        document.getElementById("zoomSlider").value = (this.cy.zoom())
     }
 
     zoomOut = () => {
-        var currentZoom = this.state.cytoscape.zoom();
-        this.state.cytoscape.zoom(currentZoom - 0.1);
-        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+        var currentZoom = this.cy.zoom();
+        this.cy.zoom(currentZoom - 0.1);
+        document.getElementById("zoomSlider").value = (this.cy.zoom())
     }
 
     handleZoomSlider = (e) => {
-        this.state.cytoscape.zoom(parseFloat(e.target.value));
+        this.cy.zoom(parseFloat(e.target.value));
     }
 
     handleWheel = (e) => {
-        document.getElementById("zoomSlider").value = (this.state.cytoscape.zoom())
+        document.getElementById("zoomSlider").value = (this.cy.zoom())
     }
 
     handleSetMinZoom = (e) => {
         try {
-            this.state.cytoscape.minZoom(parseFloat(e.target.value));
+            this.cy.minZoom(parseFloat(e.target.value));
             document.getElementById("zoomSlider").min = parseFloat(e.target.value);
         } finally {
-            if (this.state.cytoscape.zoom() < parseFloat(e.target.value)) {
-                this.state.cytoscape.zoom(parseFloat(e.target.value));
+            if (this.cy.zoom() < parseFloat(e.target.value)) {
+                this.cy.zoom(parseFloat(e.target.value));
             }
         }
     }
@@ -505,11 +529,11 @@ class GraphContent extends React.Component {
     handleSetMaxZoom = (e) => {
         try {
 
-            this.state.cytoscape.maxZoom(parseFloat(e.target.value));
+            this.cy.maxZoom(parseFloat(e.target.value));
             document.getElementById("zoomSlider").max = parseFloat(e.target.value);
         } finally {
-            if (this.state.cytoscape.zoom() > parseFloat(e.target.value)) {
-                this.state.cytoscape.zoom(parseFloat(e.target.value));
+            if (this.cy.zoom() > parseFloat(e.target.value)) {
+                this.cy.zoom(parseFloat(e.target.value));
             }
         }
     }
@@ -521,11 +545,17 @@ class GraphContent extends React.Component {
     componentDidUpdate() {
     }
 
+    handleBackToHome = () => {
+        if (window.confirm("Your current process will be loss. Are you sure to go back ?") === true) {
+            window.location.reload(true);
+        }
+    }
+
     render() {
         return <>
             <div id="leftTools" className="col-3">
                 <div>
-                    <button id="homeBtn" className="leftToolsBtn"></button>
+                    <button onClick={this.handleBackToHome} id="homeBtn" className="leftToolsBtn"></button>
                 </div>
                 <div>
                     <button onClick={this.handleRefresh} id="refreshBtn" className="leftToolsBtn"></button>
@@ -548,13 +578,13 @@ class GraphContent extends React.Component {
                                             <td style={{ width: "5%", margin: "auto" }}><img className="node_img" src={connected_ic} alt="connected_node" /></td>
                                             <td>Connected</td>
                                             <td style={{ width: "15%" }}><img className="tunnel_img" src={longdistance_ic} alt="longdistance_tunnel" /></td>
-                                            <td>Longdistance</td>
+                                            <td>Long Distance</td>
                                         </tr>
                                         <tr>
                                             <td style={{ width: "5%" }}><img className="node_img" src={not_reporting_ic} alt="not_reporting_node" /></td>
                                             <td>Not Reporting</td>
                                             <td style={{ width: "15%" }}><img className="tunnel_img" src={ondemand_ic} alt="ondemand_tunnel" /></td>
-                                            <td>Ondemand</td>
+                                            <td>On Demand</td>
                                         </tr>
                                         <tr>
                                             <td style={{ width: "5%" }}><img className="node_img" src={no_tunnel_ic} alt="no_tunnel_node" /></td>

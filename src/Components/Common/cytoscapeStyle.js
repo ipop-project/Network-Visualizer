@@ -7,7 +7,7 @@ var cytoscapeStyle = [
             "label": "data(label)",
             "text-valign": "center",
             "background-color": "#8AA626",
-            "font-weight":"bold"
+            "font-weight": "bold"
         }
     }, {
         selector: 'node:selected',
@@ -18,30 +18,30 @@ var cytoscapeStyle = [
             "background-color": "#8AA626"
         }
     }, {
-        selector: "edge.CETypeLongDistance",
+        selector: "node.hide",
         style: {
-            "line-color": "#5E4FA2"
+            "background-color": "grey",
+            "z-index": "0",
+            "opacity": "0.3"
+        }
+    }, {
+        selector: "edge",
+        style: {
+            "line-color": "data(color)",
+            "width": "5%",
+            "z-index": "3"
+        }
+    }, {
+        selector: "edge.hide",
+        style: {
+            "line-color": "grey",
+            "z-index": "0",
+            "opacity": "0.3"
         }
     }, {
         selector: "edge:selected",
         style: {
-            "width": "10%",
             "z-index": "3"
-        }
-    }, {
-        selector: "edge.CETypeILongDistance",
-        style: {
-            "line-color": "#5E4FA2"
-        }
-    }, {
-        selector: "edge.CETypePredecessor",
-        style: {
-            "line-color": "#01665E"
-        }
-    }, {
-        selector: "edge.CETypeSuccessor",
-        style: {
-            "line-color": "#01665E"
         }
     }
 ]

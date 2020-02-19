@@ -81,7 +81,6 @@ class Main extends React.Component {
     }
 
     renderGraphContent = (overlayId) => {
-        document.getElementById("searchBar").hidden = true;
         return <GraphContent selectedOverlay={overlayId} />;
     }
 
