@@ -43,7 +43,7 @@ class GraphContent extends React.Component {
     }
 
     componentDidMount() {
-        document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
+        // document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
         document.getElementById("overlayRightPanelBtn").click();
         this.fetchData();
     }
@@ -419,8 +419,7 @@ class GraphContent extends React.Component {
                 )
             }}
 
-        >
-        </Typeahead>, document.getElementById("searchBar"))
+        > </Typeahead>, document.getElementById("searchBar"))
     }
 
     elementFilter = (element, props) => {
@@ -563,7 +562,7 @@ class GraphContent extends React.Component {
                 <div>
                     <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
                         <Popover>
-                            <Popover.Title as="h3">Element Description</Popover.Title>
+                            <Popover.Title as="h3">IPOP Network Visualizer Legend</Popover.Title>
                             {/* <Card id="infoContent"> */}
                             <Popover.Content id="infoContent">
                                 <table>
@@ -616,7 +615,7 @@ class GraphContent extends React.Component {
                                         <label>Minimun zoom</label>
                                     </div>
                                     <div className="col">
-                                        <select onChange={this.handleSetMinZoom} id="minZoomSelector">
+                                        <select onChange={this.handleSetMinZoom} id="minZoomSelector" value={this.state.minZoom}>
                                             <option id="0.2">0.2</option>
                                             <option id="1">1</option>
                                         </select>
@@ -627,7 +626,7 @@ class GraphContent extends React.Component {
                                         <label>Maximum zoom</label>
                                     </div>
                                     <div className="col">
-                                        <select onChange={this.handleSetMaxZoom} id="maxZoomSelector">
+                                        <select onChange={this.handleSetMaxZoom} id="maxZoomSelector" value={this.state.maxZoom}>
                                             <option>2</option>
                                             <option>5</option>
                                         </select>
