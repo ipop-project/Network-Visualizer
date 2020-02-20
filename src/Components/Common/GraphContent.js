@@ -369,6 +369,8 @@ class GraphContent extends React.Component {
                     }
                     if (e.target[0] !== this.cy) {
                         that.setState({ switchToggle: false, currentSelectedElement: e.target })
+                    }else{
+                        that.setState({ switchToggle: false, currentSelectedElement: null })
                     }
 
                 })
@@ -453,7 +455,7 @@ class GraphContent extends React.Component {
     fetchData = () => {
         var selectedOverlay = this.props.selectedOverlay;
         var intervalNo = new Date().toISOString().split(".")[0];
-        var serverIP = '18.220.44.57:5000';
+        var serverIP = '52.139.216.32:5000';
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
 
         var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
