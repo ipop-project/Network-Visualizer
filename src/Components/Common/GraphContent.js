@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import RightPanel from "./RightPanel";
 import Card from "react-bootstrap/Card";
 import Cytoscape from 'react-cytoscapejs';
-import ViewSelector from "./ViewSelector";
 import CollapseButton from "./CollapseButton";
 import Popover from "react-bootstrap/Popover";
 import cytoscapeStyle from "./cytoscapeStyle.js";
@@ -27,6 +26,8 @@ class GraphContent extends React.Component {
         this.state = {
             initMinZoom: 0.2,
             initMaxZoom: 2,
+            setMinZoom: 0.2,
+            setMaxZoom: 2,
             // wheelSensitive:0.1,
             ipop: null,
             graphElement: [],
@@ -346,26 +347,29 @@ class GraphContent extends React.Component {
                         if (selectedElement.isNode()) {
                             // console.log(`selected from clicked : ${JSON.stringify(e.target.data())}`);
                             that.setNodeDetails(selectedElement);
+
                             relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
                             notRelatedElement = that.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
+
                         } else if (selectedElement.isEdge()) {
                             that.setLinkDetails(selectedElement)
                             relatedElement = selectedElement.connectedNodes().union(selectedElement);
                             notRelatedElement = that.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
                         }
-                        relatedElement.removeClass("hide")
-                        notRelatedElement.addClass("hide");
+                        relatedElement.removeClass("transparent")
+                        notRelatedElement.addClass("transparent");
 
                     } catch {
                         // console.log(e.target[0]===this.cy);
                         if (e.target[0] === this.cy) {
                             document.getElementById("overlayRightPanelBtn").click();
                             ReactDOM.render(<></>, document.getElementById("rightPanelContent"))
-                            that.cy.elements().removeClass("hide");
+                            that.cy.elements().removeClass("transparent");
                         }
                     }
-
-                    that.setState({ switchToggle: false, currentSelectedElement: e.target })
+                    if (e.target[0] !== this.cy) {
+                        that.setState({ switchToggle: false, currentSelectedElement: e.target })
+                    }
 
                 })
 
@@ -386,7 +390,14 @@ class GraphContent extends React.Component {
 
         />, document.getElementById("midArea"))
 
-        ReactDOM.render(<ViewSelector />, document.getElementById("viewSelector"));
+        ReactDOM.render(<select defaultValue="Topology" onChange={this.handleViewSelector} id="viewSelector" className="custom-select">
+            <option value="Topology">Topology</option>
+            <option value="Subgraph">Subgraph</option>
+            <option value="Map">Map</option>
+            <option value="Log">Log</option>
+            <option value="NetworkFlow">NetworkFlow</option>
+            <option value="TunnelUtilization">TunnelUtilization</option>
+        </select>, document.getElementById("viewBar"));
 
         ReactDOM.render(<Typeahead selectHintOnEnter id="searchGraphElement"
 
@@ -394,12 +405,16 @@ class GraphContent extends React.Component {
                 try {
                     if (this.state.currentSelectedElement !== null) {
                         this.state.currentSelectedElement.unselect();
+                    } else {
+
                     }
                     selected[0].select();
                     selected[0].trigger("click");
                     this.setState({ switchToggle: false, currentSelectedElement: selected[0] })
-                } catch{
-
+                } catch (e) {
+                    // alert(e)
+                    ReactDOM.render(<></>, document.getElementById("rightPanelContent"))
+                    this.cy.elements().removeClass("transparent");
                 }
             }}
             labelKey={(element) => { return (`${element.data().label}`); }}
@@ -480,7 +495,6 @@ class GraphContent extends React.Component {
                         linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${linkID}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}","color":"${linkColor}"} }`));
                     })
                 });
-
                 this.setState({ graphElement: [nodeConf, linkConf] })
                 this.setState({ dataReady: true })
             }).then(() => {
@@ -491,6 +505,7 @@ class GraphContent extends React.Component {
 
     handleRefresh = () => {
         this.cy.zoom(0.8);
+        document.getElementById("zoomSlider").value = this.cy.zoom();
         this.cy.center();
     }
 
@@ -522,18 +537,19 @@ class GraphContent extends React.Component {
             if (this.cy.zoom() < parseFloat(e.target.value)) {
                 this.cy.zoom(parseFloat(e.target.value));
             }
+            this.setState({ setMinZoom: e.target.value })
         }
     }
 
     handleSetMaxZoom = (e) => {
         try {
-
             this.cy.maxZoom(parseFloat(e.target.value));
             document.getElementById("zoomSlider").max = parseFloat(e.target.value);
         } finally {
             if (this.cy.zoom() > parseFloat(e.target.value)) {
                 this.cy.zoom(parseFloat(e.target.value));
             }
+            this.setState({ setMinZoom: e.target.value })
         }
     }
 
@@ -550,6 +566,41 @@ class GraphContent extends React.Component {
         }
     }
 
+    renderSubgraph = () => {
+        var selectedElement = this.state.currentSelectedElement;
+        var notRelatedElement;
+        try {
+            if (selectedElement.isNode()) {
+                notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement);
+            } else if (selectedElement.isEdge()) {
+                notRelatedElement = this.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
+            }
+            notRelatedElement.addClass("subgraph")
+        } catch{
+            alert("Please select node or tunnel.")
+            document.getElementById("viewSelector").value = "Topology"
+        }
+
+    }
+
+    renderTopology = () => {
+        this.cy.elements().removeClass("subgraph");
+    }
+
+    handleViewSelector = (e) => {
+        switch (e.target.value) {
+            case "Subgraph": this.renderSubgraph(); break;
+            case "Topology": this.renderTopology(); break;
+
+            default: ;
+        }
+    }
+
+    test = () => {
+        var c = this.cy.elements('[type="CETypeILongDistance"]');
+        this.cy.remove(c)
+    }
+
     render() {
         return <>
             <div id="leftTools" className="col-3">
@@ -562,7 +613,7 @@ class GraphContent extends React.Component {
                 <div>
                     <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
                         <Popover>
-                            <Popover.Title as="h3">IPOP Network Visualizer Legend</Popover.Title>
+                            <Popover.Title as="h3">IPOP Network Visualizer : Legend</Popover.Title>
                             {/* <Card id="infoContent"> */}
                             <Popover.Content id="infoContent">
                                 <table>
@@ -608,14 +659,14 @@ class GraphContent extends React.Component {
                 <div>
                     <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
                         <Popover>
-                            <Popover.Title as="h3">Configure</Popover.Title>
+                            <Popover.Title as="h3">IPOP Network Visualizer : Configure</Popover.Title>
                             <Popover.Content id="configContent">
                                 <div className="row">
                                     <div className="col">
                                         <label>Minimun zoom</label>
                                     </div>
                                     <div className="col">
-                                        <select onChange={this.handleSetMinZoom} id="minZoomSelector" value={this.state.minZoom}>
+                                        <select defaultValue={this.state.setMinZoom} onChange={this.handleSetMinZoom} id="minZoomSelector" value={this.state.minZoom}>
                                             <option id="0.2">0.2</option>
                                             <option id="1">1</option>
                                         </select>
@@ -626,7 +677,7 @@ class GraphContent extends React.Component {
                                         <label>Maximum zoom</label>
                                     </div>
                                     <div className="col">
-                                        <select onChange={this.handleSetMaxZoom} id="maxZoomSelector" value={this.state.maxZoom}>
+                                        <select defaultValue={this.state.setMaxZoom} onChange={this.handleSetMaxZoom} id="maxZoomSelector" value={this.state.maxZoom}>
                                             <option>2</option>
                                             <option>5</option>
                                         </select>
