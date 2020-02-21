@@ -8,22 +8,33 @@ import Popover from "react-bootstrap/Popover";
 import cytoscapeStyle from "./cytoscapeStyle.js";
 import { Typeahead } from "react-bootstrap-typeahead";
 import CreateGraphContents from "./CreateGraphContents";
+import static_ic from "../../Images/Icons/static_ic.svg";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import connected_ic from "../../Images/Icons/connected_ic.svg"
-import no_tunnel_ic from "../../Images/Icons/no_tunnel_ic.svg"
-import not_reporting_ic from "../../Images/Icons/not_reporting_ic.svg"
-import longdistance_ic from "../../Images/Icons/longdistance_ic.svg"
-import ondemand_ic from "../../Images/Icons/ondemand_ic.svg"
-import static_ic from "../../Images/Icons/static_ic.svg"
-import successor_ic from "../../Images/Icons/successor_ic.svg"
-
-
+import ondemand_ic from "../../Images/Icons/ondemand_ic.svg";
+import connected_ic from "../../Images/Icons/connected_ic.svg";
+import no_tunnel_ic from "../../Images/Icons/no_tunnel_ic.svg";
+import successor_ic from "../../Images/Icons/successor_ic.svg";
+import longdistance_ic from "../../Images/Icons/longdistance_ic.svg";
+import not_reporting_ic from "../../Images/Icons/not_reporting_ic.svg";
+import GoogleMapReact from 'google-map-react';
 
 class GraphContent extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            nodeLocations: {
+                a100001feb6040628e5fb7e70b04f001: [36.066698, 140.132462],
+                a100002feb6040628e5fb7e70b04f002: [36.063877, 140.127210],
+                a100003feb6040628e5fb7e70b04f003: [36.053425, 140.128607],
+                a100004feb6040628e5fb7e70b04f004: [36.060572, 140.131225],
+                a100005feb6040628e5fb7e70b04f005: [36.047318, 140.129809],
+                a100006feb6040628e5fb7e70b04f006: [36.055033, 140.135583],
+                a100007feb6040628e5fb7e70b04f007: [36.069550, 140.121024],
+                a100008feb6040628e5fb7e70b04f008: [36.064832, 140.112355],
+                a100009feb6040628e5fb7e70b04f009: [36.048768, 140.116732],
+                a100010feb6040628e5fb7e70b04f010: [36.045437, 140.132396],
+            },
             initMinZoom: 0.2,
             initMaxZoom: 2,
             setMinZoom: 0.2,
@@ -44,6 +55,8 @@ class GraphContent extends React.Component {
     }
 
     componentDidMount() {
+
+
         // document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
         document.getElementById("overlayRightPanelBtn").click();
         this.fetchData();
@@ -208,6 +221,8 @@ class GraphContent extends React.Component {
                             <div className="DetailsLabel">Total Byte Received</div>
                 {linkDetails.Stats[0].recv_total_bytes}
             </Card.Body>
+
+            <button>Transmission graph</button>
         </div>
 
         ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
@@ -356,8 +371,10 @@ class GraphContent extends React.Component {
                             relatedElement = selectedElement.connectedNodes().union(selectedElement);
                             notRelatedElement = that.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
                         }
-                        relatedElement.removeClass("transparent")
-                        notRelatedElement.addClass("transparent");
+                        if (document.getElementById("viewSelector").value !== "Subgraph") {
+                            relatedElement.removeClass("transparent")
+                            notRelatedElement.addClass("transparent");
+                        }
 
                     } catch {
                         // console.log(e.target[0]===this.cy);
@@ -369,7 +386,7 @@ class GraphContent extends React.Component {
                     }
                     if (e.target[0] !== this.cy) {
                         that.setState({ switchToggle: false, currentSelectedElement: e.target })
-                    }else{
+                    } else {
                         that.setState({ switchToggle: false, currentSelectedElement: null })
                     }
 
@@ -452,6 +469,15 @@ class GraphContent extends React.Component {
         }
     }
 
+    download = (content, fileName, contentType) => {
+        // var a = document.createElement("a");
+        // var file = new Blob([content], { type: contentType });
+        // a.href = URL.createObjectURL(file);
+        // a.download = fileName;
+        // a.click();
+    }
+
+
     fetchData = () => {
         var selectedOverlay = this.props.selectedOverlay;
         var intervalNo = new Date().toISOString().split(".")[0];
@@ -469,12 +495,14 @@ class GraphContent extends React.Component {
         fetch(nodeURL).then(res => res.json()).then(nodes => {
             fetch(linkURL).then(res => res.json()).then(links => {
                 console.log(links);
-
+                this.download(JSON.stringify(nodes), 'nodes.json', 'text/plain');
+                this.download(JSON.stringify(links), 'links.json', 'text/plain');
                 ipop.init(this.props.selectedOverlay, nodes, links);
                 this.setState({ ipop: ipop });
             }).then(() => {
                 ipop.getNodeIDs().forEach(nodeID => {
-                    nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}" ,"type":""} }`));
+                    console.log(nodeID);
+                    nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}" ,"type":"","lat":"${this.state.nodeLocations[nodeID][0]}","lng":"${this.state.nodeLocations[nodeID][1]}"} }`));
                     ipop.getLinkIDs(nodeID).forEach(linkID => {
                         sourceConf = ipop.getSourceNode(nodeID, linkID);
                         targetConf = ipop.getTargetNode(nodeID, linkID);
@@ -589,10 +617,41 @@ class GraphContent extends React.Component {
         this.cy.elements().removeClass("subgraph");
     }
 
+    static defaultProps = {
+        center: { lat: 40.73, lng: -73.93 },
+        zoom: 12
+    }
+
+    handleMakerClicked = (node) =>{
+        node.trigger("click")
+    }
+
+    renderMap = () => {
+        var map = <GoogleMapReact
+            bootstrapURLKeys={{
+                key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                language: 'en'
+            }}
+            defaultCenter={{lat:36.062269,lng:140.135439}}
+            center={{lat:36.062269,lng:140.135439}}
+            defaultZoom={15}
+        >
+
+        {this.cy.elements("node").map(node=>{   
+            return <button onClick={this.handleMakerClicked.bind(this,node)} id={node.data().id} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+            {node.data().label}
+            </button>
+        })}
+
+        </GoogleMapReact>
+        ReactDOM.render(map, document.getElementById("midArea"))
+    }
+
     handleViewSelector = (e) => {
         switch (e.target.value) {
             case "Subgraph": this.renderSubgraph(); break;
             case "Topology": this.renderTopology(); break;
+            case "Map": this.renderMap(); break;
 
             default: ;
         }
@@ -602,6 +661,9 @@ class GraphContent extends React.Component {
         var c = this.cy.elements('[type="CETypeILongDistance"]');
         this.cy.remove(c)
     }
+
+
+
 
     render() {
         return <>
@@ -714,7 +776,7 @@ class GraphContent extends React.Component {
 
             </div>
 
-            <section onWheel={this.handleWheel} id="midArea" className="col-9">
+            <section onWheel={this.handleWheel} id="midArea">
             </section>
 
             <RightPanel rightPanelTopic="Details"></RightPanel>
