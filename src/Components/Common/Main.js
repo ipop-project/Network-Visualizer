@@ -141,7 +141,7 @@ class Main extends React.Component {
                                 <div className="resultLabel">
                                     {option}
                                 </div>
-                                <small>Number of nodes : {this.state.overlaysObj['current_state'][option].NumNodes} Number of links : {this.state.overlaysObj['current_state'][option].NumLinks}</small><br />
+                                <small className="resultLabel">Number of nodes : {this.state.overlaysObj['current_state'][option].NumNodes} Number of links : {this.state.overlaysObj['current_state'][option].NumLinks}</small><br />
                             </div>
                         )
                     }}

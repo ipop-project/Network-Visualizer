@@ -170,21 +170,28 @@ header {
 .nodeMarker{
     outline: none;
     border: none;
-    background-color: #8AA626;
-    text-align: center;
-    border-radius: 100%;
+    width: 70px;
+    height: 70px;
+    background: url("../Images/Icons/green_node_ic.svg") no-repeat;
+    background-size: contain;
 }
 
 .nodeMarker.selected{
+    transform: translate(-15%,-15%);
     outline: none;
-    border: 0.15vw solid red;
-    text-align: center;
-    border-radius: 100%;
+    border: none;
+    width: 100px;
+    height: 100px;
+    background: url("../Images/Icons/green_node_selected_ic.svg") no-repeat;
+    background-size: contain;
 }
 
 .markerLabel{
+    font-size: medium;
+    margin: 0;
+    padding: 0;
     width: 60px;
-    height: 60px;
+    font-weight: bold;
 }
 
 @media only screen and (max-width: 1920px) {

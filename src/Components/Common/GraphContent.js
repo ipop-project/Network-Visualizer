@@ -24,16 +24,16 @@ class GraphContent extends React.Component {
         super(props);
         this.state = {
             nodeLocations: {
-                a100001feb6040628e5fb7e70b04f001: [13.751769, 100.501287],
-                a100002feb6040628e5fb7e70b04f002: [36.063877, 140.127210],
-                a100003feb6040628e5fb7e70b04f003: [36.053425, 140.128607],
-                a100004feb6040628e5fb7e70b04f004: [36.060572, 140.131225],
-                a100005feb6040628e5fb7e70b04f005: [36.047318, 140.129809],
-                a100006feb6040628e5fb7e70b04f006: [36.055033, 140.135583],
-                a100007feb6040628e5fb7e70b04f007: [36.069550, 140.121024],
-                a100008feb6040628e5fb7e70b04f008: [36.064832, 140.112355],
-                a100009feb6040628e5fb7e70b04f009: [36.048768, 140.116732],
-                a100010feb6040628e5fb7e70b04f010: [36.045437, 140.132396],
+                a100001feb6040628e5fb7e70b04f001: [35.667780, 139.792468],
+                a100002feb6040628e5fb7e70b04f002: [36.063169, 140.135293],
+                a100003feb6040628e5fb7e70b04f003: [36.036767, 139.139504],
+                a100004feb6040628e5fb7e70b04f004: [36.124898, 138.014066],
+                a100005feb6040628e5fb7e70b04f005: [35.176555, 136.856869],
+                a100006feb6040628e5fb7e70b04f006: [34.992293, 135.762571],
+                a100007feb6040628e5fb7e70b04f007: [34.682988, 135.528840],
+                a100008feb6040628e5fb7e70b04f008: [35.864095, 139.667933],
+                a100009feb6040628e5fb7e70b04f009: [36.640714, 138.955405],
+                a100010feb6040628e5fb7e70b04f010: [34.377240, 132.457048],
             },
             initMinZoom: 0.2,
             initMaxZoom: 2,
@@ -70,7 +70,8 @@ class GraphContent extends React.Component {
         var ipop = this.state.ipop;
         fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.state.nodeLocations[sourceNode.nodeID][0]},${this.state.nodeLocations[sourceNode.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
             .then(res => res.json()).then((data) => {
-                return data.plus_code.compound_code;
+                console.log(data);
+                return data.results[data.results.length - 3].formatted_address;
             }).then((location) => {
                 var nodeContent = <div>
 
@@ -82,7 +83,7 @@ class GraphContent extends React.Component {
                     <div className="DetailsLabel">State</div>
                     {sourceNode.nodeState}
 
-                    <div className="DetailsLabel">City/Country</div>
+                    <div className="DetailsLabel">City/State/Country</div>
                     {location}
                     <br /><br />
 
@@ -147,99 +148,110 @@ class GraphContent extends React.Component {
         var linkDetails = this.state.linkDetails.linkDetails;
         var sourceNodeDetails = this.state.linkDetails.sourceNodeDetails;
         var targetNodeDetails = this.state.linkDetails.targetNodeDetails;
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.state.nodeLocations[sourceNodeDetails.nodeID][0]},${this.state.nodeLocations[sourceNodeDetails.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+            .then(res => res.json()).then(data => {
+                return data.results[data.results.length - 3].formatted_address;
+            }).then(sourceLocation => {
+                fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.state.nodeLocations[targetNodeDetails.nodeID][0]},${this.state.nodeLocations[targetNodeDetails.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+                    .then(res => res.json()).then(data => {
+                        return data.results[data.results.length - 3].formatted_address;
+                    }).then(targetLocation => {
 
-        var linkContent = <div>
-            <h5>{linkDetails.InterfaceName}</h5>
+                        var linkContent = <div>
+                            <h5>{linkDetails.InterfaceName}</h5>
 
-            <div className="row">
+                            <div className="row">
 
-                <div className="col-10" style={{ paddingRight: "0" }}>
+                                <div className="col-10" style={{ paddingRight: "0" }}>
 
-                    <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.nodeID + "Btn"} id={sourceNodeDetails.nodeID + "Btn"} name={sourceNodeDetails.nodeName}>
+                                    <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.nodeID + "Btn"} id={sourceNodeDetails.nodeID + "Btn"} name={sourceNodeDetails.nodeName}>
 
-                        <div className="DetailsLabel">Node ID</div>
-                        {sourceNodeDetails.nodeID}
+                                        <div className="DetailsLabel">Node ID</div>
+                                        {sourceNodeDetails.nodeID}
 
-                        <div className="DetailsLabel">State</div>
-                        {sourceNodeDetails.nodeState}
+                                        <div className="DetailsLabel">State</div>
+                                        {sourceNodeDetails.nodeState}
 
-                        <div className="DetailsLabel">City/Country</div>
-                        {sourceNodeDetails.nodeLocation}
+                                        <div className="DetailsLabel">City/State/Country</div>
+                                        {sourceLocation}
 
-                    </CollapseButton>
+                                    </CollapseButton>
 
-                    <CollapseButton className="targetNodeBtn" key={targetNodeDetails.nodeID + "Btn"} id={targetNodeDetails.nodeID + "Btn"} name={targetNodeDetails.nodeName}>
+                                    <CollapseButton className="targetNodeBtn" key={targetNodeDetails.nodeID + "Btn"} id={targetNodeDetails.nodeID + "Btn"} name={targetNodeDetails.nodeName}>
 
-                        <div className="DetailsLabel">Node ID</div>
-                        {targetNodeDetails.nodeID}
+                                        <div className="DetailsLabel">Node ID</div>
+                                        {targetNodeDetails.nodeID}
 
-                        <div className="DetailsLabel">State</div>
-                        {targetNodeDetails.nodeState}
+                                        <div className="DetailsLabel">State</div>
+                                        {targetNodeDetails.nodeState}
 
-                        <div className="DetailsLabel">City/Country</div>
-                        {targetNodeDetails.nodeLocation}
+                                        <div className="DetailsLabel">City/Country</div>
+                                        {targetLocation}
 
-                    </CollapseButton>
+                                    </CollapseButton>
 
-                </div>
+                                </div>
 
-                <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
-                    <button onClick={this.handleSwitch} id="switchBtn" />
-                </div>
+                                <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
+                                    <button onClick={this.handleSwitch} id="switchBtn" />
+                                </div>
 
-            </div>
+                            </div>
 
-            <div className="DetailsLabel">Tunnel ID</div>
-            {linkDetails.TunnelID}
-            <div className="DetailsLabel">Interface Name</div>
-            {linkDetails.InterfaceName}
-            <div className="DetailsLabel">MAC</div>
-            {linkDetails.MAC}
-            <div className="DetailsLabel">State</div>
-            {linkDetails.State}
-            <div className="DetailsLabel">Tunnel Type</div>
-            {linkDetails.TunnelType}
-            <div className="DetailsLabel">ICE Connection Type</div>
-            {linkDetails.ICEConnectionType}
-            <div className="DetailsLabel">ICE Role</div>
-            {linkDetails.ICERole}
-            <div className="DetailsLabel">Remote Address</div>
-            {linkDetails.RemoteAddress}
-            <div className="DetailsLabel">Local Address</div>
-            {linkDetails.LocalAddress}
-            <div className="DetailsLabel">Latency</div>
-            {linkDetails.Latency}
-            <br /><br />
+                            <div className="DetailsLabel">Tunnel ID</div>
+                            {linkDetails.TunnelID}
+                            <div className="DetailsLabel">Interface Name</div>
+                            {linkDetails.InterfaceName}
+                            <div className="DetailsLabel">MAC</div>
+                            {linkDetails.MAC}
+                            <div className="DetailsLabel">State</div>
+                            {linkDetails.State}
+                            <div className="DetailsLabel">Tunnel Type</div>
+                            {linkDetails.TunnelType}
+                            <div className="DetailsLabel">ICE Connection Type</div>
+                            {linkDetails.ICEConnectionType}
+                            <div className="DetailsLabel">ICE Role</div>
+                            {linkDetails.ICERole}
+                            <div className="DetailsLabel">Remote Address</div>
+                            {linkDetails.RemoteAddress}
+                            <div className="DetailsLabel">Local Address</div>
+                            {linkDetails.LocalAddress}
+                            <div className="DetailsLabel">Latency</div>
+                            {linkDetails.Latency}
+                            <br /><br />
 
-            <Card.Body className="transmissionCard">
-                Sent
-                            <div className="DetailsLabel">Byte Sent</div>
-                -
-                            <div className="DetailsLabel">Total Byte Sent</div>
-                {linkDetails.Stats[0].sent_total_bytes}
-            </Card.Body>
+                            <Card.Body className="transmissionCard">
+                                Sent
+                                        <div className="DetailsLabel">Byte Sent</div>
+                                -
+                                        <div className="DetailsLabel">Total Byte Sent</div>
+                                {linkDetails.Stats[0].sent_total_bytes}
+                            </Card.Body>
 
-            <Card.Body className="transmissionCard">
-                Received
-                            <div className="DetailsLabel">Byte Received</div>
-                -
-                            <div className="DetailsLabel">Total Byte Received</div>
-                {linkDetails.Stats[0].recv_total_bytes}
-            </Card.Body>
-            <OverlayTrigger rootClose={true} trigger="click" placement="left" overlay={
-                <Popover>
-                    <Popover.Title as="h3">Transmission Graph</Popover.Title>
-                    <Popover.Content>
-                        <div className="row">
+                            <Card.Body className="transmissionCard">
+                                Received
+                                        <div className="DetailsLabel">Byte Received</div>
+                                -
+                                        <div className="DetailsLabel">Total Byte Received</div>
+                                {linkDetails.Stats[0].recv_total_bytes}
+                            </Card.Body>
+                            <OverlayTrigger rootClose={true} trigger="click" placement="left" overlay={
+                                <Popover>
+                                    <Popover.Title as="h3">Transmission Graph</Popover.Title>
+                                    <Popover.Content>
+                                        <div className="row">
 
+                                        </div>
+                                    </Popover.Content>
+                                </Popover>}>
+                                <button id="transmissionBtn" >Transmission graph</button>
+                            </OverlayTrigger>
                         </div>
-                    </Popover.Content>
-                </Popover>}>
-                <button id="transmissionBtn" >Transmission graph</button>
-            </OverlayTrigger>
-        </div>
 
-        ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
+                        ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
+                    })
+            })
+
     }
 
     handleSwitch = () => {
@@ -366,12 +378,23 @@ class GraphContent extends React.Component {
                 var that = this;
 
                 if (this.state.currentSelectedElement !== null) {
-                    var selectedElement = this.cy.elements().filter(node => node.data().id === this.state.currentSelectedElement.data().id).filter(element => { return element.isNode() });
-                    var relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
-                    var notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
-                    selectedElement.select();
-                    relatedElement.removeClass("transparent")
-                    notRelatedElement.addClass("transparent");
+                    if (this.state.currentSelectedElement.isNode()) {
+                        var selectedElement = this.cy.elements().filter(node => node.data().id === this.state.currentSelectedElement.data().id).filter(element => { return element.isNode() });
+                        var relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
+                        var notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
+                        selectedElement.select();
+                        relatedElement.removeClass("transparent")
+                        notRelatedElement.addClass("transparent");
+                    } else if (this.state.currentSelectedElement.isEdge()) {
+                        //    console.log(this.state.currentSelectedElement)
+                        var relatedElement2 = this.state.currentSelectedElement.connectedNodes().union(this.state.currentSelectedElement);
+                        var notRelatedElement2 = this.cy.elements().difference(this.state.currentSelectedElement.connectedNodes()).not(this.state.currentSelectedElement);
+                        // var relatedElement2 = selectedElement.connectedNodes().union(selectedElement);
+                        // var notRelatedElement2 = that.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
+                        this.state.currentSelectedElement.select();
+                        relatedElement2.removeClass("transparent")
+                        notRelatedElement2.addClass("transparent");
+                    }
                 }
 
                 this.cy.on("click", function (e) {
@@ -470,7 +493,7 @@ class GraphContent extends React.Component {
                         <div className="resultLabel">
                             {element.data().label}
                         </div>
-                        <small>ID : {element.data().id}</small>
+                        <small className="resultLabel">ID : {element.data().id}</small>
                     </div>
 
                 )
@@ -599,37 +622,6 @@ class GraphContent extends React.Component {
     //     this.setState({wheelSensitive:e.target.value});
     // }
 
-    componentDidUpdate() {
-        try {
-            if (this.state.currentSelectedElement !== this.cy.elements().selected) {
-                var map = <GoogleMapReact
-                    bootstrapURLKeys={{
-                        key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
-                        language: 'en'
-                    }}
-                    // defaultCenter={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
-                    center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
-                    defaultZoom={15}
-                >
-
-                    {this.cy.elements("node").map(node => {
-                        return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
-                            <label className="markerLabel">
-                                {node.data().label}
-                            </label>
-                        </button>
-                    })}
-
-                </GoogleMapReact>
-                if (this.state.currentView === "Map") {
-                    ReactDOM.render(map, document.getElementById("midArea"))
-                }
-            }
-        } catch{
-            console.log("waiting for data.")
-        }
-    }
-
     handleBackToHome = () => {
         if (window.confirm("Your current process will be loss. Are you sure to go back ?") === true) {
             window.location.reload(true);
@@ -640,6 +632,8 @@ class GraphContent extends React.Component {
         var selectedElement = this.state.currentSelectedElement;
         var notRelatedElement;
         if (this.state.currentView !== "Map") {
+            console.log("here");
+
             try {
                 if (selectedElement.isNode()) {
                     notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement);
@@ -661,6 +655,13 @@ class GraphContent extends React.Component {
     }
 
     renderTopology = () => {
+        document.getElementById("homeBtn").hidden = false;
+        document.getElementById("refreshBtn").hidden = false;
+        document.getElementById("configBtn").hidden = false;
+        document.getElementById("infoBtn").hidden = false;
+        document.getElementById("plusBtn").hidden = false;
+        document.getElementById("minusBtn").hidden = false;
+        document.getElementById("zoomSlider").hidden = false;
         if (this.state.currentView === "Subgraph") {
             this.cy.elements().removeClass("subgraph");
         } else if (this.state.currentView === "Map") {
@@ -669,34 +670,220 @@ class GraphContent extends React.Component {
     }
 
     handleMakerClicked = (node) => {
-        node.trigger("click")
-        document.getElementById(node.data().id + "Marker").classList.add("selected");
-        this.setState({ switchToggle: false, currentSelectedElement: node })
+        if (this.state.currentSelectedElement.isNode()) {
+            node.trigger("click")
+            document.getElementById(node.data().id + "Marker").classList.add("selected");
+            this.setState({ switchToggle: false, currentSelectedElement: node })
+        }
     }
 
+    midpoint = (lat1, lng1, lat2, lng2) => {
+        lat1 = this.deg2rad(lat1);
+        lng1 = this.deg2rad(lng1);
+        lat2 = this.deg2rad(lat2);
+        lng2 = this.deg2rad(lng2);
+
+        var dlng = lng2 - lng1;
+        var Bx = Math.cos(lat2) * Math.cos(dlng);
+        var By = Math.cos(lat2) * Math.sin(dlng);
+        var lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2),
+            Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+        var lng3 = lng1 + Math.atan2(By, (Math.cos(lat1) + Bx));
+
+        return [(lat3 * 180) / Math.PI, (lng3 * 180) / Math.PI];
+    }
+
+    deg2rad = (degrees) => {
+        return degrees * Math.PI / 180;
+    };
+
     renderMap = () => {
-        var map = <GoogleMapReact
-            bootstrapURLKeys={{
-                key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
-                language: 'en'
-            }}
-            defaultCenter={{ lat: this.state.nodeLocations[this.cy.elements()[0].data().id][0], lng: this.state.nodeLocations[this.cy.elements()[0].data().id][1] }}
-            // center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
-            defaultZoom={15}
-        >
 
-            {this.cy.elements("node").map(node => {
-                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
-                    <label className="markerLabel">
-                        {node.data().label}
-                    </label>
-                </button>
-            })}
+        document.getElementById("homeBtn").hidden = true;
+        document.getElementById("refreshBtn").hidden = true;
+        document.getElementById("configBtn").hidden = true;
+        document.getElementById("infoBtn").hidden = true;
+        document.getElementById("plusBtn").hidden = true;
+        document.getElementById("minusBtn").hidden = true;
+        document.getElementById("zoomSlider").hidden = true;
 
-        </GoogleMapReact>
+        var that = this;
+        if (this.state.currentSelectedElement !== null) {
 
-        ReactDOM.render(map, document.getElementById("midArea"))
-        this.setState({ currentView: "Map" })
+            if (this.state.currentSelectedElement.isEdge()) {
+
+                var createMapFromEdge = new Promise((resolve, reject) => {
+                    try {
+                        var selectedElement = this.state.currentSelectedElement;
+                        var relatedElement = selectedElement.connectedNodes();
+                        console.log(relatedElement);
+                        var centerPoint = this.midpoint(this.state.nodeLocations[selectedElement.data().source][0], this.state.nodeLocations[selectedElement.data().source][1], this.state.nodeLocations[selectedElement.data().target][0], this.state.nodeLocations[selectedElement.data().target][1])
+                        var map = <GoogleMapReact
+                            bootstrapURLKeys={{
+                                key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                                language: 'en'
+                            }}
+                            center={{ lat: centerPoint[0], lng: centerPoint[1] }}
+                            defaultZoom={10}
+                        >
+
+                            {relatedElement.map(node => {
+                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                    <label className="markerLabel">
+                                        {node.data().label}
+                                    </label>
+                                </button>
+                            })}
+
+                        </GoogleMapReact>
+
+                        this.setState({ currentView: "Map" })
+                        ReactDOM.render(map, document.getElementById("midArea"))
+                        resolve(true);
+                    } catch (e) {
+                        console.log(e)
+                        // alert("You have to select a node.")
+                        // document.getElementById("viewSelector").value = this.state.currentView;
+                        reject(false);
+                    }
+                })
+
+                createMapFromEdge.then(function () {
+                    if (that.state.currentSelectedElement !== null) {
+                        console.log(document.getElementById(that.state.currentSelectedElement.data().id + "Marker"));
+                        // document.getElementById(that.state.currentSelectedElement.data().id + "Marker").classList.add("selected");
+                    }
+                })
+
+            } else if (this.state.currentSelectedElement.isNode()) {
+
+                var createMapFromNode = new Promise((resolve, reject) => {
+                    try {
+                        var selectedElement = this.state.currentSelectedElement;
+                        var relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
+
+                        console.log(relatedElement);
+
+                        var map = <GoogleMapReact
+                            bootstrapURLKeys={{
+                                key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                                language: 'en'
+                            }}
+                            center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
+                            defaultZoom={10}
+                        >
+
+                            {relatedElement.map(node => {
+                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                    <label className="markerLabel">
+                                        {node.data().label}
+                                    </label>
+                                </button>
+                            })}
+
+                        </GoogleMapReact>
+
+                        ReactDOM.render(map, document.getElementById("midArea"))
+                        this.setState({ currentView: "Map" })
+                        resolve(true);
+                    } catch (e) {
+                        // alert("You have to select a node.")
+                        // document.getElementById("viewSelector").value = this.state.currentView;
+                        reject(false);
+                    }
+                })
+
+                createMapFromNode.then(function () {
+                    if (that.state.currentSelectedElement !== null) {
+                        console.log(document.getElementById(that.state.currentSelectedElement.data().id + "Marker"));
+                        document.getElementById(that.state.currentSelectedElement.data().id + "Marker").classList.add("selected");
+                    }
+                })
+
+
+            }
+        } else {
+            alert("Please select some node or tunnel.")
+            document.getElementById("viewSelector").value = this.state.currentView;
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.state.currentView === "Map") {
+            var selectedElement = this.state.currentSelectedElement;
+            if (this.state.currentSelectedElement.isNode()) {
+                try {
+                    var nodeRelatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement).filter(element => {
+                        return element.isNode();
+                    });
+                    console.log(nodeRelatedElement)
+                    var nodeMap = <GoogleMapReact
+                        bootstrapURLKeys={{
+                            key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                            language: 'en'
+                        }}
+                        center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
+                        defaultZoom={8}
+                    >
+
+                        {nodeRelatedElement.map(node => {
+                            if (node.data().id === this.state.currentSelectedElement.data().id) {
+                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker selected" lat={node.data().lat} lng={node.data().lng}>
+                                    <label className="markerLabel">
+                                        {node.data().label}
+                                    </label>
+                                </button>
+                            } else {
+                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                    <label className="markerLabel">
+                                        {node.data().label}
+                                    </label>
+                                </button>
+                            }
+                        })}
+
+                    </GoogleMapReact>
+
+                    ReactDOM.render(nodeMap, document.getElementById("midArea"))
+
+                } catch (e) {
+                    console.log(e)
+                    alert("You have to select a node.")
+                    document.getElementById("viewSelector").value = this.state.currentView;
+                }
+            } else if (this.state.currentSelectedElement.isEdge()) {
+                try {
+                    var edgeRelatedElement = selectedElement.connectedNodes();
+                    console.log(edgeRelatedElement);
+                    var centerPoint = this.midpoint(this.state.nodeLocations[selectedElement.data().source][0], this.state.nodeLocations[selectedElement.data().source][1], this.state.nodeLocations[selectedElement.data().target][0], this.state.nodeLocations[selectedElement.data().target][1])
+                    var edgeMap = <GoogleMapReact
+                        bootstrapURLKeys={{
+                            key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                            language: 'en'
+                        }}
+                        center={{ lat: centerPoint[0], lng: centerPoint[1] }}
+                        defaultZoom={10}
+                    >
+
+                        {edgeRelatedElement.map(node => {
+                            return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                <label className="markerLabel">
+                                    {node.data().label}
+                                </label>
+                            </button>
+                        })}
+
+                    </GoogleMapReact>
+
+                    ReactDOM.render(edgeMap, document.getElementById("midArea"))
+                } catch (e) {
+                    console.log(e)
+                    // alert("You have to select a node.")
+                    // document.getElementById("viewSelector").value = this.state.currentView;
+                }
+            }
+
+        }
     }
 
     handleViewSelector = (e) => {
