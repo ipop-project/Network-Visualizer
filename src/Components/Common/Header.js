@@ -1,26 +1,25 @@
-import React from "react";
-import ipop_ic from "../../Images/Icons/ipop_ic.svg";
+import React from 'react'
+import ipop_ic from '../../Images/Icons/ipop_ic.svg'
 
 class Header extends React.Component {
-    render() {
-        return <header id="header" className="row">
-
-            <div id="ipopTitle" className="col-3">
-                <img src={ipop_ic} alt="ipop_ic" style={{ marginRight: "5%" }} />
-                <label id="ipopTitle" style={{ marginTop: "2%", marginBottom: "2%" }}>
+  render () {
+    return <header id='header' className='row'>
+      <div id='ipopTitle' className='col-3'>
+        <img src={ipop_ic} alt='ipop_ic' style={{ marginRight: '5%' }} />
+        <label id='ipopTitle' style={{ marginTop: '2%', marginBottom: '2%' }}>
                     IPOP NETWORK VISUALIZER
-                </label>
-            </div>
+        </label>
+      </div>
 
-            <div id="viewBar" className="col-6">
+      <div id='viewBar' className='col-6'>
 
-            </div>
+      </div>
 
-            <div id="searchBar" className="col-3">
-                {this.props.children}
-            </div>
-        </header>
-    }
+      <div id='searchBar' className='col-3'>
+        {this.props.children}
+      </div>
+    </header>
+  }
 }
 
-export default Header;
+export default Header
