@@ -69,6 +69,10 @@ class CreateGraphContents {
             return this.getLinkObj()[nodeID][linkID]["InterfaceName"]
         }
 
+        this.NetworkUtilization = function () {
+            
+        }
+
         this.getLinkDetails = function (srcNode, linkID) {
             var linkDetails = {
                 "TunnelID": this.getLinkObj()[srcNode][linkID]["EdgeId"],

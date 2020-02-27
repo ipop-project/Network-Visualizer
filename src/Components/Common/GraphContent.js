@@ -24,7 +24,7 @@ class GraphContent extends React.Component {
         super(props);
         this.state = {
             nodeLocations: {
-                a100001feb6040628e5fb7e70b04f001: [36.066698, 140.132462],
+                a100001feb6040628e5fb7e70b04f001: [13.751769, 100.501287],
                 a100002feb6040628e5fb7e70b04f002: [36.063877, 140.127210],
                 a100003feb6040628e5fb7e70b04f003: [36.053425, 140.128607],
                 a100004feb6040628e5fb7e70b04f004: [36.060572, 140.131225],
@@ -50,13 +50,12 @@ class GraphContent extends React.Component {
             configToggle: true,
             nodeDetails: null,
             linkDetails: null,
-            currentSelectedElement: null
+            currentSelectedElement: null,
+            currentView: null
         }
     }
 
     componentDidMount() {
-
-
         // document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
         document.getElementById("overlayRightPanelBtn").click();
         this.fetchData();
@@ -69,72 +68,78 @@ class GraphContent extends React.Component {
         var connectedNodes = this.state.nodeDetails.connectedNodes;
 
         var ipop = this.state.ipop;
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.state.nodeLocations[sourceNode.nodeID][0]},${this.state.nodeLocations[sourceNode.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+            .then(res => res.json()).then((data) => {
+                return data.plus_code.compound_code;
+            }).then((location) => {
+                var nodeContent = <div>
 
-        var nodeContent = <div>
+                    <h5>{sourceNode.nodeName}</h5>
 
-            <h5>{sourceNode.nodeName}</h5>
+                    <div className="DetailsLabel">Node ID</div>
+                    {sourceNode.nodeID}
 
-            <div className="DetailsLabel">Node ID</div>
-            {sourceNode.nodeID}
+                    <div className="DetailsLabel">State</div>
+                    {sourceNode.nodeState}
 
-            <div className="DetailsLabel">State</div>
-            {sourceNode.nodeState}
+                    <div className="DetailsLabel">City/Country</div>
+                    {location}
+                    <br /><br />
 
-            <div className="DetailsLabel">City/Country</div>
-            {sourceNode.nodeLocation}
-            <br /><br />
+                    <div id="connectedNode" style={{ overflow: "auto" }}>
+                        {connectedNodes.map(connectedNode => {
+                            var connectedNodeDetail = ipop.findConnectedNodeDetails(sourceNode.nodeID, connectedNode.id())
+                            var connectedNodeBtn =
+                                <CollapseButton key={ipop.getNodeName(connectedNode.id()) + "Btn"} id={ipop.getNodeName(connectedNode.id()) + "Btn"} name={ipop.getNodeName(connectedNode.id())}>
+                                    <div className="DetailsLabel">Node ID</div>
+                                    {connectedNode.id()}
+                                    <div className="DetailsLabel">Tunnel ID</div>
+                                    {connectedNodeDetail.TunnelID}
+                                    <div className="DetailsLabel">Interface Name</div>
+                                    {connectedNodeDetail.InterfaceName}
+                                    <div className="DetailsLabel">MAC</div>
+                                    {connectedNodeDetail.MAC}
+                                    <div className="DetailsLabel">State</div>
+                                    {connectedNodeDetail.State}
+                                    <div className="DetailsLabel">Tunnel Type</div>
+                                    {connectedNodeDetail.TunnelType}
+                                    <div className="DetailsLabel">ICE Connection Type</div>
+                                    {connectedNodeDetail.ICEConnectionType}
+                                    <div className="DetailsLabel">ICE Role</div>
+                                    {connectedNodeDetail.ICERole}
+                                    <div className="DetailsLabel">Remote Address</div>
+                                    {connectedNodeDetail.RemoteAddress}
+                                    <div className="DetailsLabel">Local Address</div>
+                                    {connectedNodeDetail.LocalAddress}
+                                    <div className="DetailsLabel">Latency</div>
+                                    {connectedNodeDetail.Latency}
+                                    <Card.Body className="transmissionCard">
+                                        Sent
+                                                <div className="DetailsLabel">Byte Sent</div>
+                                        -
+                                                <div className="DetailsLabel">Total Byte Sent</div>
+                                        {connectedNodeDetail.Stats[0].sent_total_bytes}
+                                    </Card.Body>
 
-            <div id="connectedNode" style={{ overflow: "auto" }}>
-                {connectedNodes.map(connectedNode => {
-                    var connectedNodeDetail = ipop.findConnectedNodeDetails(sourceNode.nodeID, connectedNode.id())
-                    var connectedNodeBtn =
-                        <CollapseButton key={ipop.getNodeName(connectedNode.id()) + "Btn"} id={ipop.getNodeName(connectedNode.id()) + "Btn"} name={ipop.getNodeName(connectedNode.id())}>
-                            <div className="DetailsLabel">Node ID</div>
-                            {connectedNode.id()}
-                            <div className="DetailsLabel">Tunnel ID</div>
-                            {connectedNodeDetail.TunnelID}
-                            <div className="DetailsLabel">Interface Name</div>
-                            {connectedNodeDetail.InterfaceName}
-                            <div className="DetailsLabel">MAC</div>
-                            {connectedNodeDetail.MAC}
-                            <div className="DetailsLabel">State</div>
-                            {connectedNodeDetail.State}
-                            <div className="DetailsLabel">Tunnel Type</div>
-                            {connectedNodeDetail.TunnelType}
-                            <div className="DetailsLabel">ICE Connection Type</div>
-                            {connectedNodeDetail.ICEConnectionType}
-                            <div className="DetailsLabel">ICE Role</div>
-                            {connectedNodeDetail.ICERole}
-                            <div className="DetailsLabel">Remote Address</div>
-                            {connectedNodeDetail.RemoteAddress}
-                            <div className="DetailsLabel">Local Address</div>
-                            {connectedNodeDetail.LocalAddress}
-                            <div className="DetailsLabel">Latency</div>
-                            {connectedNodeDetail.Latency}
-                            <Card.Body className="transmissionCard">
-                                Sent
-                                            <div className="DetailsLabel">Byte Sent</div>
-                                -
-                                            <div className="DetailsLabel">Total Byte Sent</div>
-                                {connectedNodeDetail.Stats[0].sent_total_bytes}
-                            </Card.Body>
+                                    <Card.Body className="transmissionCard">
+                                        Received
+                                                <div className="DetailsLabel">Byte Received</div>
+                                        -
+                                                <div className="DetailsLabel">Total Byte Received</div>
+                                        {connectedNodeDetail.Stats[0].recv_total_bytes}
+                                    </Card.Body>
 
-                            <Card.Body className="transmissionCard">
-                                Received
-                                            <div className="DetailsLabel">Byte Received</div>
-                                -
-                                            <div className="DetailsLabel">Total Byte Received</div>
-                                {connectedNodeDetail.Stats[0].recv_total_bytes}
-                            </Card.Body>
+                                </CollapseButton>
 
-                        </CollapseButton>
+                            return connectedNodeBtn;
+                        })}
+                    </div>
 
-                    return connectedNodeBtn;
-                })}
-            </div>
+                </div>
+                ReactDOM.render(nodeContent, document.getElementById("rightPanelContent"))
+            })
 
-        </div>
-        ReactDOM.render(nodeContent, document.getElementById("rightPanelContent"))
+
     }
 
     renderLinkDetails = () => {
@@ -221,8 +226,17 @@ class GraphContent extends React.Component {
                             <div className="DetailsLabel">Total Byte Received</div>
                 {linkDetails.Stats[0].recv_total_bytes}
             </Card.Body>
+            <OverlayTrigger rootClose={true} trigger="click" placement="left" overlay={
+                <Popover>
+                    <Popover.Title as="h3">Transmission Graph</Popover.Title>
+                    <Popover.Content>
+                        <div className="row">
 
-            <button>Transmission graph</button>
+                        </div>
+                    </Popover.Content>
+                </Popover>}>
+                <button id="transmissionBtn" >Transmission graph</button>
+            </OverlayTrigger>
         </div>
 
         ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
@@ -336,6 +350,7 @@ class GraphContent extends React.Component {
     }
 
     renderGraph = () => {
+        this.setState({ currentView: "Topology" })
         ReactDOM.render(<Cytoscape id="cy"
             cy={(cy) => {
 
@@ -349,6 +364,15 @@ class GraphContent extends React.Component {
                 this.cy.center();
 
                 var that = this;
+
+                if (this.state.currentSelectedElement !== null) {
+                    var selectedElement = this.cy.elements().filter(node => node.data().id === this.state.currentSelectedElement.data().id).filter(element => { return element.isNode() });
+                    var relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement);
+                    var notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
+                    selectedElement.select();
+                    relatedElement.removeClass("transparent")
+                    notRelatedElement.addClass("transparent");
+                }
 
                 this.cy.on("click", function (e) {
                     var selectedElement = e.target[0];
@@ -375,7 +399,6 @@ class GraphContent extends React.Component {
                             relatedElement.removeClass("transparent")
                             notRelatedElement.addClass("transparent");
                         }
-
                     } catch {
                         // console.log(e.target[0]===this.cy);
                         if (e.target[0] === this.cy) {
@@ -383,11 +406,12 @@ class GraphContent extends React.Component {
                             ReactDOM.render(<></>, document.getElementById("rightPanelContent"))
                             that.cy.elements().removeClass("transparent");
                         }
-                    }
-                    if (e.target[0] !== this.cy) {
-                        that.setState({ switchToggle: false, currentSelectedElement: e.target })
-                    } else {
-                        that.setState({ switchToggle: false, currentSelectedElement: null })
+                    } finally {
+                        if (e.target[0] !== this.cy) {
+                            that.setState({ switchToggle: false, currentSelectedElement: e.target })
+                        } else {
+                            that.setState({ switchToggle: false, currentSelectedElement: null })
+                        }
                     }
 
                 })
@@ -399,7 +423,6 @@ class GraphContent extends React.Component {
                 nodes: this.state.graphElement[0],
                 edges: this.state.graphElement[1]
             })}
-
 
             stylesheet={cytoscapeStyle}
 
@@ -454,6 +477,7 @@ class GraphContent extends React.Component {
             }}
 
         > </Typeahead>, document.getElementById("searchBar"))
+
     }
 
     elementFilter = (element, props) => {
@@ -468,15 +492,6 @@ class GraphContent extends React.Component {
                 element.data().id.toLowerCase().indexOf(props.text.toLowerCase()) !== -1);
         }
     }
-
-    download = (content, fileName, contentType) => {
-        // var a = document.createElement("a");
-        // var file = new Blob([content], { type: contentType });
-        // a.href = URL.createObjectURL(file);
-        // a.download = fileName;
-        // a.click();
-    }
-
 
     fetchData = () => {
         var selectedOverlay = this.props.selectedOverlay;
@@ -495,8 +510,6 @@ class GraphContent extends React.Component {
         fetch(nodeURL).then(res => res.json()).then(nodes => {
             fetch(linkURL).then(res => res.json()).then(links => {
                 console.log(links);
-                this.download(JSON.stringify(nodes), 'nodes.json', 'text/plain');
-                this.download(JSON.stringify(links), 'links.json', 'text/plain');
                 ipop.init(this.props.selectedOverlay, nodes, links);
                 this.setState({ ipop: ipop });
             }).then(() => {
@@ -525,8 +538,7 @@ class GraphContent extends React.Component {
                         linkConf.push(JSON.parse(`{ "data": { "source": "${sourceConf}", "target": "${targetConf}","id":"${linkID}" ,"label":"${ipop.getLinkName(nodeID, linkID)}","type":"${ipop.getLinkObj()[nodeID][linkID]["Type"]}","color":"${linkColor}"} }`));
                     })
                 });
-                this.setState({ graphElement: [nodeConf, linkConf] })
-                this.setState({ dataReady: true })
+                this.setState({ graphElement: [nodeConf, linkConf], currentView: "Topology" })
             }).then(() => {
                 this.renderGraph()
             })
@@ -588,6 +600,34 @@ class GraphContent extends React.Component {
     // }
 
     componentDidUpdate() {
+        try {
+            if (this.state.currentSelectedElement !== this.cy.elements().selected) {
+                var map = <GoogleMapReact
+                    bootstrapURLKeys={{
+                        key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
+                        language: 'en'
+                    }}
+                    // defaultCenter={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
+                    center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
+                    defaultZoom={15}
+                >
+
+                    {this.cy.elements("node").map(node => {
+                        return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                            <label className="markerLabel">
+                                {node.data().label}
+                            </label>
+                        </button>
+                    })}
+
+                </GoogleMapReact>
+                if (this.state.currentView === "Map") {
+                    ReactDOM.render(map, document.getElementById("midArea"))
+                }
+            }
+        } catch{
+            console.log("waiting for data.")
+        }
     }
 
     handleBackToHome = () => {
@@ -599,31 +639,39 @@ class GraphContent extends React.Component {
     renderSubgraph = () => {
         var selectedElement = this.state.currentSelectedElement;
         var notRelatedElement;
-        try {
-            if (selectedElement.isNode()) {
-                notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement);
-            } else if (selectedElement.isEdge()) {
-                notRelatedElement = this.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
+        if (this.state.currentView !== "Map") {
+            try {
+                if (selectedElement.isNode()) {
+                    notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement);
+                } else if (selectedElement.isEdge()) {
+                    notRelatedElement = this.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
+                }
+                notRelatedElement.addClass("subgraph")
+            } catch{
+                alert("Please select node or tunnel.")
+                document.getElementById("viewSelector").value = this.state.currentView;
+            } finally {
+                this.setState({ currentView: "Subgraph" })
             }
-            notRelatedElement.addClass("subgraph")
-        } catch{
-            alert("Please select node or tunnel.")
-            document.getElementById("viewSelector").value = "Topology"
+        } else {
+            alert("Map is not available for this view.")
+            document.getElementById("viewSelector").value = this.state.currentView;
         }
 
     }
 
     renderTopology = () => {
-        this.cy.elements().removeClass("subgraph");
+        if (this.state.currentView === "Subgraph") {
+            this.cy.elements().removeClass("subgraph");
+        } else if (this.state.currentView === "Map") {
+            this.renderGraph();
+        }
     }
 
-    static defaultProps = {
-        center: { lat: 40.73, lng: -73.93 },
-        zoom: 12
-    }
-
-    handleMakerClicked = (node) =>{
+    handleMakerClicked = (node) => {
         node.trigger("click")
+        document.getElementById(node.data().id + "Marker").classList.add("selected");
+        this.setState({ switchToggle: false, currentSelectedElement: node })
     }
 
     renderMap = () => {
@@ -632,19 +680,23 @@ class GraphContent extends React.Component {
                 key: "AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs",
                 language: 'en'
             }}
-            defaultCenter={{lat:36.062269,lng:140.135439}}
-            center={{lat:36.062269,lng:140.135439}}
+            defaultCenter={{ lat: this.state.nodeLocations[this.cy.elements()[0].data().id][0], lng: this.state.nodeLocations[this.cy.elements()[0].data().id][1] }}
+            // center={{ lat: this.state.nodeLocations[this.state.currentSelectedElement.data().id][0], lng: this.state.nodeLocations[this.state.currentSelectedElement.data().id][1] }}
             defaultZoom={15}
         >
 
-        {this.cy.elements("node").map(node=>{   
-            return <button onClick={this.handleMakerClicked.bind(this,node)} id={node.data().id} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
-            {node.data().label}
-            </button>
-        })}
+            {this.cy.elements("node").map(node => {
+                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                    <label className="markerLabel">
+                        {node.data().label}
+                    </label>
+                </button>
+            })}
 
         </GoogleMapReact>
+
         ReactDOM.render(map, document.getElementById("midArea"))
+        this.setState({ currentView: "Map" })
     }
 
     handleViewSelector = (e) => {
@@ -657,13 +709,9 @@ class GraphContent extends React.Component {
         }
     }
 
-    test = () => {
-        var c = this.cy.elements('[type="CETypeILongDistance"]');
-        this.cy.remove(c)
+    renderTunnelUtilization = () => {
+
     }
-
-
-
 
     render() {
         return <>
