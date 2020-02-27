@@ -641,12 +641,12 @@ class GraphContent extends React.Component {
                     notRelatedElement = this.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement);
                 }
                 notRelatedElement.addClass("subgraph")
+                this.setState({ currentView: "Subgraph" })
             } catch{
                 alert("Please select node or tunnel.")
                 document.getElementById("viewSelector").value = this.state.currentView;
-            } finally {
-                this.setState({ currentView: "Subgraph" })
             }
+
         } else {
             alert("Map is not available for this view.")
             document.getElementById("viewSelector").value = this.state.currentView;
@@ -699,14 +699,6 @@ class GraphContent extends React.Component {
 
     renderMap = () => {
 
-        document.getElementById("homeBtn").hidden = true;
-        document.getElementById("refreshBtn").hidden = true;
-        document.getElementById("configBtn").hidden = true;
-        document.getElementById("infoBtn").hidden = true;
-        document.getElementById("plusBtn").hidden = true;
-        document.getElementById("minusBtn").hidden = true;
-        document.getElementById("zoomSlider").hidden = true;
-
         var that = this;
         if (this.state.currentSelectedElement !== null) {
 
@@ -739,6 +731,7 @@ class GraphContent extends React.Component {
 
                         this.setState({ currentView: "Map" })
                         ReactDOM.render(map, document.getElementById("midArea"))
+                      
                         resolve(true);
                     } catch (e) {
                         console.log(e)
@@ -751,10 +744,11 @@ class GraphContent extends React.Component {
                 createMapFromEdge.then(function () {
                     if (that.state.currentSelectedElement !== null) {
                         console.log(document.getElementById(that.state.currentSelectedElement.data().id + "Marker"));
+                        
                         // document.getElementById(that.state.currentSelectedElement.data().id + "Marker").classList.add("selected");
                     }
                 })
-
+                
             } else if (this.state.currentSelectedElement.isNode()) {
 
                 var createMapFromNode = new Promise((resolve, reject) => {
@@ -810,6 +804,13 @@ class GraphContent extends React.Component {
 
     componentDidUpdate() {
         if (this.state.currentView === "Map") {
+            document.getElementById("homeBtn").hidden = true;
+                document.getElementById("refreshBtn").hidden = true;
+                document.getElementById("configBtn").hidden = true;
+                document.getElementById("infoBtn").hidden = true;
+                document.getElementById("plusBtn").hidden = true;
+                document.getElementById("minusBtn").hidden = true;
+                document.getElementById("zoomSlider").hidden = true;
             var selectedElement = this.state.currentSelectedElement;
             if (this.state.currentSelectedElement.isNode()) {
                 try {
