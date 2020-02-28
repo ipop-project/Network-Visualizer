@@ -201,6 +201,108 @@ header {
     width: 60px;
     font-weight: bold;
 }
+@media only screen and (min-width: 1921px){
+    * {
+        font-size: 20px;
+    }
+                            
+    /* customize Herder Tag */
+    #header {
+                                    height: 5vh;
+                                }
+                                
+                                /* customize view selector */
+                                #container {
+                                    width: 100vw;
+                                    height: 92vh;
+                                }
+                            
+                                /* customize main content */
+                                #mainContent {
+                                    position: fixed;
+                                    width: 100vw;
+                                    color: white;
+                                    height: 94vh;
+                                    background-color: #101B2B;
+                                }
+                            
+                                #overlayRightPanelBtn {
+                                    width: 25px;
+                                    height: 25px;
+                                }
+                            
+                                #viewSelector {
+                                    width: 23%;
+                                }
+                            
+                                /* customize right panel */
+                                #rightPanel {
+                                    color: white;
+                                    position: absolute;
+                                    width: 23vw;
+                                    height: 100%;
+                                    overflow-y: auto;
+                                    right: 0;
+                                    padding: 0.7%;
+                                    margin-top: 0.05%;
+                                    background-color: #213758;
+                                    z-index: 1;
+                                    -ms-overflow-style: none;
+                                    word-wrap: break-word;
+                                }
+                            
+                                #switchBtn {
+                                    margin: 0;
+                                    width: 20px;
+                                    height: 20px;
+                                    border: none;
+                                    outline: none;
+                                    background: url(../Images/Icons/swap_ic.svg)no-repeat;
+                                    background-size: contain;
+                                }
+                            
+                                .leftToolsBtn {
+                                    width: 60px;
+                                    border: none;
+                                    height: 60px;
+                                    outline: none;
+                                }
+                            
+                                #zoomSlider {
+                                    position: absolute;
+                                    margin-left: -13.6vh;
+                                    margin-top: 14.5vh;
+                                    transform: rotate(-90deg);
+                                    width: 35vh;
+                                }
+                            
+                                #minusBtn {
+                                    margin-top: 34vh;
+                                    background: url(../Images/Icons/minus_ic.svg);
+                                    background-size: contain;
+                                    outline: none;
+                                }
+                            
+                                #configContent {
+                                    width: 20vw;
+                                }
+                            
+                                .popover {
+                                    padding: 0.5%;
+                                    /* width: fit-content; */
+                                    width: 450px;
+                                    max-width: unset;
+                                }
+                                
+                                #infoContent {
+                                    padding: 2%;
+                                    width: 20vw;
+                                }
+                                .rbt-input-main.form-control.rbt-input {
+                                    width: 92%;
+                                    margin-left: auto;
+                                }
+}
 
 @media only screen and (max-width: 1920px){
     * {
@@ -305,114 +407,11 @@ header {
     }
 }
 
-@media only screen and (min-width: 1681px){
-    * {
-        font-size: 20px;
-    }
-
-    /* customize Herder Tag */
-    #header {
-        height: 5vh;
-    }
-    
-    /* customize view selector */
-    #container {
-        width: 100vw;
-        height: 92vh;
-    }
-
-    /* customize main content */
-    #mainContent {
-        position: fixed;
-        width: 100vw;
-        color: white;
-        height: 94vh;
-        background-color: #101B2B;
-    }
-
-    #overlayRightPanelBtn {
-        width: 25px;
-        height: 25px;
-    }
-
-    #viewSelector {
-        width: 23%;
-    }
-
-    /* customize right panel */
-    #rightPanel {
-        color: white;
-        position: absolute;
-        width: 23vw;
-        height: 100%;
-        overflow-y: auto;
-        right: 0;
-        padding: 0.7%;
-        margin-top: 0.05%;
-        background-color: #213758;
-        z-index: 1;
-        -ms-overflow-style: none;
-        word-wrap: break-word;
-    }
-
-    #switchBtn {
-        margin: 0;
-        width: 20px;
-        height: 20px;
-        border: none;
-        outline: none;
-        background: url(../Images/Icons/swap_ic.svg)no-repeat;
-        background-size: contain;
-    }
-
-    .leftToolsBtn {
-        width: 60px;
-        border: none;
-        height: 60px;
-        outline: none;
-    }
-
-    #zoomSlider {
-        position: absolute;
-        margin-left: -13.6vh;
-        margin-top: 14.5vh;
-        transform: rotate(-90deg);
-        width: 35vh;
-    }
-
-    #minusBtn {
-        margin-top: 34vh;
-        background: url(../Images/Icons/minus_ic.svg);
-        background-size: contain;
-        outline: none;
-    }
-
-    #configContent {
-        width: 20vw;
-    }
-
-    .popover {
-        padding: 0.5%;
-        /* width: fit-content; */
-        width: 450px;
-        max-width: unset;
-    }
-    
-    #infoContent {
-        padding: 2%;
-        width: 20vw;
-    }
-    .rbt-input-main.form-control.rbt-input {
-        width: 92%;
-        margin-left: auto;
-    }
-}
-
 @media only screen and (max-width: 1680px){
     * {
         font-size: 18px;
     }
-
+    
     /* customize Herder Tag */
     #header {
         height: 7vh;

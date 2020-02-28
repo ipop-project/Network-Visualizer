@@ -235,7 +235,7 @@ class GraphContent extends React.Component {
                                         <div className="DetailsLabel">Total Byte Received</div>
                                 {linkDetails.Stats[0].recv_total_bytes}
                             </Card.Body>
-                            <OverlayTrigger rootClose={true} trigger="click" placement="left" overlay={
+                            <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
                                 <Popover>
                                     <Popover.Title as="h3">Transmission Graph</Popover.Title>
                                     <Popover.Content>
