@@ -6,7 +6,7 @@ import GraphContent from "./GraphContent";
 import Overlays from "../Common/Overlays";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CollapseButton from "./CollapseButton";
-import overlay_ic from "../../Images/Icons/overlay_ic.svg";
+// import overlay_ic from "../../Images/Icons/overlay_ic.svg";
 import { Typeahead } from "react-bootstrap-typeahead";
 import Header from "./Header";
 import "../../CSS/Main.css";
@@ -86,10 +86,10 @@ class Main extends React.Component {
 
     renderOverlaysContent = () => {
         let overlays = this.state.overlays.map((overlay) => {
-            return <Tooltip className="overlayTooltips" sticky={true} key={overlay} duration="500" animation="scale" interactive distance={40} position="bottom" arrow={true} open={true}
+            return <Tooltip className="overlayTooltips" sticky={true} key={overlay} duration="500" animation="scale" interactive position="bottom" arrow={true} open={true}
                 html={(<div>{overlay}</div>)}>
                 <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
-                    <img src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img>
+                    {/* <img src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img> */}
                 </button>
             </Tooltip>
         });

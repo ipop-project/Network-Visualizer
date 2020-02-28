@@ -720,7 +720,7 @@ class GraphContent extends React.Component {
                         >
 
                             {relatedElement.map(node => {
-                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker selected" lat={node.data().lat} lng={node.data().lng}>
                                     <label className="markerLabel">
                                         {node.data().label}
                                     </label>
@@ -731,7 +731,7 @@ class GraphContent extends React.Component {
 
                         this.setState({ currentView: "Map" })
                         ReactDOM.render(map, document.getElementById("midArea"))
-                      
+
                         resolve(true);
                     } catch (e) {
                         console.log(e)
@@ -744,11 +744,12 @@ class GraphContent extends React.Component {
                 createMapFromEdge.then(function () {
                     if (that.state.currentSelectedElement !== null) {
                         console.log(document.getElementById(that.state.currentSelectedElement.data().id + "Marker"));
-                        
-                        // document.getElementById(that.state.currentSelectedElement.data().id + "Marker").classList.add("selected");
+
+                        // document.getElementById(that.state.currentSelectedElement.data().source + "Marker").classList.add("selected");
+                        // document.getElementById(that.state.currentSelectedElement.data().target + "Marker").classList.add("selected");
                     }
                 })
-                
+
             } else if (this.state.currentSelectedElement.isNode()) {
 
                 var createMapFromNode = new Promise((resolve, reject) => {
@@ -805,12 +806,12 @@ class GraphContent extends React.Component {
     componentDidUpdate() {
         if (this.state.currentView === "Map") {
             document.getElementById("homeBtn").hidden = true;
-                document.getElementById("refreshBtn").hidden = true;
-                document.getElementById("configBtn").hidden = true;
-                document.getElementById("infoBtn").hidden = true;
-                document.getElementById("plusBtn").hidden = true;
-                document.getElementById("minusBtn").hidden = true;
-                document.getElementById("zoomSlider").hidden = true;
+            document.getElementById("refreshBtn").hidden = true;
+            document.getElementById("configBtn").hidden = true;
+            document.getElementById("infoBtn").hidden = true;
+            document.getElementById("plusBtn").hidden = true;
+            document.getElementById("minusBtn").hidden = true;
+            document.getElementById("zoomSlider").hidden = true;
             var selectedElement = this.state.currentSelectedElement;
             if (this.state.currentSelectedElement.isNode()) {
                 try {
@@ -867,7 +868,7 @@ class GraphContent extends React.Component {
                     >
 
                         {edgeRelatedElement.map(node => {
-                            return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                            return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + "Marker"} id={node.data().id + "Marker"} className="nodeMarker selected" lat={node.data().lat} lng={node.data().lng}>
                                 <label className="markerLabel">
                                     {node.data().label}
                                 </label>

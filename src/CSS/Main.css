@@ -1,4 +1,7 @@
 /* customize global */
+* {
+    font-family: sans-serif;
+}
 
 #root {
     width: 100vw;
@@ -41,7 +44,10 @@ header {
 /* customize overlay button */
 
 .overlay {
-    background: transparent;
+    background: url("../Images/Icons/overlay_ic.svg")no-repeat;
+    background-size: contain;
+    width: 100px;
+    height: 75px;
     border: none;
     outline: none;
 }
@@ -153,7 +159,9 @@ header {
 }
 
 .popover {
-    width: fit-content;
+    padding: 0.5%;
+    /* width: fit-content; */
+    width: 230px;
     max-width: unset;
 }
 
@@ -194,21 +202,22 @@ header {
     font-weight: bold;
 }
 
-@media only screen and (max-width: 1920px) {
+@media only screen and (max-width: 1920px){
     * {
-        font-family: tahoma;
-        font-size: 16px;
+        font-size: 20px;
     }
+
     /* customize Herder Tag */
-    header {
+    #header {
         height: 7vh;
     }
     
     /* customize view selector */
     #container {
         width: 100vw;
-        height: 94vh;
+        height: 92vh;
     }
+
     /* customize main content */
     #mainContent {
         position: fixed;
@@ -217,6 +226,16 @@ header {
         height: 94vh;
         background-color: #101B2B;
     }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 22%;
+    }
+
     /* customize right panel */
     #rightPanel {
         color: white;
@@ -225,23 +244,653 @@ header {
         height: 100%;
         overflow-y: auto;
         right: 0;
-        padding: 1%;
+        padding: 0.7%;
         margin-top: 0.05%;
         background-color: #213758;
         z-index: 1;
         -ms-overflow-style: none;
         word-wrap: break-word;
     }
-    .leftToolsBtn {
-        width: 55px;
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
         border: none;
-        height: 55px;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
         outline: none;
     }
+
     #zoomSlider {
         position: absolute;
-        margin-left: -13.5vh;
-        margin-top: 14.9vh;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 380px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (min-width: 1681px){
+    * {
+        font-size: 20px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 5vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 23%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 450px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (max-width: 1680px){
+    * {
+        font-size: 18px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 7vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 23%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 350px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (max-width: 1600px){
+    * {
+        font-size: 16px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 7vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 22%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 310px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (max-width: 1440px){
+    * {
+        font-size: 16px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 7vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 24%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 300px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (max-width: 1366px){
+    * {
+        font-size: 16px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 7vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 25%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+
+    #configContent {
+        width: 20vw;
+    }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 300px;
+        max-width: unset;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (max-width: 1280px){
+    * {
+        font-size: 14px;
+    }
+
+    /* customize Herder Tag */
+    #header {
+        height: 7vh;
+    }
+    
+    /* customize view selector */
+    #container {
+        width: 100vw;
+        height: 92vh;
+    }
+
+    /* customize main content */
+    #mainContent {
+        position: fixed;
+        width: 100vw;
+        color: white;
+        height: 94vh;
+        background-color: #101B2B;
+    }
+
+    #overlayRightPanelBtn {
+        width: 25px;
+        height: 25px;
+    }
+
+    #viewSelector {
+        width: 24%;
+    }
+
+    /* customize right panel */
+    #rightPanel {
+        color: white;
+        position: absolute;
+        width: 23vw;
+        height: 100%;
+        overflow-y: auto;
+        right: 0;
+        padding: 0.7%;
+        margin-top: 0.05%;
+        background-color: #213758;
+        z-index: 1;
+        -ms-overflow-style: none;
+        word-wrap: break-word;
+    }
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: none;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
         transform: rotate(-90deg);
         width: 35vh;
     }
@@ -254,6 +903,14 @@ header {
     #configContent {
         width: 20vw;
     }
+
+    .popover {
+        padding: 0.5%;
+        /* width: fit-content; */
+        width: 270px;
+        max-width: unset;
+    }
+    
     #infoContent {
         padding: 2%;
         width: 20vw;
@@ -264,67 +921,243 @@ header {
     }
 }
 
-@media only screen and (min-width: 1920px){
+@media only screen and (max-width: 1024px){
     * {
-        font-family: tahoma;
-        font-size: 20px;
+        font-size: 12px;
     }
-    header {
-        height: 5vh;
+
+    /* customize Herder Tag */
+    #header {
+        height: 8vh;
     }
-    /* customize title name */
-    #ipopTitle {}
+    
+    /* customize view selector */
     #container {
         width: 100vw;
-        height: 96vh;
+        height: 92vh;
     }
+
     /* customize main content */
     #mainContent {
         position: fixed;
         width: 100vw;
         color: white;
-        height: 96vh;
+        height: 94vh;
         background-color: #101B2B;
     }
+
+    #overlayRightPanelBtn {
+        width: 15px;
+        height: 15px;
+    }
+
+    #viewSelector {
+        width: 26%;
+    }
+
     /* customize right panel */
     #rightPanel {
         color: white;
         position: absolute;
-        width: 17vw;
+        width: 23vw;
         height: 100%;
         overflow-y: auto;
         right: 0;
-        padding: 1%;
+        padding: 0.7%;
         margin-top: 0.05%;
         background-color: #213758;
         z-index: 1;
         -ms-overflow-style: none;
         word-wrap: break-word;
     }
-    .leftToolsBtn {
-        width: 75px;
+
+    #switchBtn {
+        margin: 0;
+        width: 20px;
+        height: 20px;
         border: none;
-        height: 75px;
+        outline: none;
+        background: url(../Images/Icons/swap_ic.svg)no-repeat;
+        background-size: contain;
+    }
+
+    .leftToolsBtn {
+        width: 60px;
+        border: none;
+        height: 60px;
         outline: none;
     }
+
     #zoomSlider {
         position: absolute;
-        margin-left: -14.5vh;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+    #minusBtn {
+        margin-top: 34vh;
+        background: url(../Images/Icons/minus_ic.svg);
+        background-size: contain;
+        outline: none;
+    }
+    #configContent {
+        width: 20vw;
+    }
+    
+    #infoContent {
+        padding: 2%;
+        width: 20vw;
+    }
+    .rbt-input-main.form-control.rbt-input {
+        width: 92%;
+        margin-left: auto;
+    }
+}
+
+@media only screen and (min-height:1201px){
+    #header{
+        height: 5vh;
+    }
+
+    #mainContent{
+        height: 95vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -15.1vh;
         margin-top: 15.7vh;
         transform: rotate(-90deg);
         width: 35vh;
     }
-    #configContent {
-        width: 14vw;
+}
+
+@media only screen and (max-height:1200px){
+    #header{
+        height: 5vh;
     }
-    #infoContent {
-        padding: 2%;
-        width: 14vw;
-        height: 19vh;
+
+    #mainContent{
+        height: 95vh;
     }
-    .rbt-input-main.form-control.rbt-input {
-        margin-top: auto;
-        width: 64%;
-        margin-left: 35%;
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -14.8vh;
+        margin-top: 15.6vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:1080px){
+    #header{
+        height: 5vh;
+    }
+
+    #mainContent{
+        height: 95vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -14.6vh;
+        margin-top: 15.3vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:1050px){
+    #header{
+        height: 5vh;
+    }
+
+    #mainContent{
+        height: 95vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -14.5vh;
+        margin-top: 15.3vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:950px){
+    #header{
+        height: 5vh;
+    }
+
+    #mainContent{
+        height: 95vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -14.3vh;
+        margin-top: 15.3vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:768px){
+    #header{
+        height: 6vh;
+    }
+
+    #mainContent{
+        height: 94vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.5vh;
+        margin-top: 15vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:720px){
+    #header{
+        height: 6vh;
+    }
+
+    #mainContent{
+        height: 94vh;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.2vh;
+        margin-top: 15vh;
+        transform: rotate(-90deg);
+        width: 35vh;
+    }
+}
+
+@media only screen and (max-height:600px){
+    #header{
+        height: 7vh;
+    }
+
+    .leftToolsBtn {
+        width: 45px;
+        border: none;
+        height: 45px;
+        outline: none;
+    }
+
+    #zoomSlider {
+        position: absolute;
+        margin-left: -13.6vh;
+        margin-top: 14.5vh;
+        transform: rotate(-90deg);
+        width: 35vh;
     }
 }
