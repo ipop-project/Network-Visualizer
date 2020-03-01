@@ -3,134 +3,130 @@
 // var linkObj;
 
 class CreateGraphContents {
+  constructor () {
+    var nodesObj = null
+    var linksObj = null
+    var selectedOverlay = null
 
-    constructor() {
+    this.init = function (overlay, nodes, links) {
+      this.setSelectedOverlay(overlay)
+      this.setNodeObj(nodes)
+      this.setLinkObj(links)
+    }
 
-        var nodesObj = null;
-        var linksObj = null;
-        var selectedOverlay = null;
+    this.setNodeObj = function (nodes) {
+      nodesObj = nodes[this.getSelectedOverlay()].current_state
+      console.log(nodesObj)
+    }
 
-        this.init = function (overlay, nodes, links) {
-            this.setSelectedOverlay(overlay);
-            this.setNodeObj(nodes);
-            this.setLinkObj(links);
-        }
+    this.getNodeObj = function () {
+      return nodesObj
+    }
 
-        this.setNodeObj = function (nodes) {
-            nodesObj = nodes[this.getSelectedOverlay()]["current_state"];
-            console.log(nodesObj);
-        }
+    this.setLinkObj = function (links) {
+      linksObj = links[this.getSelectedOverlay()].current_state
+      console.log(linksObj)
+    }
 
-        this.getNodeObj = function () {
-            return nodesObj;
-        }
+    this.getLinkObj = function () {
+      return linksObj
+    }
 
-        this.setLinkObj = function (links) {
-            linksObj = links[this.getSelectedOverlay()]["current_state"];
-            console.log(linksObj);
-        }
+    this.setSelectedOverlay = function (overlay) {
+      selectedOverlay = overlay
+      console.log(`Overlay ${selectedOverlay} has been set.`)
+    }
 
-        this.getLinkObj = function () {
-            return linksObj;
-        }
+    this.getSelectedOverlay = function (overlay) {
+      return selectedOverlay
+    }
 
-        this.setSelectedOverlay = function (overlay) {
-            selectedOverlay = overlay;
-            console.log(`Overlay ${selectedOverlay} has been set.`);
-        }
+    this.getNodeIDs = function () {
+      return Object.keys(this.getNodeObj()).sort()
+    }
 
-        this.getSelectedOverlay = function (overlay) {
-            return selectedOverlay;
-        }
+    this.getNodeName = function (nodeID) {
+      return this.getNodeObj()[nodeID].NodeName
+    }
 
-        this.getNodeIDs = function () {
-            return Object.keys(this.getNodeObj()).sort();
-        }
+    this.getNodeDetails = function (nodeID) {
+      var nodeDetails = {
+        nodeName: this.getNodeName(nodeID),
+        nodeID: nodeID,
+        nodeState: 'Connected',
+        nodeLocation: 'Mississippi, USA'
+      }
+      return nodeDetails
+    }
 
-        this.getNodeName = function (nodeID) {
-            return this.getNodeObj()[nodeID]["NodeName"];
-        }
+    this.getLinkIDs = function (nodeID) {
+      return Object.keys(this.getLinkObj()[nodeID]).sort()
+    }
 
-        this.getNodeDetails = function (nodeID) {
-            var nodeDetails = {
-                "nodeName": this.getNodeName(nodeID),
-                "nodeID": nodeID,
-                "nodeState": "Connected",
-                "nodeLocation": "Mississippi, USA"
-            }
-            return nodeDetails;
-        }
+    this.getLinkName = function (nodeID, linkID) {
+      return this.getLinkObj()[nodeID][linkID].InterfaceName
+    }
 
-        this.getLinkIDs = function (nodeID) {
-            return Object.keys(this.getLinkObj()[nodeID]).sort();
-        }
-
-        this.getLinkName = function (nodeID, linkID) {
-            return this.getLinkObj()[nodeID][linkID]["InterfaceName"]
-        }
-
-        this.NetworkUtilization = function () {
-            
-        }
-
-        this.getLinkDetails = function (srcNode, linkID) {
-            var linkDetails = {
-                "TunnelID": this.getLinkObj()[srcNode][linkID]["EdgeId"],
-                "InterfaceName": this.getLinkObj()[srcNode][linkID]["InterfaceName"],
-                "MAC": this.getLinkObj()[srcNode][linkID]["MAC"],
-                "State": this.getLinkObj()[srcNode][linkID]["State"],
-                "TunnelType": this.getLinkObj()[srcNode][linkID]["Type"],
-                "ICEConnectionType": "-",
-                "ICERole": "-",
-                "RemoteAddress": "-",
-                "LocalAddress": "-",
-                "Latency": "-",
-                "Stats": this.getLinkObj()[srcNode][linkID]["Stats"]
-            }
-
-            // console.log(linkDetails);
-
-            return linkDetails;
-        }
-
-        this.findConnectedNodeDetails = function (srcNode, tgtNode) {
-            var connectedNodeDetails;
-            // console.log("src : "+srcNode);
-            // console.log("tgt : "+tgtNode);
-
-            this.getLinkIDs(srcNode).forEach(link => {
-                if (this.getLinkObj()[srcNode][link]["TgtNodeId"] === tgtNode) {
-                    // console.log("matched !!");
-                    connectedNodeDetails = {
-                        "TunnelID": link,
-                        "InterfaceName": this.getLinkObj()[srcNode][link]["InterfaceName"],
-                        "MAC": this.getLinkObj()[srcNode][link]["MAC"],
-                        "State": this.getLinkObj()[srcNode][link]["State"],
-                        "TunnelType": this.getLinkObj()[srcNode][link]["Type"],
-                        "ICEConnectionType": "-",
-                        "ICERole": "-",
-                        "RemoteAddress": "-",
-                        "LocalAddress": "-",
-                        "Latency": "-",
-                        "Stats": this.getLinkObj()[srcNode][link]["Stats"]
-                    }
-                }
-            })
-            // console.log(connectedNodeDetails);
-
-            return connectedNodeDetails;
-        }
-
-        this.getTargetNode = function (nodeID, linkID) {
-            return this.getLinkObj()[nodeID][linkID]["TgtNodeId"];
-        }
-
-        this.getSourceNode = function (nodeID, linkID) {
-            return this.getLinkObj()[nodeID][linkID]["SrcNodeId"];
-        }
+    this.NetworkUtilization = function () {
 
     }
 
+    this.getLinkDetails = function (srcNode, linkID) {
+      var linkDetails = {
+        TunnelID: this.getLinkObj()[srcNode][linkID].EdgeId,
+        InterfaceName: this.getLinkObj()[srcNode][linkID].InterfaceName,
+        MAC: this.getLinkObj()[srcNode][linkID].MAC,
+        State: this.getLinkObj()[srcNode][linkID].State,
+        TunnelType: this.getLinkObj()[srcNode][linkID].Type,
+        ICEConnectionType: '-',
+        ICERole: '-',
+        RemoteAddress: '-',
+        LocalAddress: '-',
+        Latency: '-',
+        Stats: this.getLinkObj()[srcNode][linkID].Stats
+      }
+
+      // console.log(linkDetails);
+
+      return linkDetails
+    }
+
+    this.findConnectedNodeDetails = function (srcNode, tgtNode) {
+      var connectedNodeDetails
+      // console.log("src : "+srcNode);
+      // console.log("tgt : "+tgtNode);
+
+      this.getLinkIDs(srcNode).forEach(link => {
+        if (this.getLinkObj()[srcNode][link].TgtNodeId === tgtNode) {
+          // console.log("matched !!");
+          connectedNodeDetails = {
+            TunnelID: link,
+            InterfaceName: this.getLinkObj()[srcNode][link].InterfaceName,
+            MAC: this.getLinkObj()[srcNode][link].MAC,
+            State: this.getLinkObj()[srcNode][link].State,
+            TunnelType: this.getLinkObj()[srcNode][link].Type,
+            ICEConnectionType: '-',
+            ICERole: '-',
+            RemoteAddress: '-',
+            LocalAddress: '-',
+            Latency: '-',
+            Stats: this.getLinkObj()[srcNode][link].Stats
+          }
+        }
+      })
+      // console.log(connectedNodeDetails);
+
+      return connectedNodeDetails
+    }
+
+    this.getTargetNode = function (nodeID, linkID) {
+      return this.getLinkObj()[nodeID][linkID].TgtNodeId
+    }
+
+    this.getSourceNode = function (nodeID, linkID) {
+      return this.getLinkObj()[nodeID][linkID].SrcNodeId
+    }
+  }
 }
 
-export default CreateGraphContents;
+export default CreateGraphContents
