@@ -1,11 +1,11 @@
-import React from "react";
-import "react-tippy/dist/tippy.css";
-import { Tooltip } from "react-tippy";
-import RightPanel from "./RightPanel";
-import GraphContent from "./GraphContent";
-import Overlays from "../Common/Overlays";
-import "bootstrap/dist/css/bootstrap.min.css";
-import CollapseButton from "./CollapseButton";
+import React from 'react'
+import 'react-tippy/dist/tippy.css'
+import { Tooltip } from 'react-tippy'
+import RightPanel from './RightPanel'
+import GraphContent from './GraphContent'
+import Overlays from '../Common/Overlays'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import CollapseButton from './CollapseButton'
 // import overlay_ic from "../../Images/Icons/overlay_ic.svg";
 import { Typeahead } from "react-bootstrap-typeahead";
 import Header from "./Header";
@@ -14,13 +14,16 @@ import Config from "../../config";
 
 class Main extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
-            overlays: [], overlaysObj: {}, selectedOverlay: false, selectedOverlayId: "",
+            overlays: [],
+            overlaysObj: {},
+            selectedOverlay: false,
+            selectedOverlayId: '',
             isToggle: true
         }
     }
-
+    
     componentDidMount() {
         //on init state.
         //fetch overlay data.
@@ -60,61 +63,62 @@ class Main extends React.Component {
                     document.getElementById(overlay + "Btn").hidden = false;
                 })
             }
+
         }
     }
 
     // toggle overlay right panel
     togglePanel = () => {
         this.setState(prevState => {
-            return { isToggle: !prevState.isToggle };
+            return { isToggle: !prevState.isToggle }
         })
         if (this.state.isToggle) {
-            document.getElementById("rightPanel").hidden = true;
+            document.getElementById('rightPanel').hidden = true
         } else {
-            document.getElementById("rightPanel").hidden = false;
+            document.getElementById('rightPanel').hidden = false
         }
     }
 
     renderMainContent = () => {
         if (this.state.selectedOverlay) {
-            return this.renderGraphContent(this.state.selectedOverlayId);
+            return this.renderGraphContent(this.state.selectedOverlayId)
         } else {
-            return this.renderOverlaysContent();
+            return this.renderOverlaysContent()
         }
     }
 
     renderGraphContent = (overlayId) => {
-        return <GraphContent selectedOverlay={overlayId} />;
+        return <GraphContent selectedOverlay={overlayId} />
     }
 
     renderOverlaysContent = () => {
-        let overlays = this.state.overlays.map((overlay) => {
+        const overlays = this.state.overlays.map((overlay) => {
             return <Tooltip className="overlayTooltips" sticky={true} key={overlay} duration="500" animation="scale" interactive position="bottom" arrow={true} open={true}
                 html={(<div>{overlay}</div>)}>
                 <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
                     {/* <img src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img> */}
                 </button>
             </Tooltip>
-        });
+        })
 
         return <>
             <Overlays>{overlays}</Overlays>
             <RightPanel rightPanelTopic="Overlays" >{this.renderRightPanel()}</RightPanel>
-        </>;
+        </>
     }
 
     renderRightPanel = () => {
-        return this.renderOverlayBtn();
+        return this.renderOverlayBtn()
     }
 
     renderOverlayBtn = () => {
-        let overlayBtn = this.state.overlays.map((overlay) => {
-            return <CollapseButton key={overlay + "Btn"} id={overlay + "Btn"} name={overlay}>
-                <div>Number of nodes : {this.state.overlaysObj['current_state'][overlay].NumNodes}<br />
-                    Number of links : {this.state.overlaysObj['current_state'][overlay].NumLinks}</div>
+        const overlayBtn = this.state.overlays.map((overlay) => {
+            return <CollapseButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay}>
+                <div>Number of nodes : {this.state.overlaysObj.current_state[overlay].NumNodes}<br />
+                    Number of links : {this.state.overlaysObj.current_state[overlay].NumLinks}</div>
             </CollapseButton>
-        });
-        return overlayBtn;
+        })
+        return overlayBtn
     }
 
     selectOverlay = (overlayId) => {
@@ -129,8 +133,8 @@ class Main extends React.Component {
                     id="searchOverlay"
                     onChange={(selected) => {
                         try {
-                            this.selectOverlay(selected[0]);
-                        } catch{
+                            this.selectOverlay(selected[0])
+                        } catch {
 
                         }
                     }}
@@ -144,7 +148,7 @@ class Main extends React.Component {
                                 <div className="resultLabel">
                                     {option}
                                 </div>
-                                <small className="resultLabel">Number of nodes : {this.state.overlaysObj['current_state'][option].NumNodes} Number of links : {this.state.overlaysObj['current_state'][option].NumLinks}</small><br />
+                                <small className="resultLabel">Number of nodes : {this.state.overlaysObj.current_state[option].NumNodes} Number of links : {this.state.overlaysObj.current_state[option].NumLinks}</small><br />
                             </div>
                         )
                     }}
@@ -154,7 +158,7 @@ class Main extends React.Component {
 
             <button onClick={this.togglePanel} id="overlayRightPanelBtn" />
 
-            <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white" }}>
+            <div id="mainContent" className="row" style={{ backgroundColor: '#101B2B', color: 'white' }}>
                 {this.renderMainContent()}
             </div>
 
@@ -162,4 +166,4 @@ class Main extends React.Component {
     }
 }
 
-export default Main;
+export default Main
