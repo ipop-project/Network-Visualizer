@@ -17,6 +17,8 @@ import successor_ic from "../../Images/Icons/successor_ic.svg";
 import longdistance_ic from "../../Images/Icons/longdistance_ic.svg";
 import not_reporting_ic from "../../Images/Icons/not_reporting_ic.svg";
 import GoogleMapReact from 'google-map-react';
+import { ResponsiveLine } from '@nivo/line'
+import Config from "../../config";
 
 class GraphContent extends React.Component {
 
@@ -235,17 +237,121 @@ class GraphContent extends React.Component {
                                         <div className="DetailsLabel">Total Byte Received</div>
                                 {linkDetails.Stats[0].recv_total_bytes}
                             </Card.Body>
-                            <OverlayTrigger rootClose={true} trigger="click" placement="right" overlay={
-                                <Popover>
-                                    <Popover.Title as="h3">Transmission Graph</Popover.Title>
-                                    <Popover.Content>
-                                        <div className="row">
-
-                                        </div>
-                                    </Popover.Content>
-                                </Popover>}>
-                                <button id="transmissionBtn" >Transmission graph</button>
-                            </OverlayTrigger>
+                            <Card.Body className="transmissionCard" style={{ height: "500px" }}>
+                                <ResponsiveLine
+                                    data={[{
+                                        "id": "japan",
+                                        "color": "hsl(318, 70%, 50%)",
+                                        "data": [
+                                            {
+                                                "x": "plane",
+                                                "y": 63
+                                            },
+                                            {
+                                                "x": "helicopter",
+                                                "y": 126
+                                            },
+                                            {
+                                                "x": "boat",
+                                                "y": 218
+                                            },
+                                            {
+                                                "x": "train",
+                                                "y": 190
+                                            },
+                                            {
+                                                "x": "subway",
+                                                "y": 207
+                                            },
+                                            {
+                                                "x": "bus",
+                                                "y": 101
+                                            },
+                                            {
+                                                "x": "car",
+                                                "y": 27
+                                            },
+                                            {
+                                                "x": "moto",
+                                                "y": 66
+                                            },
+                                            {
+                                                "x": "bicycle",
+                                                "y": 41
+                                            },
+                                            {
+                                                "x": "horse",
+                                                "y": 66
+                                            },
+                                            {
+                                                "x": "skateboard",
+                                                "y": 124
+                                            },
+                                            {
+                                                "x": "others",
+                                                "y": 235
+                                            }
+                                        ]
+                                    }]}
+                                    margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+                                    xScale={{ type: 'point' }}
+                                    yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
+                                    axisTop={null}
+                                    axisRight={null}
+                                    axisBottom={{
+                                        orient: 'bottom',
+                                        tickSize: 5,
+                                        tickPadding: 5,
+                                        tickRotation: 0,
+                                        legend: 'transportation',
+                                        legendOffset: 36,
+                                        legendPosition: 'middle'
+                                    }}
+                                    axisLeft={{
+                                        orient: 'left',
+                                        tickSize: 5,
+                                        tickPadding: 5,
+                                        tickRotation: 0,
+                                        legend: 'count',
+                                        legendOffset: -40,
+                                        legendPosition: 'middle'
+                                    }}
+                                    colors={{ scheme: 'nivo' }}
+                                    pointSize={10}
+                                    pointColor={{ theme: 'background' }}
+                                    pointBorderWidth={2}
+                                    pointBorderColor={{ from: 'serieColor' }}
+                                    pointLabel="y"
+                                    pointLabelYOffset={-12}
+                                    useMesh={true}
+                                    legends={[
+                                        {
+                                            anchor: 'bottom-right',
+                                            direction: 'column',
+                                            justify: false,
+                                            translateX: 100,
+                                            translateY: 0,
+                                            itemsSpacing: 0,
+                                            itemDirection: 'left-to-right',
+                                            itemWidth: 80,
+                                            itemHeight: 20,
+                                            itemOpacity: 0.75,
+                                            symbolSize: 12,
+                                            symbolShape: 'circle',
+                                            symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                                            effects: [
+                                                {
+                                                    on: 'hover',
+                                                    style: {
+                                                        itemBackground: 'rgba(0, 0, 0, .03)',
+                                                        itemOpacity: 1
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]}
+                                />
+                            </Card.Body>
                         </div>
 
                         ReactDOM.render(linkContent, document.getElementById("rightPanelContent"))
@@ -519,9 +625,10 @@ class GraphContent extends React.Component {
     fetchData = () => {
         var selectedOverlay = this.props.selectedOverlay;
         var intervalNo = new Date().toISOString().split(".")[0];
-        var serverIP = '52.139.216.32:5000';
+        // var serverIP = '52.139.216.32:5000';
+        var serverIP = Config.serverIP;
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
-
+        // var allowOrigin = "";
         var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
         var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
 
@@ -563,7 +670,11 @@ class GraphContent extends React.Component {
                 });
                 this.setState({ graphElement: [nodeConf, linkConf], currentView: "Topology" })
             }).then(() => {
-                this.renderGraph()
+                try{
+                    this.renderGraph()
+                }catch{
+                    console.log("fetching not finish yet.");    
+                }
             })
         })
     }

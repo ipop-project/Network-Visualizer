@@ -10,6 +10,7 @@ import CollapseButton from "./CollapseButton";
 import { Typeahead } from "react-bootstrap-typeahead";
 import Header from "./Header";
 import "../../CSS/Main.css";
+import Config from "../../config";
 
 class Main extends React.Component {
     constructor(props) {
@@ -24,8 +25,10 @@ class Main extends React.Component {
         //on init state.
         //fetch overlay data.
         var intervalNo = new Date().toISOString().split(".")[0];
-        var serverIP = '52.139.216.32:5000';
+        // var serverIP = '52.139.216.32:5000';
+        var serverIP = Config.serverIP;
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
+        // var allowOrigin =""
         var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
 
         fetch(url).then(res => res.json())
