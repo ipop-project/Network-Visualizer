@@ -60,13 +60,6 @@ header {
     display: none;
 }
 
-.transmissionCard {
-    border-radius: 3px;
-    border: solid #486186;
-    background-color: #405B80;
-    margin-bottom: 1%;
-}
-
 #overlayRightPanelBtn {
     margin: 0.5%;
     right: 0;
@@ -304,6 +297,28 @@ header {
     .rbt-input-main.form-control.rbt-input {
         width: 92%;
         margin-left: auto;
+    }
+
+    .transmissionCard {
+        width: 21.5vw;
+        height: 15vh;
+        border-radius: 3px;
+        border: solid #486186;
+        background-color: #405B80;
+        margin-bottom: 1%;
+    }
+
+    #transmissionGraph{
+        height: 27vh;
+    }
+
+    .c3 svg{
+        padding-top: 4%;
+        padding-right: 4%;
+    }
+
+    tspan{
+        font-size: 9px;
     }
 }
 
@@ -613,6 +628,26 @@ header {
     .rbt-input-main.form-control.rbt-input {
         width: 92%;
         margin-left: auto;
+    }
+    .transmissionCard {
+        width: 21.5vw;
+        border-radius: 3px;
+        border: solid #486186;
+        background-color: #405B80;
+        margin-bottom: 1%;
+    }
+
+    #transmissionGraph{
+        height: 23vh;
+    }
+
+    .c3 svg{
+        padding-top: 4%;
+        padding-right: 4%;
+    }
+
+    tspan{
+        font-size: 9px;
     }
 }
 

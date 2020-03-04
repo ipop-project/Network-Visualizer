@@ -7,162 +7,161 @@ import Overlays from '../Common/Overlays'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import CollapseButton from './CollapseButton'
 // import overlay_ic from "../../Images/Icons/overlay_ic.svg";
-import { Typeahead } from "react-bootstrap-typeahead";
-import Header from "./Header";
-import "../../CSS/Main.css";
-import Config from "../../config";
+import { Typeahead } from 'react-bootstrap-typeahead'
+import Header from './Header'
+import 'c3/c3.css'
+import '../../CSS/Main.css'
+import Config from '../../config'
 
 class Main extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            overlays: [],
-            overlaysObj: {},
-            selectedOverlay: false,
-            selectedOverlayId: '',
-            isToggle: true
-        }
+  constructor (props) {
+    super(props)
+    this.state = {
+      overlays: [],
+      overlaysObj: {},
+      selectedOverlay: false,
+      selectedOverlayId: '',
+      isToggle: true
     }
-    
-    componentDidMount() {
-        //on init state.
-        //fetch overlay data.
-        var intervalNo = new Date().toISOString().split(".")[0];
-        // var serverIP = '52.139.216.32:5000';
-        var serverIP = Config.serverIP;
-        var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
-        // var allowOrigin =""
-        var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+  }
 
-        fetch(url).then(res => res.json())
-            .then((overlays) => {
-                this.setState({ overlaysObj: overlays });
-                this.setState({ overlays: Object.keys(this.state.overlaysObj['current_state']) });
-            })
-            .catch(err => {
-                alert(err);
-            })
+  componentDidMount () {
+    // on init state.
+    // fetch overlay data.
+    var intervalNo = new Date().toISOString().split('.')[0]
+    // var serverIP = '52.139.216.32:5000';
+    var serverIP = Config.serverIP
+    var allowOrigin = 'https://cors-anywhere.herokuapp.com/' /* you need to allow origin to get data from outside server */
+    // var allowOrigin =""
+    var url = allowOrigin + 'http://' + serverIP + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+
+    fetch(url).then(res => res.json())
+      .then((overlays) => {
+        this.setState({ overlaysObj: overlays })
+        this.setState({ overlays: Object.keys(this.state.overlaysObj.current_state) })
+      })
+      .catch(err => {
+        alert(err)
+      })
+  }
+
+  componentDidUpdate () {
+    if (this.state.selectedOverlay === false) {
+      if (this.state.searchData !== '') {
+        this.state.overlays.forEach(overlay => {
+          if (!overlay.match(this.state.searchData)) {
+            document.getElementById(overlay).hidden = true
+            document.getElementById(overlay + 'Btn').hidden = true
+          } else {
+            document.getElementById(overlay).hidden = false
+            document.getElementById(overlay + 'Btn').hidden = false
+          }
+        })
+      } else {
+        this.state.overlays.forEach(overlay => {
+          document.getElementById(overlay).hidden = false
+          document.getElementById(overlay + 'Btn').hidden = false
+        })
+      }
     }
-
-    componentDidUpdate() {
-        if (this.state.selectedOverlay === false) {
-
-            if (this.state.searchData !== "") {
-                this.state.overlays.forEach(overlay => {
-                    if (!overlay.match(this.state.searchData)) {
-                        document.getElementById(overlay).hidden = true;
-                        document.getElementById(overlay + "Btn").hidden = true;
-                    } else {
-                        document.getElementById(overlay).hidden = false;
-                        document.getElementById(overlay + "Btn").hidden = false;
-                    }
-                })
-            } else {
-                this.state.overlays.forEach(overlay => {
-                    document.getElementById(overlay).hidden = false;
-                    document.getElementById(overlay + "Btn").hidden = false;
-                })
-            }
-
-        }
-    }
+  }
 
     // toggle overlay right panel
     togglePanel = () => {
-        this.setState(prevState => {
-            return { isToggle: !prevState.isToggle }
-        })
-        if (this.state.isToggle) {
-            document.getElementById('rightPanel').hidden = true
-        } else {
-            document.getElementById('rightPanel').hidden = false
-        }
+      this.setState(prevState => {
+        return { isToggle: !prevState.isToggle }
+      })
+      if (this.state.isToggle) {
+        document.getElementById('rightPanel').hidden = true
+      } else {
+        document.getElementById('rightPanel').hidden = false
+      }
     }
 
     renderMainContent = () => {
-        if (this.state.selectedOverlay) {
-            return this.renderGraphContent(this.state.selectedOverlayId)
-        } else {
-            return this.renderOverlaysContent()
-        }
+      if (this.state.selectedOverlay) {
+        return this.renderGraphContent(this.state.selectedOverlayId)
+      } else {
+        return this.renderOverlaysContent()
+      }
     }
 
     renderGraphContent = (overlayId) => {
-        return <GraphContent selectedOverlay={overlayId} />
+      return <GraphContent selectedOverlay={overlayId} />
     }
 
     renderOverlaysContent = () => {
-        const overlays = this.state.overlays.map((overlay) => {
-            return <Tooltip className="overlayTooltips" sticky={true} key={overlay} duration="500" animation="scale" interactive position="bottom" arrow={true} open={true}
-                html={(<div>{overlay}</div>)}>
-                <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
-                    {/* <img src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img> */}
-                </button>
-            </Tooltip>
-        })
+      const overlays = this.state.overlays.map((overlay) => {
+        return <Tooltip className="overlayTooltips" sticky={true} key={overlay} duration="500" animation="scale" interactive position="bottom" arrow={true} open={true}
+          html={(<div>{overlay}</div>)}>
+          <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
+            {/* <img src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img> */}
+          </button>
+        </Tooltip>
+      })
 
-        return <>
-            <Overlays>{overlays}</Overlays>
-            <RightPanel rightPanelTopic="Overlays" >{this.renderRightPanel()}</RightPanel>
-        </>
+      return <>
+        <Overlays>{overlays}</Overlays>
+        <RightPanel rightPanelTopic="Overlays" >{this.renderRightPanel()}</RightPanel>
+      </>
     }
 
     renderRightPanel = () => {
-        return this.renderOverlayBtn()
+      return this.renderOverlayBtn()
     }
 
     renderOverlayBtn = () => {
-        const overlayBtn = this.state.overlays.map((overlay) => {
-            return <CollapseButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay}>
-                <div>Number of nodes : {this.state.overlaysObj.current_state[overlay].NumNodes}<br />
+      const overlayBtn = this.state.overlays.map((overlay) => {
+        return <CollapseButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay}>
+          <div>Number of nodes : {this.state.overlaysObj.current_state[overlay].NumNodes}<br />
                     Number of links : {this.state.overlaysObj.current_state[overlay].NumLinks}</div>
-            </CollapseButton>
-        })
-        return overlayBtn
+        </CollapseButton>
+      })
+      return overlayBtn
     }
 
     selectOverlay = (overlayId) => {
-        this.setState({ selectedOverlay: true, selectedOverlayId: overlayId })
+      this.setState({ selectedOverlay: true, selectedOverlayId: overlayId })
     }
 
-    render() {
-        return (<div id="container" className="container-fluid">
+    render () {
+      return (<div id="container" className="container-fluid">
 
-            <Header>
-                <Typeahead
-                    id="searchOverlay"
-                    onChange={(selected) => {
-                        try {
-                            this.selectOverlay(selected[0])
-                        } catch {
+        <Header>
+          <Typeahead
+            id="searchOverlay"
+            onChange={(selected) => {
+              try {
+                this.selectOverlay(selected[0])
+              } catch {
 
-                        }
-                    }}
-                    options={this.state.overlays}
-                    selected={this.state.selected}
-                    selectHintOnEnter
-                    placeholder="Search overlay"
-                    renderMenuItemChildren={(option) => {
-                        return (
-                            <div className="searchResult">
-                                <div className="resultLabel">
-                                    {option}
-                                </div>
-                                <small className="resultLabel">Number of nodes : {this.state.overlaysObj.current_state[option].NumNodes} Number of links : {this.state.overlaysObj.current_state[option].NumLinks}</small><br />
-                            </div>
-                        )
-                    }}
-                >
-                </Typeahead>
-            </Header>
+              }
+            }}
+            options={this.state.overlays}
+            selected={this.state.selected}
+            selectHintOnEnter
+            placeholder="Search overlay"
+            renderMenuItemChildren={(option) => {
+              return (
+                <div className="searchResult">
+                  <div className="resultLabel">
+                    {option}
+                  </div>
+                  <small className="resultLabel">Number of nodes : {this.state.overlaysObj.current_state[option].NumNodes} Number of links : {this.state.overlaysObj.current_state[option].NumLinks}</small><br />
+                </div>
+              )
+            }}
+          >
+          </Typeahead>
+        </Header>
 
-            <button onClick={this.togglePanel} id="overlayRightPanelBtn" />
+        <button onClick={this.togglePanel} id="overlayRightPanelBtn" />
 
-            <div id="mainContent" className="row" style={{ backgroundColor: '#101B2B', color: 'white' }}>
-                {this.renderMainContent()}
-            </div>
+        <div id="mainContent" className="row" style={{ backgroundColor: '#101B2B', color: 'white' }}>
+          {this.renderMainContent()}
+        </div>
 
-        </div>)
+      </div>)
     }
 }
 

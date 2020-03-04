@@ -1,5 +1,5 @@
 var config = {
-    "serverIP": "52.139.216.32:5000"
+  serverIP: '13.76.88.113:5000'
 }
 
-export default config;
+export default config
