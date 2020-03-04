@@ -553,6 +553,56 @@ class GraphContent extends React.Component {
     }
   }
 
+  demoGraph = () => {
+    var change = new Promise((resolve, reject) => {
+      try {
+        this.cy.elements().filter(element => {
+          return element.data().id === 'a100004feb6040628e5fb7e70b04f004'
+        }).addClass('notReporting')
+
+        this.cy.elements().filter(element => {
+          return element.data().id === 'a100008feb6040628e5fb7e70b04f008'
+        }).connectedEdges().remove()
+
+        this.cy.elements().filter(element => {
+          return element.data().id === 'a100008feb6040628e5fb7e70b04f008'
+        }).addClass('noTunnel')
+
+        this.cy.elements().filter(element => {
+          return element.data().id === '72f12e13de414fa7886ed513e45dc489'
+        }).addClass('static')
+
+        this.cy.elements().filter(element => {
+          return element.data().id === 'fb9bb2fd6b094d2b8e892117a9d3a6fe'
+        }).remove()
+
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+
+    change.then(() => {
+      this.forceUpdate()
+    })
+  }
+
+  addOndemandTunnel = () => {
+    this.cy.add([
+      { group: 'edges', data: { id: 'fb9bb2fd6b094d2b8e892117a9d3a6fe', source: 'a100004feb6040628e5fb7e70b04f004', target: 'a100010feb6040628e5fb7e70b04f010' } }
+    ])
+
+    this.cy.elements().filter(element => {
+      return element.data().id === 'fb9bb2fd6b094d2b8e892117a9d3a6fe'
+    }).addClass('onDemand')
+  }
+
+  removeOndemandTunnel = () => {
+    this.cy.elements().filter(element => {
+      return element.data().id === 'fb9bb2fd6b094d2b8e892117a9d3a6fe'
+    }).remove()
+  }
+
   fetchData = () => {
     var selectedOverlay = this.props.selectedOverlay
     var intervalNo = new Date().toISOString().split('.')[0]
@@ -576,7 +626,7 @@ class GraphContent extends React.Component {
       }).then(() => {
         ipop.getNodeIDs().forEach(nodeID => {
           console.log(nodeID)
-          nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}" ,"type":"","lat":"${this.state.nodeLocations[nodeID][0]}","lng":"${this.state.nodeLocations[nodeID][1]}"} }`))
+          nodeConf.push(JSON.parse(`{ "data": { "id": "${nodeID}", "label": "${ipop.getNodeName(nodeID)}","color":"#8AA626" ,"type":"","lat":"${this.state.nodeLocations[nodeID][0]}","lng":"${this.state.nodeLocations[nodeID][1]}"} }`))
           ipop.getLinkIDs(nodeID).forEach(linkID => {
             sourceConf = ipop.getSourceNode(nodeID, linkID)
             targetConf = ipop.getTargetNode(nodeID, linkID)
@@ -929,10 +979,6 @@ class GraphContent extends React.Component {
     }
   }
 
-  renderTunnelUtilization = () => {
-
-  }
-
   render() {
     return <>
       <div id="leftTools" className="col-3">
@@ -1044,11 +1090,15 @@ class GraphContent extends React.Component {
       </div>
 
       <div>
-        <button className="">add node</button>
+        <button onClick={this.demoGraph} >Set demo graph</button>
       </div>
 
       <div>
-        <button className="">remove node</button>
+        <button onClick={this.addOndemandTunnel} >add ondemand tunnel</button>
+      </div>
+
+      <div>
+        <button onClick={this.removeOndemandTunnel} >remove ondemand tunnel</button>
       </div>
 
       <section onWheel={this.handleWheel} id="midArea">
