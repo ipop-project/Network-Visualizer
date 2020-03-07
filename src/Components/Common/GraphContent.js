@@ -250,6 +250,10 @@ class GraphContent extends React.Component {
               </Card.Body>
               <Card.Body id='transmissionGraph' style={{ margin: '0', padding: '0' }} className="transmissionCard">
                 <C3Chart style={{ color: 'black' }}
+                  // bindto={'#transmissionGraph'}
+                  onresize={() => {
+                    console.log(document.getElementById('c3Graph'))
+                  }}
                   data={{
                     x: 'x',
                     // xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
@@ -268,16 +272,16 @@ class GraphContent extends React.Component {
                       received: 'area'
                     }
                   }}
-                  size={{
-                    width: 550,
-                    height: 330
-                  }}
+                  // size={{
+                  //   width: 550,
+                  //   height: 330
+                  // }}
                   zoom={{
                     enabled: true
                   }}
                   axis={{
                     x: {
-                      show: false,
+                      show: true,
                       type: 'timeseries',
                       localtime: false,
                       tick: {
