@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom'
 import RightPanel from './RightPanel'
 import Card from 'react-bootstrap/Card'
 import Cytoscape from 'react-cytoscapejs'
-import CollapseButton from './CollapseButton'
+import CollapseButton from './CollapsibleButton'
 import Popover from 'react-bootstrap/Popover'
 import cytoscapeStyle from './cytoscapeStyle.js'
 import { Typeahead } from 'react-bootstrap-typeahead'
@@ -20,12 +20,10 @@ import successor_ic from '../../Images/Icons/successor_ic.svg'
 import longdistance_ic from '../../Images/Icons/longdistance_ic.svg'
 import not_reporting_ic from '../../Images/Icons/not_reporting_ic.svg'
 import GoogleMapReact from 'google-map-react'
-// import { ResponsiveLine } from '@nivo/line'
-import C3Chart from 'react-c3js'
 import Config from '../../config'
 
 class GraphContent extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       nodeLocations: {
@@ -61,7 +59,7 @@ class GraphContent extends React.Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // document.getElementById("searchBar").remove(document.getElementById("searchOverlay"))
     document.getElementById('overlayRightPanelBtn').click()
     this.fetchData()
@@ -247,58 +245,6 @@ class GraphContent extends React.Component {
                 -
                 <div className="DetailsLabel">Total Byte Received</div>
                 {linkDetails.Stats[0].recv_total_bytes}
-              </Card.Body>
-              <Card.Body id='transmissionGraph' style={{ margin: '0', padding: '0' }} className="transmissionCard">
-                <C3Chart style={{ color: 'black' }}
-                  // bindto={'#transmissionGraph'}
-                  onresize={() => {
-                    console.log(document.getElementById('c3Graph'))
-                  }}
-                  data={{
-                    x: 'x',
-                    // xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-                    columns: [
-                      ['x', this.state.testDate[0], this.state.testDate[1], this.state.testDate[2], this.state.testDate[3], this.state.testDate[4], this.state.testDate[5]],
-                      // ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-                      ['sent', 30, 200, 100, 400, 150, 250],
-                      ['received', 130, 340, 200, 500, 250, 350]
-                    ],
-                    colors: {
-                      sent: '#8FD24D',
-                      received: '#42B2C3'
-                    },
-                    types: {
-                      sent: 'area',
-                      received: 'area'
-                    }
-                  }}
-                  // size={{
-                  //   width: 550,
-                  //   height: 330
-                  // }}
-                  zoom={{
-                    enabled: true
-                  }}
-                  axis={{
-                    x: {
-                      show: true,
-                      type: 'timeseries',
-                      localtime: false,
-                      tick: {
-                        format: '%Y-%m-%d %H:%M:%S'
-                      }
-                    }
-                  }}
-                  tooltip={{
-                    format: {
-                      title: function (d) { return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() },
-                      value: function (value, ratio, id) {
-                        return value
-                      }
-                    }
-                  }}
-                  legend={{ show: false }}
-                ></C3Chart>
               </Card.Body>
             </div >
 
@@ -840,7 +786,7 @@ class GraphContent extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate () {
     if (this.state.currentView === 'Map') {
       document.getElementById('homeBtn').hidden = true
       document.getElementById('refreshBtn').hidden = true
@@ -933,7 +879,7 @@ class GraphContent extends React.Component {
     }
   }
 
-  render() {
+  render () {
     return <>
       <div id="leftTools" className="col-3">
         <div>
