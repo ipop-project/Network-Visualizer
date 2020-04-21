@@ -1,20 +1,27 @@
 // import logo from './logo.svg';
 // import './App.css';
 import React from 'react'
-import './CSS/Global.css'
-import './CSS/Component.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import {HashRouter, Route} from 'react-router-dom'
+import Main from './Components/Common/Main'
+import Tool from './Components/SAGE2/Tool'
+import Overlay from './Components/SAGE2/Overlay'
+import Info from './Components/SAGE2/Info'
+import Search from './Components/SAGE2/Search'
+import Graph from './Components/SAGE2/Graph'
+import Map from './Components/SAGE2/Map'
 
-import Header from './Components/Common/Header'
-import ipop_ic from './Images/Icons/ipop_ic.svg'
-import SystemContent from './Components/Common/SystemContent'
-
-function App () {
+function App() {
   return (
-    <>
-      <Header src={ipop_ic} alt="ipop_ic">IPOP NETWORK VISUALIZER</Header>
-      <SystemContent />
-    </>
+    <HashRouter>
+      <Route exact path="/" component={Main}/>
+      <Route path="/SAGE2_tool" component={Tool}/>
+      <Route path="/SAGE2_overlays" component={Overlay}/>
+      <Route path="/SAGE2_legend" component={Info}/>
+      <Route path="/SAGE2_search" component={Search}/>
+      <Route path="/SAGE2_graph" component={Graph}/>
+      <Route path="/SAGE2_map" component={Map}/>
+    </HashRouter>
   )
 }
 
