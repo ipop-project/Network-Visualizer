@@ -3,19 +3,35 @@ export default class ElementsObj {
     constructor(nodes, links) {
         var raw_nodes = nodes
         var raw_links = links
+        var elementObj = [];
+
+        this.addNodeElement = (id) =>{
+            const nodeDetails = this.getNodeDetails(id)
+            elementObj.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeDetails.id}","label": "${nodeDetails.name}","state":"","type":""}}`));
+        }
+
+        this.addLinkElement = (src,id) =>{
+            const linkDetails = this.getLinkDetails(src,id)
+            elementObj.push(JSON.parse(`{"group":"edges","data": { "id":"${linkDetails.id}" ,"label":"${linkDetails.name}","source": "${linkDetails.source}","target": "${linkDetails.target}","state":"","type":"${linkDetails.type}"}}`));
+        }
+
+        this.getAllElementObj = () =>{
+            return elementObj
+        }
 
         this.getNodeDetails = (id) => {
             var nodeDetails = {
-                "name": raw_nodes[id].NodeName,
+                "name": raw_nodes[id].node_name,
                 "id": id,
                 "state": '-',
-                "location": '-'
+                "location": '-',
+                "raw_data":raw_nodes
             }
 
             return nodeDetails
         }
 
-        this.getLinkDetails = (src,id) => {
+        this.getLinkDetails = (src, id) => {
             var linkDetails = {
                 "name": raw_links[src][id].InterfaceName,
                 "id": id,
@@ -27,7 +43,10 @@ export default class ElementsObj {
                 "remoteAdress": '-',
                 "localAddress": '-',
                 "latency": '-',
-                "stats": raw_links[src][id].Stats
+                "stats": raw_links[src][id].Stats,
+                "source":raw_links[src][id]['SrcNodeID'],
+                "target":raw_links[src][id]['TgtNodeID'],
+                "raw_data":raw_links
             }
 
             return linkDetails
@@ -35,15 +54,15 @@ export default class ElementsObj {
 
         this.getConnectedNodeDetails = (src, tgt) => {
             var connectedNodeDetails
-            
+
             Object.keys(raw_links[src]).forEach(link => {
                 if (raw_links[src][link].TgtNodeId === tgt) {
-                    connectedNodeDetails = this.getLinkDetails(src,link)
+                    connectedNodeDetails = this.getLinkDetails(src, link)
                 }
             });
 
             return connectedNodeDetails
         }
-        
+
     }
 }
