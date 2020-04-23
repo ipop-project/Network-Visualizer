@@ -8,17 +8,13 @@
     height: 100vh;
     background-color: #101B2B;
     color: 'white';
+    overflow: hidden;
 }
 
 header {
     width: 100vw;
     background-color: #213758;
     color: white;
-}
-
-/* customize title name */
-#ipopTitle {
-    margin: auto;
 }
 
 #loading{
@@ -45,10 +41,17 @@ header {
 #rightPanel{
     padding: 0.5%;
     color: white;
-    position: absolute;
-    width: 18.5vw;
+    position: fixed;
+    width: 19vw;
     right: 0;
     background-color: #213758;
+    z-index: 2;
+}
+
+#leftToolsBtn{
+    margin-top: 4.5%;
+    position: fixed;
+    z-index: 2;
 }
 
 #menuBtn{
@@ -60,3 +63,74 @@ header {
     background-size: contain;
     right: 0;
 }
+
+#homeBtn,#refreshBtn,#infoBtn,#plusBtn,#minusBtn,#switchBtn,#configBtn{
+    outline: none;
+    border: none;
+    background: none;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+}
+
+#homeBtn{
+    background-image: url('../Images/Icons/home_ic.svg');
+    background-size: cover;
+}
+
+#refreshBtn{
+    background-image: url('../Images/Icons/refresh_ic.svg');
+    background-size: cover;
+}
+
+#infoBtn{
+    background-image: url('../Images/Icons/info_ic.svg');
+    background-size: cover;
+}
+
+.node_img {
+    transform: translateY(-2.5px);
+    width: 100%;
+}
+
+.tunnel_img {
+    transform: translateY(1px);
+    width: 90%;
+}
+
+#configBtn{
+    background-image: url('../Images/Icons/config_ic.svg');
+    background-size: cover;
+}
+
+.popover {
+    padding: 0.5%;
+    /* width: fit-content; */
+    width: 320px;
+    max-width: unset;
+}
+
+.popover-header {
+    background-color: white;
+    border: none;
+}
+
+#plusBtn{
+    background-image: url('../Images/Icons/plus_ic.svg');
+    background-size: cover;
+}
+
+#zoomSlider {
+    position: absolute;
+    margin-left: -14.2vh;
+    margin-top: 15.5vh;
+    transform: rotate(-90deg);
+    width: 35vh;
+}
+
+#minusBtn{
+    margin-top: 34.2vh;
+    background-image: url('../Images/Icons/minus_ic.svg');
+    background-size: cover;
+}
+

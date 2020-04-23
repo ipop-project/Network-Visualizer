@@ -14,7 +14,7 @@ var cytoscapeStyle = [{
     'border-width': '30%',
     'border-opacity': '0.3',
     'border-color': 'white',
-    'background-color': 'data(color)'
+    // 'background-color': 'data(color)'
   }
 }, {
   selector: 'node.transparent',
@@ -31,7 +31,7 @@ var cytoscapeStyle = [{
 }, {
   selector: 'edge',
   style: {
-    'line-color': 'data(color)',
+    // 'line-color': 'data(color)',
     width: '5%',
     'z-index': '3'
   }
