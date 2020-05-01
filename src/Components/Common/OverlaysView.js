@@ -17,7 +17,6 @@ class OverlaysView extends React.Component {
     super(props)
     this.state = {
       overlaysObj: null,
-      searchElement: [],
       selectedOverlay: null,
       isToggle: true,
       selectedView: 'Topology',
@@ -30,32 +29,44 @@ class OverlaysView extends React.Component {
 
     // you need to allow origin to get data from outside server.
     var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    // var allowOrigin=''
 
     // URL for REST API.
-    var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    // var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
     console.log(url);
-    
+
     fetch(url).then(res => res.json())
       .then((overlays) => {
-        // console.log(overlays);
+        console.log(overlays);
 
         return new OverlayObj(overlays.current_state) // create overlay object that contain all overlays and its details.
       })
-      .then((overlaysObj) => { this.setState({ overlaysObj: overlaysObj, searchElement: overlaysObj.getOverlayName() }) }) // set overlay object to overlaysObj state.
+      .then((overlaysObj) => { this.setState({ overlaysObj: overlaysObj }) }) // set overlay object to overlaysObj state.
       .catch(error => {
         alert(error)
       })
   }
 
   handleRightPanelToggle = () => {
-    this.setState(prevState => {
-      return { isToggle: !prevState.isToggle }
+    var rightPanelEvent = new Promise((resolve, reject) => {
+      try {
+        this.setState(prevState => {
+          return { isToggle: !prevState.isToggle }
+        })
+        resolve()
+      } catch (e) {
+        console.log(e)
+      }
     })
-    if (this.state.isToggle) {
-      document.getElementById('rightPanel').hidden = true
-    } else {
-      document.getElementById('rightPanel').hidden = false
-    }
+
+    rightPanelEvent.then(() => {
+      if (this.state.isToggle) {
+        document.getElementById('rightPanel').hidden = false
+      } else {
+        document.getElementById('rightPanel').hidden = true
+      }
+    })
   }
 
   renderRightPanel = () => {
@@ -69,7 +80,7 @@ class OverlaysView extends React.Component {
   renderOverlayBtn = () => {
     const overlayBtn = this.state.overlaysObj.getOverlayName().map((overlay) => {
       return <CollapsibleButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay}>
-        <div>Number of nodes : {this.state.overlaysObj.getNumberOfNodes(overlay)}<br />Number of links : {this.state.overlaysObj.getNumberOfLinks(overlay)}</div>
+        <div>{this.state.overlaysObj.getOverlayDescription(overlay)}<br />Number of nodes : {this.state.overlaysObj.getNumberOfNodes(overlay)}<br />Number of links : {this.state.overlaysObj.getNumberOfLinks(overlay)}</div>
       </CollapsibleButton>
     })
     return overlayBtn
@@ -79,12 +90,17 @@ class OverlaysView extends React.Component {
     this.setState({ selectedOverlay: overlay })
 
     var intervalNo = new Date().toISOString().split('.')[0]
-    
+
     // you need to allow origin to get data from outside server.
     var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    // var allowOrigin=''
 
-    var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/nodes?interval=' + intervalNo + '&current_state=True'
-    var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/links?interval=' + intervalNo + '&current_state=True'
+    // var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/nodes?interval=' + intervalNo + '&current_state=True'
+    // var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/links?interval=' + intervalNo + '&current_state=True'
+
+    var nodeURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/nodes?interval=2020-04-29T19:12:41&current_state=True'
+    var linkURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/links?interval=2020-04-29T19:12:41&current_state=True'
+
     console.log(nodeURL);
 
     console.log(linkURL);
@@ -115,7 +131,7 @@ class OverlaysView extends React.Component {
 
         })
         return elementObj
-      }).then((elementObj) => { this.setState({ elementObj: elementObj, searchElement: elementObj.getAllElementObj().map((obj) => { return obj.data.label }) }) })
+      }).then((elementObj) => { this.setState({ elementObj: elementObj }) })
 
     })
 
@@ -126,11 +142,13 @@ class OverlaysView extends React.Component {
       if (this.state.selectedOverlay === null) {
         return this.renderOverlaysContent()
       } else {
-        if (this.state.graphElement === null) {
+        if (this.state.elementObj === null) {
+          document.getElementById('searchBar').childNodes.forEach((node) => {
+            document.getElementById('searchBar').removeChild(node)
+          })
           return <Spinner id='loading' animation='border' variant='info' />
         } else {
           if (this.state.elementObj !== null) {
-            
             return this.renderOthersViewContent()
           }
         }
@@ -158,12 +176,12 @@ class OverlaysView extends React.Component {
   }
 
   render() {
-    return (<div id='container' className='container-fluid' style={{ padding: '0' }}>
+    return (<div id='container' className='container-fluid' style={{ padding: '0' }} >
 
       <header id='header' className='row' style={{ padding: '0.2%', margin: '0' }}>
         <div id='ipopTitle' className='col-2' style={{ marginLeft: '0' }}>
           <img id='ipopLogo' src={ipop_ic} alt='ipop_ic' />
-          <label id='ipopTitle' style={{ marginTop: '0.5rem' }}>
+          <label id='ipopTitle' style={{ marginTop: '0.5rem', color: 'white' }}>
             IPOP NETWORK VISUALIZER
           </label>
         </div>
@@ -178,20 +196,21 @@ class OverlaysView extends React.Component {
             onChange={(selected) => {
               try {
                 document.getElementById(selected).click()
-              } catch {
+              } catch (e) {
+                console.log(e)
               }
             }}
-            options={this.state.searchElement !== null ? this.state.searchElement : []}
+            options={this.state.overlaysObj !== null ? this.state.overlaysObj.getOverlayName() : []}
             selected={this.state.selected}
             selectHintOnEnter
-            placeholder={this.state.selectedOverlay == null ? 'select an overlay' : 'select a node or tunnel'}
+            placeholder={'select an overlay'}
             renderMenuItemChildren={(option) => {
               return (
                 <div className='searchResult'>
                   <div className='resultLabel'>
                     <b>{option}</b>
                   </div>
-                  <small className='resultLabel'>Number of nodes : Number of links : </small><br />
+                  <small className='resultLabel'>{`Number of nodes :  ${this.state.overlaysObj.getNumberOfNodes(option)} Number of links : ${this.state.overlaysObj.getNumberOfLinks(option)}`}</small><br />
                 </div>
               )
             }}
@@ -201,13 +220,12 @@ class OverlaysView extends React.Component {
         <Button onClick={this.handleRightPanelToggle} id='menuBtn' style={{ marginRight: '0.5%' }} />
       </header>
 
-
       <div id='mainContent' style={{ margin: 'auto' }} >
         <RightPanel rightPanelTopic='Overlays' >{this.renderRightPanel()}</RightPanel>
         {this.renderMainContent()}
       </div>
 
-    </div>)
+    </div >)
   }
 }
 

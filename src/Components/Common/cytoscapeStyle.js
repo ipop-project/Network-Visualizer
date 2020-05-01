@@ -31,7 +31,7 @@ var cytoscapeStyle = [{
 }, {
   selector: 'edge',
   style: {
-    // 'line-color': 'data(color)',
+    'line-color': 'data(color)',
     width: '5%',
     'z-index': '3'
   }

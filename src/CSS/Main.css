@@ -1,6 +1,8 @@
 /* customize global */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 * {
-    font-family: Helvetica;
+    font-family: 'Roboto', sans-serif;
 }
 
 #root {
@@ -14,7 +16,7 @@
 header {
     width: 100vw;
     background-color: #213758;
-    color: white;
+    /* color: white; */
 }
 
 #loading{
@@ -46,6 +48,16 @@ header {
     right: 0;
     background-color: #213758;
     z-index: 2;
+    overflow-wrap: break-word;
+}
+
+#nodeDetails::-webkit-scrollbar,#linkDetails::-webkit-scrollbar {
+    display: none;
+}
+
+#nodeDetails,#linkDetails{
+    height: 90vh;
+    overflow-y: auto;
 }
 
 #leftToolsBtn{
@@ -54,11 +66,18 @@ header {
     z-index: 2;
 }
 
+#cytoscape{
+    width: 100vw;
+    height: 100vh;
+}
+
 #menuBtn{
+    margin: auto;
+    margin-left: 0;
     outline: none;
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 25px;
     background: url('../Images/Icons/menu_ic.svg') no-repeat;
     background-size: contain;
     right: 0;
@@ -75,6 +94,13 @@ header {
 
 #homeBtn{
     background-image: url('../Images/Icons/home_ic.svg');
+    background-size: cover;
+}
+
+#switchBtn {
+    width: 25px;
+    height: 25px;
+    background: url('../Images/Icons/swap_ic.svg')no-repeat;
     background-size: cover;
 }
 

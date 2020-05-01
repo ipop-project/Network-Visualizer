@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import RightPanel from './RightPanel'
 import Card from 'react-bootstrap/Card'
+import Button from 'react-bootstrap/Button'
 import Cytoscape from 'react-cytoscapejs'
 import CollapsibleButton from './CollapsibleButton.js'
 import Popover from 'react-bootstrap/Popover'
@@ -18,6 +19,7 @@ import longdistance_ic from '../../Images/Icons/longdistance_ic.svg'
 import not_reporting_ic from '../../Images/Icons/not_reporting_ic.svg'
 import GoogleMapReact from 'google-map-react'
 import Config from '../../config'
+import Select from 'react-select'
 
 class OtherViews extends React.Component {
   constructor(props) {
@@ -38,50 +40,267 @@ class OtherViews extends React.Component {
       minZoom: 0.1,
       maxZoom: 2,
       switchToggle: false,
-      selectedElement: null
+      selectedElement: null,
+      selectedElementLocation: null,
+      elementDetails: null,
+      selectedView: { value: 'Topology', label: 'Topology' }
     }
   }
 
   componentDidMount() {
-    document.getElementById('mainContent').onwheel = this.handleWheelZoom
-    // document.getElementById('rightPanel')
+    document.getElementById('rightPanel').remove(document.getElementById('rightPanel').childNodes)
+
+    var perpareSearchElement = new Promise((resolve, reject) => {
+      try {
+        var searchElement = this.props.elementObj.getAllElementObj().map((element) => { return JSON.stringify(element) })
+        resolve(searchElement)
+      } catch (e) {
+        reject(e)
+      }
+    })
+
+    perpareSearchElement.then((searchElement) => {
+      ReactDOM.render(<Typeahead
+        id='searchOverlay'
+        onChange={(selected) => {
+          try {
+            this.cy.elements().getElementById(JSON.parse(selected).data.id).trigger('click')
+            this.cy.elements().getElementById(JSON.parse(selected).data.id).select()
+          } catch (e) {
+            console.log(e)
+          }
+        }}
+        options={searchElement}
+        selected={this.state.selected}
+        selectHintOnEnter
+        placeholder={'select a node or tunnel'}
+        renderToken={(option) => { return JSON.parse(option).data.label }}
+        renderMenuItemChildren={(option) => {
+          return (
+            <div className='searchResult'>
+              <div className='resultLabel'>
+                <b>{JSON.parse(option).data.label}</b>
+              </div>
+              <small className='resultLabel'>{`ID : ${JSON.parse(option).data.id}`}</small><br />
+            </div>
+          )
+        }}
+      >
+      </Typeahead>, document.getElementById('searchBar'))
+    })
+
   }
 
+  renderViewSelector = () => {
+    return <Select
+      id='viewSelector'
+      isSearchable={false}
+      ref={ref => this.ref = ref}
+      options={[
+        { value: 'Topology', label: 'Topology' },
+        { value: 'Subgraph', label: 'Subgraph' },
+        { value: 'Map', label: 'Map' },
+        { value: 'Network Flow', label: 'Network Flow' },
+        { value: 'Tunnel Utilization', label: 'Tunnel Utilization' },
+        { value: 'Log', label: 'Log' },
+      ]}
+      value={this.state.selectedView}
+      onChange={(option) => { this.handleChangeView(option) }}
+      defaultValue={{ value: 'Topology', label: 'Topology' }}
+    />
+  }
+
+  handleChangeView = (option) => {
+    switch (option.label) {
+      case 'Topology': this.renderTopology(option); break;
+      case 'Subgraph': this.renderSubgraph(option); break;
+      case 'Map': ; this.renderMap(option); break;
+      default: ;
+    }
+  }
+
+  renderTopology = (option) => {
+    try {
+      this.cy.elements().forEach(element => {
+        element.removeClass('subgraph')
+      });
+      this.setState({ selectedView: option })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  renderSubgraph = (option) => {
+    var selectedElement = this.state.selectedElement
+    var notRelatedElement, relatedElement
+    try {
+      if (selectedElement.isNode()) {
+        // relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement)
+        notRelatedElement = this.cy.elements().difference(selectedElement.outgoers().union(selectedElement.incomers())).not(selectedElement)
+      } else if (selectedElement.isEdge()) {
+        // relatedElement = selectedElement.connectedNodes().union(selectedElement)
+        notRelatedElement = this.cy.elements().difference(selectedElement.connectedNodes()).not(selectedElement)
+      }
+      notRelatedElement.addClass('subgraph')
+      this.setState({ selectedView: option })
+    } catch (e) {
+      alert('Please select node or tunnel.')
+      console.log(this.ref.select.props.value)
+    }
+  }
+
+  renderMap = (option) => {
+    try {
+      if (this.state.selectedElement.isNode()) {
+        const nodeDetails = this.props.elementObj.getNodeDetails(this.state.selectedElement.data().id)
+        const connectedNodes = this.cy.elements(this.state.selectedElement.incomers().union(this.state.selectedElement.outgoers())).filter((element) => {
+          return element.isNode()
+        })
+        const coordinate = this.state.selectedElement.data().coordinate.split(',')
+        console.log(coordinate)
+      } else if (this.state.selectedElement.isEdge()) {
+
+        var createMapFromEdge = new Promise((resolve, reject) => {
+          try {
+            var selectedElement = this.state.selectedElement
+
+            const srcNode = selectedElement.connectedNodes().filter((element) => {
+              return element.data().id == selectedElement.data().source
+            })
+
+            const tgtNode = selectedElement.connectedNodes().filter((element) => {
+              return element.data().id == selectedElement.data().target
+            })
+
+            const srcCoordinate = srcNode.data().coordinate.split(',')
+            const tgtCoordinate = tgtNode.data().coordinate.split(',')
+
+            console.log(srcCoordinate)
+            console.log(tgtCoordinate)
+            console.log((srcCoordinate[0])+" "+parseFloat(srcCoordinate[1])+" "+parseFloat(tgtCoordinate[0])+" "+parseFloat(tgtCoordinate[1]))
+
+            var centerPoint = this.midpoint(parseFloat(srcCoordinate[0]), parseFloat(srcCoordinate[1]), parseFloat(srcCoordinate[0]), parseFloat(srcCoordinate[1]))
+
+            var map = <GoogleMapReact
+              bootstrapURLKeys={{
+                key: 'AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs',
+                language: 'en'
+              }}
+              center={{ lat: centerPoint[0], lng: centerPoint[1] }}
+              defaultZoom={10}
+            >
+
+              <button onClick={this.handleMakerClicked.bind(this, srcNode)} key={srcNode.data().id + 'Marker'} id={srcNode.data().id + 'Marker'} className="nodeMarker selected" lat={parseFloat(srcCoordinate[0])} lng={parseFloat(srcCoordinate[1])}>
+                <label className="markerLabel">
+                  {srcNode.data().label}
+                </label>
+              </button>
+
+              <button onClick={this.handleMakerClicked.bind(this, tgtNode)} key={tgtNode.data().id + 'Marker'} id={tgtNode.data().id + 'Marker'} className="nodeMarker selected" lat={parseFloat(srcCoordinate[0])} lng={parseFloat(srcCoordinate[1])}>
+                <label className="markerLabel">
+                  {tgtNode.data().label}
+                </label>
+              </button>
+
+            </GoogleMapReact>
+
+            this.setState({ selectedView: option })
+
+            resolve(map)
+          } catch (e) {
+            console.log(e)
+            reject()
+          }
+        })
+
+        createMapFromEdge.then((map) => {
+          ReactDOM.render(map, document.getElementById('cytoscape'))
+        })
+      }
+    } catch (e) {
+      alert('Please select node or tunnel.')
+    }
+  }
+
+  handleMakerClicked = (node) => {
+    if (this.state.selectedElement.isNode()) {
+      node.trigger('click')
+      document.getElementById(node.data().id + 'Marker').classList.add('selected')
+      this.setState({ selectedElement: node })
+    }
+  }
+
+  midpoint = (lat1, lng1, lat2, lng2) => {
+    lat1 = this.deg2rad(lat1)
+    lng1 = this.deg2rad(lng1)
+    lat2 = this.deg2rad(lat2)
+    lng2 = this.deg2rad(lng2)
+
+    var dlng = lng2 - lng1
+    var Bx = Math.cos(lat2) * Math.cos(dlng)
+    var By = Math.cos(lat2) * Math.sin(dlng)
+    var lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2),
+      Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By))
+    var lng3 = lng1 + Math.atan2(By, (Math.cos(lat1) + Bx))
+
+    return [(lat3 * 180) / Math.PI, (lng3 * 180) / Math.PI]
+  }
+
+  deg2rad = (degrees) => {
+    return degrees * Math.PI / 180
+  };
+
   renderViewContent = () => {
-    return <Cytoscape id='cy'
+
+    ReactDOM.render(this.renderViewSelector(), document.getElementById('viewBar'))
+
+    return <div id='cytoscape'><Cytoscape id='cy'
       cy={(cy) => {
 
         this.cy = cy
         this.cy.userZoomingEnabled(false)
-        this.cy.minZoom(this.state.minZoom)
-        this.cy.zoom(0.8)
-        this.cy.maxZoom(this.state.maxZoom)
-        this.cy.center()
+
+        this.cy.ready(() => {
+          document.getElementById('cytoscape').onwheel = this.handleWheelZoom
+        })
 
         this.cy.on('click', (e) => {
           var clickEvent = new Promise((resolve, reject) => {
             try {
-              this.setState({ selectedElement: (e.target) })
-              resolve()
+              if (e.target[0] !== this.state.selectedElement) {
+                console.log('clicked');
+
+                this.setState({ selectedElement: (e.target[0]) })
+                resolve()
+              } else {
+                reject()
+              }
             } catch (e) {
-              console.log(e);
               reject()
             }
           })
-          try {
-            if (e.target.isNode()) {
-              clickEvent.then(this.renderNodeDetails)
-            } else if (e.target.isEdge()) {
-              var sourceNodeDetails = this.state.elementObj.getNodeDetails(e.target.data().source)
-              var targetNodeDetails = this.state.elementObj.getNodeDetails(e.target.data().target)
-              var linkDetails = this.state.elementObj.getLinkDetails(sourceNodeDetails.id, e.target.data().id)
-              clickEvent.then(this.renderLinkDetails(sourceNodeDetails, targetNodeDetails, linkDetails))
+
+          clickEvent.then(() => {
+            try {
+              if (this.state.selectedElement !== undefined) {
+                if (this.state.selectedElement.isNode()) {
+                  this.renderNodeDetails()
+                  document.getElementById('rightPanel').hidden = false;
+                } else {
+                  var sourceNodeDetails = this.props.elementObj.getNodeDetails(this.state.selectedElement.data().source)
+                  var targetNodeDetails = this.props.elementObj.getNodeDetails(this.state.selectedElement.data().target)
+                  var linkDetails = this.props.elementObj.getLinkDetails(sourceNodeDetails.id, this.state.selectedElement.data().id)
+                  this.renderLinkDetails(sourceNodeDetails, targetNodeDetails, linkDetails)
+                  document.getElementById('rightPanel').hidden = false;
+                }
+              } else {
+                document.getElementById('rightPanel').hidden = true;
+                this.setState({ elementDetails: '', selectedElement: null })
+              }
+            } catch (e) {
+              console.log(e)
             }
-            document.getElementById('rightPanel').hidden = false;
-          } catch (e) {
-            document.getElementById('rightPanel').hidden = true;
-            // setRightPanelElement(null)
-          }
+          }).catch(() => { console.log(`don't do anything`) })
 
         })
 
@@ -95,7 +314,8 @@ class OtherViews extends React.Component {
 
       layout={{ name: 'circle' }}
 
-    />
+    /></div>
+
   }
 
   renderNodeDetails = () => {
@@ -103,181 +323,243 @@ class OtherViews extends React.Component {
     const connectedNodes = this.cy.elements(this.state.selectedElement.incomers().union(this.state.selectedElement.outgoers())).filter((element) => {
       return element.isNode()
     })
-
-    var rightPanelElement = (<div id='nodeDetails'>
-      <h5>{nodeDetails.name}</h5>
-
-      <div className="DetailsLabel">Node ID</div>
-      {nodeDetails.id}
-
-      <div className="DetailsLabel">State</div>
-      {nodeDetails.state}
-
-      <div className="DetailsLabel">City/State/Country</div>
-      {nodeDetails.location}
-      <br /><br />
-
-      <div id="connectedNode">
-        {connectedNodes.map(connectedNode => {
-          var connectedNodeDetails = this.props.elementObj.getConnectedNodeDetails(nodeDetails.id, connectedNode.data().id)
-          // console.log(connectedNodeDetails);
-          return <CollapsibleButton
-
-            id={connectedNode.data().id + 'Btn'}
-            className='connectedNodeBtn'
-            key={connectedNode.data().id + 'Btn'}
-            eventKey={connectedNode.data().label}
-            name={connectedNode.data().label}
-          ><>
-              <div className="DetailsLabel">Node ID</div>
-              {connectedNode.data().id}
-              <div className="DetailsLabel">Tunnel ID</div>
-              {connectedNodeDetails.id}
-              <div className="DetailsLabel">Interface Name</div>
-              {connectedNodeDetails.name}
-              <div className="DetailsLabel">MAC</div>
-              {connectedNodeDetails.MAC}
-              <div className="DetailsLabel">State</div>
-              {connectedNodeDetails.state}
-              <div className="DetailsLabel">Tunnel Type</div>
-              {connectedNodeDetails.type}
-              <div className="DetailsLabel">ICE Connection Type</div>
-              {connectedNodeDetails.ICEConnectionType}
-              <div className="DetailsLabel">ICE Role</div>
-              {connectedNodeDetails.ICERole}
-              <div className="DetailsLabel">Remote Address</div>
-              {connectedNodeDetails.remoteAddress}
-              <div className="DetailsLabel">Local Address</div>
-              {connectedNodeDetails.localAddress}
-              <div className="DetailsLabel">Latency</div>
-              {connectedNodeDetails.latency}
-              <Card.Body className="transmissionCard">
-                Sent
-                                        <div className="DetailsLabel">Byte Sent</div>
-                                            -
-                                        <div className="DetailsLabel">Total Byte Sent</div>
-                {connectedNodeDetails.stats[0].sent_total_bytes}
-              </Card.Body>
-
-              <Card.Body className="transmissionCard">
-                Received
-                                        <div className="DetailsLabel">Byte Received</div>
-                                            -
-                                        <div className="DetailsLabel">Total Byte Received</div>
-                {connectedNodeDetails.stats[0].recv_total_bytes}
-              </Card.Body>
-            </>
-          </CollapsibleButton>
-        })
-
+    const coordinate = this.state.selectedElement.data().coordinate.split(',')
+    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate[0]},${coordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+      .then(res => res.json()).then((location) => {
+        try {
+          this.setState({ selectedElementLocation: location.results[location.results.length - 1].formatted_address })
+        } catch (e) {
+          this.setState({ selectedElementLocation: '-' })
         }
-      </div>
-    </div>)
+      }).then(() => {
+        var rightPanelElement = (<div id='nodeDetails' style={{ overflowY: 'auto' }}>
+          <h5>{nodeDetails.name}</h5>
 
+          <div className="DetailsLabel">Node ID</div>
+          {nodeDetails.id}
+
+          <div className="DetailsLabel">State</div>
+          {nodeDetails.state}
+
+          <div className="DetailsLabel">City/State/Country</div>
+          {this.state.selectedElementLocation}
+          <br /><br />
+
+          <div id="connectedNode">
+            {connectedNodes.map(connectedNode => {
+              var connectedNodeDetails = this.props.elementObj.getConnectedNodeDetails(nodeDetails.id, connectedNode.data().id)
+              // console.log(connectedNodeDetails);
+              return <CollapsibleButton
+                id={connectedNode.data().id + 'Btn'}
+                className='connectedNodeBtn'
+                key={connectedNode.data().id + 'Btn'}
+                eventKey={connectedNode.data().label}
+                name={connectedNode.data().label}
+              ><>
+                  <div className="DetailsLabel">Node ID</div>
+                  {connectedNode.data().id}
+                  <div className="DetailsLabel">Tunnel ID</div>
+                  {connectedNodeDetails.id}
+                  <div className="DetailsLabel">Interface Name</div>
+                  {connectedNodeDetails.name}
+                  <div className="DetailsLabel">MAC</div>
+                  {connectedNodeDetails.MAC}
+                  <div className="DetailsLabel">State</div>
+                  {connectedNodeDetails.state}
+                  <div className="DetailsLabel">Tunnel Type</div>
+                  {connectedNodeDetails.type}
+                  <div className="DetailsLabel">ICE Connection Type</div>
+                  {/* {connectedNodeDetails.ICEConnectionType} */}
+                -
+                <div className="DetailsLabel">ICE Role</div>
+                  {/* {connectedNodeDetails.ICERole} */}
+                  {connectedNodeDetails.stats.IceProperties.role}
+                  {/* <div className="DetailsLabel">Remote Address</div> */}
+                  {/* {connectedNodeDetails.remoteAddress} */}
+                  {/* {connectedNodeDetails.stats.IceProperties.remote_addr} */}
+                  {/* <div className="DetailsLabel">Local Address</div> */}
+                  {/* {connectedNodeDetails.localAddress} */}
+                  {/* {connectedNodeDetails.stats.IceProperties.local_addr} */}
+                  <div className="DetailsLabel">Latency</div>
+                  {/* {connectedNodeDetails.latency} */}
+                  {connectedNodeDetails.stats.IceProperties.latency}
+                  <Card.Body className="transmissionCard">
+                    Sent
+                  <div className="DetailsLabel">Byte Sent</div>
+                    {connectedNodeDetails.stats.byte_sent}
+                    <div className="DetailsLabel">Total Byte Sent</div>
+                    {/* {connectedNodeDetails.stats[0].sent_total_bytes} */}
+                    {connectedNodeDetails.stats.total_byte_sent}
+                  </Card.Body>
+
+                  <Card.Body className="transmissionCard">
+                    Received
+                  <div className="DetailsLabel">Byte Received</div>
+                    {connectedNodeDetails.stats.byte_receive}
+                    <div className="DetailsLabel">Total Byte Received</div>
+                    {/* {connectedNodeDetails.stats[0].recv_total_bytes} */}
+                    {connectedNodeDetails.stats.total_byte_receive}
+                  </Card.Body>
+                </>
+              </CollapsibleButton>
+            })
+
+            }
+          </div>
+        </div>)
+        this.setState({ elementDetails: rightPanelElement })
+      })
   }
 
   handleSwitch = (sourceNodeDetails, targetNodeDetails, linkDetails) => {
-    const { elements } = this.props
-    const new_linkDetails = elements.getLinkDetails(targetNodeDetails.id, linkDetails.id)
+    const new_linkDetails = this.props.elementObj.getLinkDetails(targetNodeDetails.id, linkDetails.id)
     this.renderLinkDetails(targetNodeDetails, sourceNodeDetails, new_linkDetails)
   }
 
   renderLinkDetails = (sourceNodeDetails, targetNodeDetails, linkDetails) => {
     try {
 
-      var rightPanelElement = (<div>
-        <h5>{linkDetails.name}</h5>
+      const srcNode = this.state.selectedElement.connectedNodes().filter((element) => {
+        return element.data().id == sourceNodeDetails.id
+      })
 
-        <div className="row">
+      const tgtNode = this.state.selectedElement.connectedNodes().filter((element) => {
+        return element.data().id == targetNodeDetails.id
+      })
 
-          <div className="col-9" style={{ paddingRight: '0' }}>
-            <CollapsibleButton
+      const srcCoordinate = srcNode.data().coordinate.split(',')
+      const tgtCoordinate = tgtNode.data().coordinate.split(',')
 
-              id={sourceNodeDetails.id + 'Btn'}
-              className='sourceNodeBtn'
-              key={sourceNodeDetails.id + 'Btn'}
-              eventKey={sourceNodeDetails.id + 'Btn'}
-              name={sourceNodeDetails.name}
-            >
-              <>
-                <div className="DetailsLabel">Node ID</div>
-                {sourceNodeDetails.id}
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${srcCoordinate[0]},${srcCoordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+        .then((res) => {
+          return res.json()
+        }).then((srcLocation) => {
+          try {
+            this.setState({ selectedElementLocation: srcLocation.results[srcLocation.results.length - 1].formatted_address })
+          } catch (e) {
+            this.setState({ selectedElementLocation: '-' })
+          }
+        }).then(() => {
+          fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${tgtCoordinate[0]},${tgtCoordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+            .then((res) => {
+              return res.json()
+            }).then((tgtLocation) => {
+              try {
+                return [this.state.selectedElementLocation, tgtLocation.results[tgtLocation.results.length - 1].formatted_address]
+              } catch (e) {
+                return [this.state.selectedElementLocation, '-']
+              }
+            }).then((locations) => {
+              this.setState({ selectedElementLocation: locations })
+            }).then(() => {
+              console.log(this.state.selectedElementLocation)
+              var rightPanelElement = (<div id='linkDetails'>
+                <h5>{linkDetails.name}</h5>
 
+                <div className="row">
+
+                  <div className="col-10" style={{ paddingRight: '0' }}>
+                    <CollapsibleButton
+
+                      id={sourceNodeDetails.id + 'Btn'}
+                      className='sourceNodeBtn'
+                      key={sourceNodeDetails.id + 'Btn'}
+                      eventKey={sourceNodeDetails.id + 'Btn'}
+                      name={sourceNodeDetails.name}
+                    >
+                      <>
+                        <div className="DetailsLabel">Node ID</div>
+                        {sourceNodeDetails.id}
+
+                        <div className="DetailsLabel">State</div>
+                        {sourceNodeDetails.state}
+
+                        <div className="DetailsLabel">City/State/Country</div>
+                        {/* {sourceNodeDetails.location} */}
+                        {this.state.selectedElementLocation[0]}
+                      </>
+                    </CollapsibleButton>
+
+                    <CollapsibleButton
+
+                      id={targetNodeDetails.id + 'Btn'}
+                      className='targetNodeBtn'
+                      key={targetNodeDetails.id + 'Btn'}
+                      eventKey={targetNodeDetails.id + 'Btn'}
+                      name={targetNodeDetails.name}
+                    >
+                      <>
+                        <div className="DetailsLabel">Node ID</div>
+                        {targetNodeDetails.id}
+
+                        <div className="DetailsLabel">State</div>
+                        {targetNodeDetails.state}
+
+                        <div className="DetailsLabel">City/State/Country</div>
+                        {/* {targetNodeDetails.location} */}
+                        {this.state.selectedElementLocation[1]}
+                      </>
+
+                    </CollapsibleButton>
+
+                  </div>
+
+                  <div className="col" style={{ margin: 'auto', padding: '0', textAlign: 'center' }}>
+                    <Button onClick={this.handleSwitch.bind(this, sourceNodeDetails, targetNodeDetails, linkDetails)} id="switchBtn" />
+                  </div>
+
+                </div>
+
+                <div className="DetailsLabel">Tunnel ID</div>
+                {linkDetails.id}
+                <div className="DetailsLabel">Interface Name</div>
+                {linkDetails.name}
+                <div className="DetailsLabel">MAC</div>
+                {linkDetails.MAC}
                 <div className="DetailsLabel">State</div>
-                {sourceNodeDetails.state}
+                {linkDetails.state}
+                <div className="DetailsLabel">Tunnel Type</div>
+                {linkDetails.type}
+                <div className="DetailsLabel">ICE Connection Type</div>
+                {/* {linkDetails.ICEConnectionType} */}
+          -
+                <div className="DetailsLabel">ICE Role</div>
+                {/* {linkDetails.ICERole} */}
+                {linkDetails.stats.IceProperties.role}
+                {/* <div className="DetailsLabel">Remote Address</div> */}
+                {/* {linkDetails.remoteAddress} */}
+                {/* {linkDetails.stats.IceProperties.remote_addr} */}
+                {/* <div className="DetailsLabel">Local Address</div> */}
+                {/* {linkDetails.localAddress} */}
+                {/* {linkDetails.stats.IceProperties.local_addr} */}
+                <div className="DetailsLabel">Latency</div>
+                {/* {linkDetails.latency} */}
+                {linkDetails.stats.IceProperties.latency}
+                <br /><br />
 
-                <div className="DetailsLabel">City/State/Country</div>
-                {sourceNodeDetails.location}
-              </>
-            </CollapsibleButton>
+                <Card.Body className="transmissionCard">
+                  Sent
+            <div className="DetailsLabel">Byte Sent</div>
+                  {linkDetails.stats.byte_sent}
+                  <div className="DetailsLabel">Total Byte Sent</div>
+                  {/* {linkDetails.stats[0].sent_total_bytes} */}
+                  {linkDetails.stats.total_byte_sent}
+                </Card.Body>
 
-            <CollapsibleButton
+                <Card.Body className="transmissionCard">
+                  Received
+            <div className="DetailsLabel">Byte Received</div>
+                  {linkDetails.stats.byte_receive}
+                  <div className="DetailsLabel">Total Byte Received</div>
+                  {/* {linkDetails.stats[0].recv_total_bytes} */}
+                  {linkDetails.stats.total_byte_receive}
+                </Card.Body>
 
-              id={targetNodeDetails.id + 'Btn'}
-              className='targetNodeBtn'
-              key={targetNodeDetails.id + 'Btn'}
-              eventKey={targetNodeDetails.id + 'Btn'}
-              name={targetNodeDetails.name}
-            >
-              <>
-                <div className="DetailsLabel">Node ID</div>
-                {targetNodeDetails.id}
+              </div >)
+              this.setState({ elementDetails: rightPanelElement })
 
-                <div className="DetailsLabel">State</div>
-                {targetNodeDetails.state}
-
-                <div className="DetailsLabel">City/State/Country</div>
-                {targetNodeDetails.location}
-              </>
-            </CollapsibleButton>
-
-          </div>
-
-          <div className="col" style={{ margin: 'auto', padding: '0', textAlign: 'center' }}>
-            <button onClick={this.handleSwitch.bind(this, sourceNodeDetails, targetNodeDetails, linkDetails)} id="switchBtn" />
-          </div>
-
-        </div>
-
-        <div className="DetailsLabel">Tunnel ID</div>
-        {linkDetails.id}
-        <div className="DetailsLabel">Interface Name</div>
-        {linkDetails.name}
-        <div className="DetailsLabel">MAC</div>
-        {linkDetails.MAC}
-        <div className="DetailsLabel">State</div>
-        {linkDetails.state}
-        <div className="DetailsLabel">Tunnel Type</div>
-        {linkDetails.type}
-        <div className="DetailsLabel">ICE Connection Type</div>
-        {linkDetails.ICEConnectionType}
-        <div className="DetailsLabel">ICE Role</div>
-        {linkDetails.ICERole}
-        <div className="DetailsLabel">Remote Address</div>
-        {linkDetails.remoteAddress}
-        <div className="DetailsLabel">Local Address</div>
-        {linkDetails.localAddress}
-        <div className="DetailsLabel">Latency</div>
-        {linkDetails.latency}
-        <br /><br />
-
-        <Card.Body className="transmissionCard">
-          Sent
-                    <div className="DetailsLabel">Byte Sent</div>
-                        -
-                    <div className="DetailsLabel">Total Byte Sent</div>
-          {linkDetails.stats[0].sent_total_bytes}
-        </Card.Body>
-
-        <Card.Body className="transmissionCard">
-          Received
-                    <div className="DetailsLabel">Byte Received</div>
-                        -
-                    <div className="DetailsLabel">Total Byte Received</div>
-          {linkDetails.stats[0].recv_total_bytes}
-        </Card.Body>
-
-      </div >)
+            })
+        })
 
     } catch{
 
@@ -285,14 +567,14 @@ class OtherViews extends React.Component {
   }
 
   handleZoomIn = () => {
-    if (this.cy.zoom !== this.state.maxZoom) {
+    if (this.cy.zoom() <= this.state.maxZoom) {
       this.cy.zoom(this.cy.zoom() + 0.1)
       document.getElementById('zoomSlider').value = (this.cy.zoom())
     }
   }
 
   handleZoomOut = () => {
-    if (this.cy.zoom !== this.state.minZoom) {
+    if (this.cy.zoom() >= this.state.minZoom) {
       this.cy.zoom(this.cy.zoom() - 0.1)
       document.getElementById('zoomSlider').value = (this.cy.zoom())
     }
@@ -315,7 +597,7 @@ class OtherViews extends React.Component {
       this.cy.zoom(parseFloat(e.target.value))
       document.getElementById('zoomSlider').value = parseFloat(e.target.value)
     }
-    this.setState({ minZoom: e.target.value })
+    this.setState({ minZoom: parseFloat(e.target.value) })
   }
 
   handleSetMaxZoom = (e) => {
@@ -323,7 +605,7 @@ class OtherViews extends React.Component {
       this.cy.zoom(parseFloat(e.target.value))
       document.getElementById('zoomSlider').value = parseFloat(e.target.value)
     }
-    this.setState({ maxZoom: e.target.value })
+    this.setState({ maxZoom: parseFloat(e.target.value) })
   }
 
   handleBackToHome = () => {
@@ -332,9 +614,13 @@ class OtherViews extends React.Component {
     }
   }
 
+  renderRightPanel = () => {
+    return this.state.elementDetails
+  }
+
   render() {
     return <>
-      {/* <RightPanel rightPanelTopic='Overlays' >{this.renderRightPanel()}</RightPanel> */}
+      <RightPanel rightPanelTopic='Details' >{this.renderRightPanel()}</RightPanel>
       <div id='leftToolsBtn'>
         <div style={{ width: 'fit-content' }}>
           <button onClick={this.handleBackToHome} id='homeBtn'></button>
@@ -396,7 +682,7 @@ class OtherViews extends React.Component {
                     <label>Minimun zoom</label>
                   </div>
                   <div className='col'>
-                    <select defaultValue={this.state.minZoom} onChange={this.handleSetMinZoom} id='minZoomSelector' value={this.state.minZoom}>
+                    <select onChange={this.handleSetMinZoom} id='minZoomSelector' value={this.state.minZoom}>
                       <option>0.1</option>
                       <option>1</option>
                     </select>
@@ -407,7 +693,7 @@ class OtherViews extends React.Component {
                     <label>Maximum zoom</label>
                   </div>
                   <div className='col'>
-                    <select defaultValue={this.state.maxZoom} onChange={this.handleSetMaxZoom} id='maxZoomSelector' value={this.state.maxZoom}>
+                    <select onChange={this.handleSetMaxZoom} id='maxZoomSelector' value={this.state.maxZoom}>
                       <option>2</option>
                       <option>5</option>
                     </select>
@@ -429,6 +715,7 @@ class OtherViews extends React.Component {
           <button onClick={this.handleZoomOut} id='minusBtn' ></button>
         </div>
       </div>
+      <div id="map" style={{position:"absolute"}}></div>
       {this.renderViewContent()}
     </>
   }
