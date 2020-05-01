@@ -3,7 +3,7 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import {HashRouter, Route} from 'react-router-dom'
-import Main from './Components/Common/Main'
+import OverlaysView from './Components/Common/OverlaysView'
 import Tool from './Components/SAGE2/Tool'
 import Overlay from './Components/SAGE2/Overlay'
 import Info from './Components/SAGE2/Info'
@@ -14,7 +14,7 @@ import Map from './Components/SAGE2/Map'
 function App() {
   return (
     <HashRouter>
-      <Route exact path="/" component={Main}/>
+      <Route exact path="/" component={OverlaysView}/>
       <Route path="/SAGE2_tool" component={Tool}/>
       <Route path="/SAGE2_overlays" component={Overlay}/>
       <Route path="/SAGE2_legend" component={Info}/>

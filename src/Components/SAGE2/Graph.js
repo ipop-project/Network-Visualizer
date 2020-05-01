@@ -22,6 +22,7 @@ class Graph extends React.Component {
         super(props);
         this.state = {
             nodes: [], links: [], initMinZoom: 0.2, initMaxZoom: 2, setMinZoom: 0.2, setMaxZoom: 2
+            , elementObj: null
             , switchToggle: false
             , isShowRightPanel: false
             , isAutoRefresh: false
@@ -579,8 +580,8 @@ class Graph extends React.Component {
      * @method fetchData
      */
     fetchData = () => {
-        var intervalNo = new Date().toISOString().split(".")[0];
-        //var serverIP = '52.139.216.32:5000'; /** IP for IPOP server. */
+        // var intervalNo = new Date().toISOString().split(".")[0];
+        var intervalNo = "2020-04-29T19:12:41";
         var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
 
@@ -590,60 +591,96 @@ class Graph extends React.Component {
         var nodeList = [];
         var linkList = [];
         var ipop = new CreateGraphContents();
+        var elementObj = null;
+        var overlay = this.state.selectedOverlay;
 
-        fetch(nodeURL)
-            .then(res => res.json())
-            .then(nodes =>
-                fetch(linkURL)
-                    .then(res => res.json())
-                    .then(links => {
-                        ipop.init(this.state.selectedOverlay, nodes, links);
-                        this.setState({ ipop: ipop });
-                        Object.keys(nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-                            var nodeJSON = `{ "data": { "id": "${node}", "label": "${nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
+        /** new fetch for influxDB */
+        fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
+            console.log(nodesJSON);
+      
+            fetch(linkURL).then(res => res.json()).then(linksJSON => {
+              console.log(linksJSON);
+      
+              elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
+      
+              var nodes = nodesJSON[overlay]['current_state']
+      
+              Object.keys(nodes).sort().forEach((nodeID) => {
+      
+                // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+                elementObj.addNodeElement(nodeID)
+      
+                var links = linksJSON[overlay]['current_state'][nodeID]
+      
+                Object.keys(links).forEach(linkID => {
+                  // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                  elementObj.addLinkElement(nodeID, linkID)
+                })
+      
+              })
+              return elementObj
+            }).then((elementObj) => { this.setState({ elementObj: elementObj, renderGraph: true }, () => {
+                this.renderGraph();
+            }) })
+            .then(() => {
+                this.setDataForSearch(this.cy.json());
+            })
+      
+          })
 
-                            // var nodeJSON = `{ "data": { "id": "` + node + `", "label": "` + nodes[this.state.selectedOverlay]['current_state'][node]['NodeName'] + `" } }`
-                            var linkIds = Object.keys(links[this.state.selectedOverlay]['current_state'][node]);
+        // fetch(nodeURL)
+        //     .then(res => res.json())
+        //     .then(nodes =>
+        //         fetch(linkURL)
+        //             .then(res => res.json())
+        //             .then(links => {
+        //                 ipop.init(this.state.selectedOverlay, nodes, links);
+        //                 this.setState({ ipop: ipop });
+        //                 Object.keys(nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
+        //                     var nodeJSON = `{ "data": { "id": "${node}", "label": "${nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
 
-                            linkIds.forEach(linkIds => {
-                                var source = links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-                                var target = links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-                                var colorCode;
-                                switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-                                    case 'CETypeILongDistance':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                    case 'CETypeLongDistance':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                    case 'CETypePredecessor':
-                                        colorCode = '#01665E';
-                                        break;
-                                    case 'CETypeSuccessor':
-                                        colorCode = '#01665E';
-                                        break;
-                                }
-                                if (Object.keys(nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-                                    var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-                                    linkList.push(JSON.parse(linkJSON));
-                                }
-                                this.setState({ links: linkList });
-                            });
-                            nodeList.push(JSON.parse(nodeJSON));
-                            this.setState({ nodes: nodeList })
-                            this.setOverlayElements(nodes, links);
-                        }
-                        )
+        //                     // var nodeJSON = `{ "data": { "id": "` + node + `", "label": "` + nodes[this.state.selectedOverlay]['current_state'][node]['NodeName'] + `" } }`
+        //                     var linkIds = Object.keys(links[this.state.selectedOverlay]['current_state'][node]);
 
-                    }
-                    ).then(() => {
-                        this.setState({ renderGraph: true }, () => {
-                            this.renderGraph();
-                        });
-                    }).then(() => {
-                        this.setDataForSearch(this.cy.json());
-                    })
-            )
+        //                     linkIds.forEach(linkIds => {
+        //                         var source = links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
+        //                         var target = links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
+        //                         var colorCode;
+        //                         switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
+        //                             case 'CETypeILongDistance':
+        //                                 colorCode = '#5E4FA2';
+        //                                 break;
+        //                             case 'CETypeLongDistance':
+        //                                 colorCode = '#5E4FA2';
+        //                                 break;
+        //                             case 'CETypePredecessor':
+        //                                 colorCode = '#01665E';
+        //                                 break;
+        //                             case 'CETypeSuccessor':
+        //                                 colorCode = '#01665E';
+        //                                 break;
+        //                         }
+        //                         if (Object.keys(nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
+        //                             var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
+        //                             linkList.push(JSON.parse(linkJSON));
+        //                         }
+        //                         this.setState({ links: linkList });
+        //                     });
+        //                     nodeList.push(JSON.parse(nodeJSON));
+        //                     this.setState({ nodes: nodeList })
+        //                     this.setOverlayElements(nodes, links);
+        //                 }
+        //                 )
+
+        //             }
+        //             ).then(() => {
+        //                 this.setState({ renderGraph: true }, () => {
+        //                     this.renderGraph();
+        //                 });
+        //             }).then(() => {
+        //                 this.setDataForSearch(this.cy.json());
+        //             })
+        //     )
     }
 
     autoFetchData = () => {
@@ -1071,10 +1108,11 @@ class Graph extends React.Component {
                         _this.handleMouseOverPage();
                     })
                 }}
-                elements={Cytoscape.normalizeElements({
-                    nodes: this.state.nodes,
-                    edges: this.state.links
-                })}
+                // elements={Cytoscape.normalizeElements({
+                //     nodes: this.state.nodes,
+                //     edges: this.state.links
+                // })}
+                elements={this.state.elementObj.getAllElementObj()}
                 stylesheet={CytoscapeStyle}
                 style={{ width: window.innerWidth, height: window.innerHeight }}
                 layout={{ name: "circle" }}
