@@ -1,20 +1,16 @@
 import React from "react";
-//import "../../CSS/Main.css";
-import ReactDOM from "react-dom";
 import "react-tippy/dist/tippy.css";
 import { Tooltip } from "react-tippy";
-import Card from "react-bootstrap/Card";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Accordion from "react-bootstrap/Accordion";
-import ipop_ic from "../../Images/Icons/ipop_ic.svg";
 import overlay_ic from "../../Images/Icons/overlay_ic.svg";
 import Config from "../../Config/config";
+import OverlayObj from '../Common/OverlaysObj';
 
 class Overlay extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            overlays: [], overlaysObj: {}, selectedOverlayId: '',
+            overlays: null, overlaysObj: {}, selectedOverlayId: '',
         }
         window.overlayComponent = this;
     }
@@ -28,7 +24,7 @@ class Overlay extends React.Component {
         fetch(url).then(res => res.json())
             .then((overlays) => {
                 this.setState({ overlaysObj: overlays });
-                this.setState({ overlays: Object.keys(this.state.overlaysObj['current_state']) });
+                this.setState({ overlays: new OverlayObj(overlays.current_state) });
             })
             .catch(err => {
                 console.log(err);
@@ -36,7 +32,7 @@ class Overlay extends React.Component {
     }
 
     renderOverlays = () => {
-        let overlays = this.state.overlays.map((overlay) => {
+        let overlays = this.state.overlays.getOverlayName().map((overlay) => {
             return <Tooltip className="overlayTooltips" key={overlay} duration="500" animation="scale" interactive distance={40} position="bottom" arrow={true} open={true}
                 html={(<div>{overlay}</div>)}>
                 <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
@@ -64,7 +60,7 @@ class Overlay extends React.Component {
                 <div id="container" className="container-fluid">
                     <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white" }}>
                         <section id="midArea" className="col-10">
-                            {this.renderOverlays()}
+                            {this.state.overlays ? this.renderOverlays() : (<div className="loader">Loading...</div>)}
                         </section>
                     </div>
 

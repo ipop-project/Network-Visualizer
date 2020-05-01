@@ -3,7 +3,7 @@ import "../../CSS/SAGE2.css";
 import ReactDOM from "react-dom";
 import Cytoscape from 'react-cytoscapejs';
 import CreateGraphContents from './CreateGraphContents';
-import CollapseButton from "./CollapseButton";
+import CollapseButton from "../Common/CollapsibleButton";
 import Card from "react-bootstrap/Card";
 import RightPanel from "./RightPanel";
 import CytoscapeStyle from './CytoscapeStyle';
@@ -15,6 +15,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "react-tippy/dist/tippy.css";
 import C3Chart from 'react-c3js'
 import 'c3/c3.css'
+import ElementsObj from '../Common/ElementsObj';
 
 class Graph extends React.Component {
     constructor(props) {
@@ -31,7 +32,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            , /*selectedOverlay: '101000F', graphType: 'main' /** For React test */
+            , selectedOverlay: '101000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -99,9 +100,9 @@ class Graph extends React.Component {
     }
 
     componentDidMount() {
-        //this.fetchData();
+        this.fetchData();
         this.toggleRightPanel(true);
-        this.requestGraphProperty();
+        //this.requestGraphProperty();
         this.requestToolProperty();
 
         // For test transmissionGraph
@@ -540,87 +541,6 @@ class Graph extends React.Component {
                             ReactDOM.render(rightPanelContent, document.getElementById("rightPanelContent"));
                         })
                 })
-
-            // rightPanelContent = <div id='elementDetails'>
-            //     <h2>{linkDetails.InterfaceName}</h2>
-
-            //     <div className="row">
-
-            //         <div className="col-10" style={{ paddingRight: "0" }}>
-
-            //             <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.nodeID + "Btn"} id={sourceNodeDetails.nodeID + "Btn"} name={sourceNodeDetails.nodeName}>
-
-            //                 <div className="DetailsLabel">Node ID</div>
-            //                 {sourceNodeDetails.nodeID}
-
-            //                 <div className="DetailsLabel">State</div>
-            //                 {sourceNodeDetails.nodeState}
-
-            //                 <div className="DetailsLabel">City/Country</div>
-            //                 {sourceNodeDetails.nodeLocation}
-
-            //             </CollapseButton>
-
-            //             <CollapseButton className="targetNodeBtn" key={targetNodeDetails.nodeID + "Btn"} id={targetNodeDetails.nodeID + "Btn"} name={targetNodeDetails.nodeName}>
-
-            //                 <div className="DetailsLabel">Node ID</div>
-            //                 {targetNodeDetails.nodeID}
-
-            //                 <div className="DetailsLabel">State</div>
-            //                 {targetNodeDetails.nodeState}
-
-            //                 <div className="DetailsLabel">City/Country</div>
-            //                 {targetNodeDetails.nodeLocation}
-
-            //             </CollapseButton>
-
-            //         </div>
-
-            //         <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
-            //             <button onClick={this.handleSwitch} id="switchBtn" />
-            //         </div>
-
-            //     </div>
-
-            //     <div className="DetailsLabel">Tunnel ID</div>
-            //     {linkDetails.TunnelID}
-            //     <div className="DetailsLabel">Interface Name</div>
-            //     {linkDetails.InterfaceName}
-            //     <div className="DetailsLabel">MAC</div>
-            //     {linkDetails.MAC}
-            //     <div className="DetailsLabel">State</div>
-            //     {linkDetails.State}
-            //     <div className="DetailsLabel">Tunnel Type</div>
-            //     {linkDetails.TunnelType}
-            //     <div className="DetailsLabel">ICE Connection Type</div>
-            //     {linkDetails.ICEConnectionType}
-            //     <div className="DetailsLabel">ICE Role</div>
-            //     {linkDetails.ICERole}
-            //     <div className="DetailsLabel">Remote Address</div>
-            //     {linkDetails.RemoteAddress}
-            //     <div className="DetailsLabel">Local Address</div>
-            //     {linkDetails.LocalAddress}
-            //     <div className="DetailsLabel">Latency</div>
-            //     {linkDetails.Latency}
-            //     <br /><br />
-
-            //     <Card.Body className="transmissionCard">
-            //         Sent
-            //                 <div className="DetailsLabel">Byte Sent</div>
-            //         -
-            //                 <div className="DetailsLabel">Total Byte Sent</div>
-            //         {linkDetails.Stats[0].sent_total_bytes}
-            //     </Card.Body>
-
-            //     <Card.Body className="transmissionCard">
-            //         Received
-            //                 <div className="DetailsLabel">Byte Received</div>
-            //         -
-            //                 <div className="DetailsLabel">Total Byte Received</div>
-            //         {linkDetails.Stats[0].recv_total_bytes}
-            //     </Card.Body>
-            // </div>
-            // this.toggleRightPanel(false);
         }
         else {
             rightPanelContent = <div></div>
@@ -680,8 +600,6 @@ class Graph extends React.Component {
                         ipop.init(this.state.selectedOverlay, nodes, links);
                         this.setState({ ipop: ipop });
                         Object.keys(nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-                            /** Test lat lng for map view. */
-                            var [lat, lng] = [this.getRandomInRange(34, 40, 3), this.getRandomInRange(132, 140, 3)]
                             var nodeJSON = `{ "data": { "id": "${node}", "label": "${nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
 
                             // var nodeJSON = `{ "data": { "id": "` + node + `", "label": "` + nodes[this.state.selectedOverlay]['current_state'][node]['NodeName'] + `" } }`
