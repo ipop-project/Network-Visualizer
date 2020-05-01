@@ -733,7 +733,7 @@ class Graph extends React.Component {
             case 'main':
                 var packet = {
                     //url: 'http://150.29.149.79:3000/graph', /** IP for React client server */
-                    url: `${Config.React.perfix}${Config.React.ip}:${Config.React.port}/graph`,
+                    url: `${Config.React.perfix}${Config.React.ip}:${Config.React.port}/#/SAGE2_graph`,
                     targetId: id,
                     targetLabel: this.state.currentSelectedElement.data('label'),
                     overlayId: this.state.selectedOverlay,
