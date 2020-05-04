@@ -2,7 +2,6 @@ import React from "react";
 import "../../CSS/SAGE2.css";
 import ReactDOM from "react-dom";
 import Cytoscape from 'react-cytoscapejs';
-import CreateGraphContents from './CreateGraphContents';
 import CollapseButton from "../Common/CollapsibleButton";
 import Card from "react-bootstrap/Card";
 import RightPanel from "./RightPanel";
@@ -13,15 +12,13 @@ import Select from "react-select";
 import Config from "../../Config/config";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-tippy/dist/tippy.css";
-import C3Chart from 'react-c3js'
-import 'c3/c3.css'
 import ElementsObj from '../Common/ElementsObj';
 
 class Graph extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            nodes: [], links: [], initMinZoom: 0.2, initMaxZoom: 2, setMinZoom: 0.2, setMaxZoom: 2
+            initMinZoom: 0.2, initMaxZoom: 2, setMinZoom: 0.2, setMaxZoom: 2
             , elementObj: null
             , isShowRightPanel: false
             , isAutoRefresh: false
@@ -32,7 +29,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            , selectedOverlay: '103000F', graphType: 'main' /** For React test */
+            // , selectedOverlay: '103000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -100,9 +97,9 @@ class Graph extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchData();
+        //this.fetchData();
         this.toggleRightPanel(true);
-        //this.requestGraphProperty();
+        this.requestGraphProperty();
         this.requestToolProperty();
 
         // For test transmissionGraph
@@ -240,47 +237,31 @@ class Graph extends React.Component {
     createSubGraph = (packet) => {
         return new Promise((resolve, reject) => {
             try {
-                var ipop = new CreateGraphContents();
-                var nodeList = [];
-                var linkList = [];
-                ipop.init(this.state.selectedOverlay, packet.nodes, packet.links);
-                this.setState({ ipop: ipop });
-                Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-                    /** Test lat lng for map view. */
-                    var [lat, lng] = [this.getRandomInRange(34, 40, 3), this.getRandomInRange(132, 140, 3)]
-                    var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
+                //delete this.viewOptions[0]; /** Remove Topology view from Subgraph view select options. */
+                var elementObj = null;
+                var overlay = this.state.selectedOverlay;
+                var nodesJSON = packet.nodes;
+                var linksJSON = packet.links;
 
-                    //var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}"}}`
-                    var linkIds = Object.keys(packet.links[this.state.selectedOverlay]['current_state'][node]);
+                elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
 
-                    linkIds.forEach(linkIds => {
-                        var source = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-                        var target = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-                        var colorCode;
-                        switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-                            case 'CETypeILongDistance':
-                                colorCode = '#5E4FA2';
-                                break;
-                            case 'CETypeLongDistance':
-                                colorCode = '#5E4FA2';
-                                break;
-                            case 'CETypePredecessor':
-                                colorCode = '#01665E';
-                                break;
-                            case 'CETypeSuccessor':
-                                colorCode = '#01665E';
-                                break;
-                        }
-                        if (Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-                            var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-                            linkList.push(JSON.parse(linkJSON));
-                        }
+                var nodes = nodesJSON[overlay]['current_state']
+
+                Object.keys(nodes).sort().forEach((nodeID) => {
+
+                    // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+                    elementObj.addNodeElement(nodeID)
+
+                    var links = linksJSON[overlay]['current_state'][nodeID]
+
+                    Object.keys(links).forEach(linkID => {
+                        // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                        elementObj.addLinkElement(nodeID, linkID)
                     })
 
-                    nodeList.push(JSON.parse(nodeJSON));
                 })
-                this.setState({ nodes: nodeList, links: linkList });
-                //delete this.viewOptions[0]; /** Remove Topology view from Subgraph view select options. */
+                this.setState({elementObj:elementObj});
+
                 resolve(true);
             }
             catch (e) {
@@ -300,8 +281,6 @@ class Graph extends React.Component {
         if (flag) {
             var sourceNode = this.state.nodeDetails.sourceNode;
             var connectedNodes = this.state.nodeDetails.connectedNodes;
-            var ipop = this.state.ipop;
-            console.log(sourceNode)
             var coordinate = this.state.currentSelectedElement.data('coordinate').split(',');
             fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate[0]},${coordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
                 .then(res => res.json()).then((data) => {
@@ -501,7 +480,7 @@ class Graph extends React.Component {
                                     Sent
                             <div className="DetailsLabel">Byte Sent</div>
                                     {linkDetails.stats.byte_sent}
-                            <div className="DetailsLabel">Total Byte Sent</div>
+                                    <div className="DetailsLabel">Total Byte Sent</div>
                                     {linkDetails.stats.total_byte_sent}
                                 </Card.Body>
 
@@ -509,7 +488,7 @@ class Graph extends React.Component {
                                     Received
                             <div className="DetailsLabel">Byte Received</div>
                                     {linkDetails.stats.byte_receive}
-                            <div className="DetailsLabel">Total Byte Received</div>
+                                    <div className="DetailsLabel">Total Byte Received</div>
                                     {linkDetails.stats.total_byte_receive}
                                 </Card.Body>
 
@@ -566,22 +545,13 @@ class Graph extends React.Component {
         var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
         var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
 
-        console.log(nodeURL);
-        console.log(linkURL);
-
-        var nodeList = [];
-        var linkList = [];
-        var ipop = new CreateGraphContents();
-        
         var elementObj = null;
         var overlay = this.state.selectedOverlay;
 
         /** new fetch for influxDB */
         fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
-            console.log(nodesJSON);
 
             fetch(linkURL).then(res => res.json()).then(linksJSON => {
-                console.log(linksJSON);
 
                 elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
 
@@ -600,6 +570,7 @@ class Graph extends React.Component {
                     })
 
                 })
+                this.setOverlayElements(nodesJSON, linksJSON);
                 return elementObj
             }).then((elementObj) => {
                 this.setState({ elementObj: elementObj, renderGraph: true }, () => {
@@ -647,7 +618,6 @@ class Graph extends React.Component {
                     callback: `handleSelectElement`,
                     targetId: this.state.currentSelectedElement.data().id,
                 }
-                console.log('set data select for map  ')
                 window.SAGE2_AppState.callFunctionInContainer(`sendSelectNodeToMap`, packet4map);
                 break;
             case 'sub':
@@ -709,7 +679,7 @@ class Graph extends React.Component {
         var sourceNode = targetNodeDetails;
         var targetNode = sourceNodeDetails;
         linkDetails = this.state.elementObj.getLinkDetails(targetNodeDetails.id, linkDetails.id)
-        this.setState({linkDetails: {linkDetails, sourceNode, targetNode}}, () => {
+        this.setState({ linkDetails: { linkDetails, sourceNode, targetNode } }, () => {
             this.createEdgeDetail(true);
         });
     }
@@ -722,7 +692,6 @@ class Graph extends React.Component {
     handleMouseOverPage = (e) => {
         if (this.state.graphType === 'sub' && this.state.currentSelectedElement)
             this.handleClickCyElement(this.state.currentSelectedElement.id());
-        //console.log(`TargetId:${this.state.targetId}, CurrentElement:${this.state.currentSelectedElement.id()}`);
     }
 
     handleSetMinZoom = (e) => {
@@ -901,7 +870,6 @@ class Graph extends React.Component {
                     this.cy.center();
                     this.cy.on('click', (event) => {
                         if (event.target !== cy) {
-                            console.log(`${this.state.graphType}:click!!`)
                             /** reset style */
                             cy.elements().removeClass(this.state.viewSelector.value);
                             cy.elements().removeClass('selected');
@@ -937,10 +905,6 @@ class Graph extends React.Component {
                         _this.handleMouseOverPage();
                     })
                 }}
-                // elements={Cytoscape.normalizeElements({
-                //     nodes: this.state.nodes,
-                //     edges: this.state.links
-                // })}
                 elements={this.state.elementObj.getAllElementObj()}
                 stylesheet={CytoscapeStyle}
                 style={{ width: window.innerWidth, height: window.innerHeight }}

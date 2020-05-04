@@ -8,6 +8,7 @@ import CreateGraphContents from './CreateGraphContents';
 import RightPanel from "./RightPanel";
 import CytoscapeStyle from './CytoscapeStyle';
 import GoogleMapReact from "google-map-react";
+import ElementsObj from '../Common/ElementsObj';
 
 class Map extends React.Component {
 
@@ -19,6 +20,7 @@ class Map extends React.Component {
             , currentSelectedElement: null
             , center: { lat: 35.6762, lng: 139.6503 }
             , zoom: 0
+            , elementObj: null
             ,
 
         }
@@ -69,6 +71,7 @@ class Map extends React.Component {
                 this.renderGraph();
             })
                 .then(() => {
+                    console.log(JSON.stringify(this.cy.json()));
                     if (packet.targetId) {
                         var element = this.cy.elements(`#${packet.targetId}`);
                         this.setState({ currentSelectedElement: element });
@@ -82,46 +85,69 @@ class Map extends React.Component {
     createCytoscapeElement = (packet) => {
         return new Promise((resolve, reject) => {
             try {
-                var ipop = new CreateGraphContents();
-                var nodeList = [];
-                var linkList = [];
-                ipop.init(this.state.selectedOverlay, packet.nodes, packet.links);
-                this.setState({ ipop: ipop });
-                Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-                    /** Test lat lng for map view. */
-                    var [lat, lng] = [this.getRandomInRange(35.5, 36, 3), this.getRandomInRange(139.5, 140, 3)]
-                    var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
+                // var ipop = new CreateGraphContents();
+                // var nodeList = [];
+                // var linkList = [];
+                // ipop.init(this.state.selectedOverlay, packet.nodes, packet.links);
+                // this.setState({ ipop: ipop });
+                // Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
+                //     /** Test lat lng for map view. */
+                //     var [lat, lng] = [this.getRandomInRange(35.5, 36, 3), this.getRandomInRange(139.5, 140, 3)]
+                //     var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
 
-                    //var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}"}}`
-                    var linkIds = Object.keys(packet.links[this.state.selectedOverlay]['current_state'][node]);
+                //     //var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}"}}`
+                //     var linkIds = Object.keys(packet.links[this.state.selectedOverlay]['current_state'][node]);
 
-                    linkIds.forEach(linkIds => {
-                        var source = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-                        var target = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-                        var colorCode;
-                        switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-                            case 'CETypeILongDistance':
-                                colorCode = '#5E4FA2';
-                                break;
-                            case 'CETypeLongDistance':
-                                colorCode = '#5E4FA2';
-                                break;
-                            case 'CETypePredecessor':
-                                colorCode = '#01665E';
-                                break;
-                            case 'CETypeSuccessor':
-                                colorCode = '#01665E';
-                                break;
-                        }
-                        if (Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-                            var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-                            linkList.push(JSON.parse(linkJSON));
-                        }
+                //     linkIds.forEach(linkIds => {
+                //         var source = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
+                //         var target = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
+                //         var colorCode;
+                //         switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
+                //             case 'CETypeILongDistance':
+                //                 colorCode = '#5E4FA2';
+                //                 break;
+                //             case 'CETypeLongDistance':
+                //                 colorCode = '#5E4FA2';
+                //                 break;
+                //             case 'CETypePredecessor':
+                //                 colorCode = '#01665E';
+                //                 break;
+                //             case 'CETypeSuccessor':
+                //                 colorCode = '#01665E';
+                //                 break;
+                //         }
+                //         if (Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
+                //             var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
+                //             linkList.push(JSON.parse(linkJSON));
+                //         }
+                //     })
+
+                //     nodeList.push(JSON.parse(nodeJSON));
+                // })
+                // this.setState({ nodes: nodeList, links: linkList });
+                var elementObj = null;
+                var overlay = this.state.selectedOverlay;
+                var nodesJSON = packet.nodes;
+                var linksJSON = packet.links;
+
+                elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
+
+                var nodes = nodesJSON[overlay]['current_state']
+
+                Object.keys(nodes).sort().forEach((nodeID) => {
+
+                    // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+                    elementObj.addNodeElement(nodeID)
+
+                    var links = linksJSON[overlay]['current_state'][nodeID]
+
+                    Object.keys(links).forEach(linkID => {
+                        // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                        elementObj.addLinkElement(nodeID, linkID)
                     })
 
-                    nodeList.push(JSON.parse(nodeJSON));
                 })
-                this.setState({ nodes: nodeList, links: linkList });
+                this.setState({ elementObj: elementObj });
                 resolve(true);
             }
             catch (e) {
@@ -273,10 +299,7 @@ class Map extends React.Component {
                     this.cy = cy;
                     var _this = this;
                 }}
-                elements={Cytoscape.normalizeElements({
-                    nodes: this.state.nodes,
-                    edges: this.state.links
-                })}
+                elements={this.state.elementObj.getAllElementObj()}
                 stylesheet={CytoscapeStyle}
                 style={{ width: window.innerWidth, height: window.innerHeight }}
                 layout={{ name: "circle" }}
@@ -331,13 +354,13 @@ class Map extends React.Component {
                                     yesIWantToUseGoogleMapApiInternals
                                     onGoogleApiLoaded={this.handleGoogleApiLoaded}
                                 >
-                                    {this.cy.elements("node").map(node => {
+                                    {/* {this.cy.elements("node").map(node => {
                                         return <button key={node.data().id + `Maker`} onClick={this.handleMakerClicked.bind(this, node)} id={`nodeMaker-${node.data().id}`} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
                                             <label className="markerLabel">
                                                 {node.data().label}
                                             </label>
                                         </button>
-                                    })}
+                                    })} */}
                                 </GoogleMapReact>
                             </>) : (<div className="loader">Loading...</div>)}
                         </section>
