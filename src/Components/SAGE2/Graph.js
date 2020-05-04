@@ -23,7 +23,6 @@ class Graph extends React.Component {
         this.state = {
             nodes: [], links: [], initMinZoom: 0.2, initMaxZoom: 2, setMinZoom: 0.2, setMaxZoom: 2
             , elementObj: null
-            , switchToggle: false
             , isShowRightPanel: false
             , isAutoRefresh: false
             , nodeDetails: null
@@ -33,7 +32,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            , selectedOverlay: '101000F', graphType: 'main' /** For React test */
+            , selectedOverlay: '103000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -302,16 +301,23 @@ class Graph extends React.Component {
             var sourceNode = this.state.nodeDetails.sourceNode;
             var connectedNodes = this.state.nodeDetails.connectedNodes;
             var ipop = this.state.ipop;
-            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.nodeLocations[sourceNode.nodeID][0]},${this.nodeLocations[sourceNode.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+            console.log(sourceNode)
+            var coordinate = this.state.currentSelectedElement.data('coordinate').split(',');
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinate[0]},${coordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
                 .then(res => res.json()).then((data) => {
-                    return data.results[data.results.length - 3].formatted_address;
+                    try {
+                        return data.results[data.results.length - 1].formatted_address;
+                    }
+                    catch (e) {
+                        return '-';
+                    }
                 }).then((location) => {
                     rightPanelContent = <div id="elementDetails">
-                        <h2>{sourceNode.nodeName}</h2>
+                        <h2>{sourceNode.name}</h2>
                         <div className="DetailsLabel">Node ID</div>
-                        {sourceNode.nodeID}
+                        {sourceNode.id}
                         <div className="DetailsLabel">State</div>
-                        {sourceNode.nodeState}
+                        {sourceNode.state}
                         <div className="DetailsLabel">City/State/Country</div>
                         {/* {sourceNode.location} wait for real data. */}
                         {location}
@@ -319,49 +325,50 @@ class Graph extends React.Component {
                         <div id="connectedNode">
                             {connectedNodes.map(connectedNode => {
                                 try {
-                                    var connectedNodeDetail = ipop.findConnectedNodeDetails(sourceNode.nodeID, connectedNode.id())
+                                    var connectedNodeDetail = this.state.elementObj.getConnectedNodeDetails(sourceNode.id, connectedNode.id())
                                     var connectedNodeBtn =
-                                        <CollapseButton key={ipop.getNodeName(connectedNode.id()) + "Btn"} id={ipop.getNodeName(connectedNode.id()) + "Btn"} name={ipop.getNodeName(connectedNode.id())}>
+                                        <CollapseButton key={connectedNode.data('id') + "Btn"} id={connectedNode.data('id') + "Btn"} name={connectedNode.data('label')}>
                                             <div className="DetailsLabel">Node ID</div>
                                             {connectedNode.id()}
                                             <div className="DetailsLabel">Tunnel ID</div>
-                                            {connectedNodeDetail.TunnelID}
+                                            {connectedNodeDetail.id}
                                             <div className="DetailsLabel">Interface Name</div>
-                                            {connectedNodeDetail.InterfaceName}
+                                            {connectedNodeDetail.name}
                                             <div className="DetailsLabel">MAC</div>
                                             {connectedNodeDetail.MAC}
                                             <div className="DetailsLabel">State</div>
-                                            {connectedNodeDetail.State}
+                                            {connectedNodeDetail.state}
                                             <div className="DetailsLabel">Tunnel Type</div>
-                                            {connectedNodeDetail.TunnelType}
+                                            {connectedNodeDetail.type}
                                             <div className="DetailsLabel">ICE Connection Type</div>
-                                            {connectedNodeDetail.ICEConnectionType}
+                                            {/* {connectedNodeDetail.ICEConnectionType} */}
+                                                -
                                             <div className="DetailsLabel">ICE Role</div>
-                                            {connectedNodeDetail.ICERole}
+                                            {connectedNodeDetail.stats.IceProperties.role}
                                             <div className="DetailsLabel">Remote Address</div>
                                             {connectedNodeDetail.RemoteAddress}
                                             <div className="DetailsLabel">Local Address</div>
                                             {connectedNodeDetail.LocalAddress}
                                             <div className="DetailsLabel">Latency</div>
-                                            {connectedNodeDetail.Latency}
+                                            {connectedNodeDetail.stats.IceProperties.latency}
                                             <Card.Body className="transmissionCard">
                                                 Sent
                                             <div className="DetailsLabel">Byte Sent</div>
-                                                -
-                                            <div className="DetailsLabel">Total Byte Sent</div>
-                                                {connectedNodeDetail.Stats[0].sent_total_bytes}
+                                                {connectedNodeDetail.stats.byte_sent}
+                                                <div className="DetailsLabel">Total Byte Sent</div>
+                                                {connectedNodeDetail.stats.total_byte_sent}
                                             </Card.Body>
                                             <Card.Body className="transmissionCard">
                                                 Received
                                             <div className="DetailsLabel">Byte Received</div>
-                                                -
-                                            <div className="DetailsLabel">Total Byte Received</div>
-                                                {connectedNodeDetail.Stats[0].recv_total_bytes}
+                                                {connectedNodeDetail.stats.byte_receive}
+                                                <div className="DetailsLabel">Total Byte Received</div>
+                                                {connectedNodeDetail.state.total_byte_receive}
                                             </Card.Body>
                                         </CollapseButton>
                                     return connectedNodeBtn;
                                 } catch (e) {
-
+                                    console.log(`Error createNodeDetail > ${e}`);
                                 }
                             })}
                         </div>
@@ -391,17 +398,38 @@ class Graph extends React.Component {
         var rightPanelContent;
         if (flag) {
             var linkDetails = this.state.linkDetails.linkDetails;
-            var sourceNodeDetails = this.state.linkDetails.sourceNodeDetails;
-            var targetNodeDetails = this.state.linkDetails.targetNodeDetails;
+            var sourceNodeDetails = this.state.linkDetails.sourceNode;
+            var targetNodeDetails = this.state.linkDetails.targetNode;
+
+            const srcNode = this.state.currentSelectedElement.connectedNodes().filter((element) => {
+                return element.data('id') == sourceNodeDetails.id
+            })
+
+            const tgtNode = this.state.currentSelectedElement.connectedNodes().filter((element) => {
+                return element.data('id') == targetNodeDetails.id
+            })
+
+            const srcCoordinate = srcNode.data().coordinate.split(',')
+            const tgtCoordinate = tgtNode.data().coordinate.split(',')
 
             /** For test in demo location wait for real data. */
-            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.nodeLocations[sourceNodeDetails.nodeID][0]},${this.nodeLocations[sourceNodeDetails.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${srcCoordinate[0]},${srcCoordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
                 .then(res => res.json()).then(data => {
-                    return data.results[data.results.length - 3].formatted_address;
+                    try {
+                        return data.results[data.results.length - 1].formatted_address;
+                    }
+                    catch (e) {
+                        return '-';
+                    }
                 }).then(sourceLocation => {
-                    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${this.nodeLocations[targetNodeDetails.nodeID][0]},${this.nodeLocations[targetNodeDetails.nodeID][1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
+                    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${tgtCoordinate[0]},${tgtCoordinate[1]}&key=AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs&language=en`)
                         .then(res => res.json()).then(data => {
-                            return data.results[data.results.length - 3].formatted_address;
+                            try {
+                                return data.results[data.results.length - 1].formatted_address;
+                            }
+                            catch (e) {
+                                return '-';
+                            }
                         }).then(targetLocation => {
                             rightPanelContent = <div id='elementDetails'>
                                 <h2>{linkDetails.InterfaceName}</h2>
@@ -410,13 +438,13 @@ class Graph extends React.Component {
 
                                     <div className="col-10" style={{ paddingRight: "0" }}>
 
-                                        <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.nodeID + "Btn"} id={sourceNodeDetails.nodeID + "Btn"} name={sourceNodeDetails.nodeName}>
+                                        <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.id + "Btn"} id={sourceNodeDetails.id + "Btn"} name={sourceNodeDetails.name}>
 
                                             <div className="DetailsLabel">Node ID</div>
-                                            {sourceNodeDetails.nodeID}
+                                            {sourceNodeDetails.id}
 
                                             <div className="DetailsLabel">State</div>
-                                            {sourceNodeDetails.nodeState}
+                                            {sourceNodeDetails.state}
 
                                             <div className="DetailsLabel">City/State/Country</div>
                                             {/* {sourceNodeDetails.nodeLocation} */}
@@ -424,13 +452,13 @@ class Graph extends React.Component {
 
                                         </CollapseButton>
 
-                                        <CollapseButton className="targetNodeBtn" key={targetNodeDetails.nodeID + "Btn"} id={targetNodeDetails.nodeID + "Btn"} name={targetNodeDetails.nodeName}>
+                                        <CollapseButton className="targetNodeBtn" key={targetNodeDetails.id + "Btn"} id={targetNodeDetails.id + "Btn"} name={targetNodeDetails.name}>
 
                                             <div className="DetailsLabel">Node ID</div>
-                                            {targetNodeDetails.nodeID}
+                                            {targetNodeDetails.id}
 
                                             <div className="DetailsLabel">State</div>
-                                            {targetNodeDetails.nodeState}
+                                            {targetNodeDetails.state}
 
                                             <div className="DetailsLabel">City/State/Country</div>
                                             {/* {targetNodeDetails.nodeLocation} */}
@@ -441,98 +469,49 @@ class Graph extends React.Component {
                                     </div>
 
                                     <div className="col" style={{ margin: "auto", padding: "0", textAlign: "center" }}>
-                                        <button onClick={this.handleSwitch} id="switchBtn" />
+                                        <button onClick={this.handleSwitch.bind(this, sourceNodeDetails, targetNodeDetails, linkDetails)} id="switchBtn" />
                                     </div>
 
                                 </div>
 
                                 <div className="DetailsLabel">Tunnel ID</div>
-                                {linkDetails.TunnelID}
+                                {linkDetails.id}
                                 <div className="DetailsLabel">Interface Name</div>
-                                {linkDetails.InterfaceName}
+                                {linkDetails.name}
                                 <div className="DetailsLabel">MAC</div>
                                 {linkDetails.MAC}
                                 <div className="DetailsLabel">State</div>
-                                {linkDetails.State}
+                                {linkDetails.state}
                                 <div className="DetailsLabel">Tunnel Type</div>
-                                {linkDetails.TunnelType}
+                                {linkDetails.type}
                                 <div className="DetailsLabel">ICE Connection Type</div>
-                                {linkDetails.ICEConnectionType}
+                                {/* {linkDetails.ICEConnectionType} */}
+                                -
                                 <div className="DetailsLabel">ICE Role</div>
-                                {linkDetails.ICERole}
+                                {linkDetails.stats.IceProperties.role}
                                 <div className="DetailsLabel">Remote Address</div>
                                 {linkDetails.RemoteAddress}
                                 <div className="DetailsLabel">Local Address</div>
                                 {linkDetails.LocalAddress}
                                 <div className="DetailsLabel">Latency</div>
-                                {linkDetails.Latency}
+                                {linkDetails.stats.IceProperties.latency}
                                 <br /><br />
 
                                 <Card.Body className="transmissionCard">
                                     Sent
                             <div className="DetailsLabel">Byte Sent</div>
-                                    -
+                                    {linkDetails.stats.byte_sent}
                             <div className="DetailsLabel">Total Byte Sent</div>
-                                    {linkDetails.Stats[0].sent_total_bytes}
+                                    {linkDetails.stats.total_byte_sent}
                                 </Card.Body>
 
                                 <Card.Body className="transmissionCard">
                                     Received
                             <div className="DetailsLabel">Byte Received</div>
-                                    -
+                                    {linkDetails.stats.byte_receive}
                             <div className="DetailsLabel">Total Byte Received</div>
-                                    {linkDetails.Stats[0].recv_total_bytes}
+                                    {linkDetails.stats.total_byte_receive}
                                 </Card.Body>
-
-                                <Card.Body id='transmissionGraph' style={{ margin: '0', padding: '0' }} className="transmissionCard">
-                                    <C3Chart style={{ color: 'black' }}
-                                        data={{
-                                            x: 'x',
-                                            // xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-                                            columns: [
-                                                ['x', this.state.testDate[0], this.state.testDate[1], this.state.testDate[2], this.state.testDate[3], this.state.testDate[4], this.state.testDate[5]],
-                                                // ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-                                                ['sent', 30, 200, 100, 400, 150, 250],
-                                                ['received', 130, 340, 200, 500, 250, 350]
-                                            ],
-                                            colors: {
-                                                sent: '#8FD24D',
-                                                received: '#42B2C3'
-                                            },
-                                            types: {
-                                                sent: 'area',
-                                                received: 'area'
-                                            }
-                                        }}
-                                        size={{
-                                            width: 550,
-                                            height: 330
-                                        }}
-                                        zoom={{
-                                            enabled: true
-                                        }}
-                                        axis={{
-                                            x: {
-                                                show: false,
-                                                type: 'timeseries',
-                                                localtime: false,
-                                                tick: {
-                                                    format: '%Y-%m-%d %H:%M:%S'
-                                                }
-                                            }
-                                        }}
-                                        tooltip={{
-                                            format: {
-                                                title: function (d) { return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() },
-                                                value: function (value, ratio, id) {
-                                                    return value
-                                                }
-                                            }
-                                        }}
-                                        legend={{ show: false }}
-                                    ></C3Chart>
-                                </Card.Body>
-
 
                             </div>
                             this.toggleRightPanel(false);
@@ -580,177 +559,62 @@ class Graph extends React.Component {
      * @method fetchData
      */
     fetchData = () => {
-        // var intervalNo = new Date().toISOString().split(".")[0];
-        var intervalNo = "2020-04-29T19:12:41";
+        var intervalNo = new Date().toISOString().split(".")[0];
         var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
         var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
 
         var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
         var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
 
+        console.log(nodeURL);
+        console.log(linkURL);
+
         var nodeList = [];
         var linkList = [];
         var ipop = new CreateGraphContents();
+        
         var elementObj = null;
         var overlay = this.state.selectedOverlay;
 
         /** new fetch for influxDB */
         fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
             console.log(nodesJSON);
-      
+
             fetch(linkURL).then(res => res.json()).then(linksJSON => {
-              console.log(linksJSON);
-      
-              elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
-      
-              var nodes = nodesJSON[overlay]['current_state']
-      
-              Object.keys(nodes).sort().forEach((nodeID) => {
-      
-                // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
-                elementObj.addNodeElement(nodeID)
-      
-                var links = linksJSON[overlay]['current_state'][nodeID]
-      
-                Object.keys(links).forEach(linkID => {
-                  // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
-                  elementObj.addLinkElement(nodeID, linkID)
+                console.log(linksJSON);
+
+                elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
+
+                var nodes = nodesJSON[overlay]['current_state']
+
+                Object.keys(nodes).sort().forEach((nodeID) => {
+
+                    // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+                    elementObj.addNodeElement(nodeID)
+
+                    var links = linksJSON[overlay]['current_state'][nodeID]
+
+                    Object.keys(links).forEach(linkID => {
+                        // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                        elementObj.addLinkElement(nodeID, linkID)
+                    })
+
                 })
-      
-              })
-              return elementObj
-            }).then((elementObj) => { this.setState({ elementObj: elementObj, renderGraph: true }, () => {
-                this.renderGraph();
-            }) })
-            .then(() => {
-                this.setDataForSearch(this.cy.json());
+                return elementObj
+            }).then((elementObj) => {
+                this.setState({ elementObj: elementObj, renderGraph: true }, () => {
+                    this.renderGraph();
+                })
             })
-      
-          })
+                .then(() => {
+                    this.setDataForSearch(this.cy.json());
+                })
 
-        // fetch(nodeURL)
-        //     .then(res => res.json())
-        //     .then(nodes =>
-        //         fetch(linkURL)
-        //             .then(res => res.json())
-        //             .then(links => {
-        //                 ipop.init(this.state.selectedOverlay, nodes, links);
-        //                 this.setState({ ipop: ipop });
-        //                 Object.keys(nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-        //                     var nodeJSON = `{ "data": { "id": "${node}", "label": "${nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
-
-        //                     // var nodeJSON = `{ "data": { "id": "` + node + `", "label": "` + nodes[this.state.selectedOverlay]['current_state'][node]['NodeName'] + `" } }`
-        //                     var linkIds = Object.keys(links[this.state.selectedOverlay]['current_state'][node]);
-
-        //                     linkIds.forEach(linkIds => {
-        //                         var source = links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-        //                         var target = links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-        //                         var colorCode;
-        //                         switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-        //                             case 'CETypeILongDistance':
-        //                                 colorCode = '#5E4FA2';
-        //                                 break;
-        //                             case 'CETypeLongDistance':
-        //                                 colorCode = '#5E4FA2';
-        //                                 break;
-        //                             case 'CETypePredecessor':
-        //                                 colorCode = '#01665E';
-        //                                 break;
-        //                             case 'CETypeSuccessor':
-        //                                 colorCode = '#01665E';
-        //                                 break;
-        //                         }
-        //                         if (Object.keys(nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-        //                             var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-        //                             linkList.push(JSON.parse(linkJSON));
-        //                         }
-        //                         this.setState({ links: linkList });
-        //                     });
-        //                     nodeList.push(JSON.parse(nodeJSON));
-        //                     this.setState({ nodes: nodeList })
-        //                     this.setOverlayElements(nodes, links);
-        //                 }
-        //                 )
-
-        //             }
-        //             ).then(() => {
-        //                 this.setState({ renderGraph: true }, () => {
-        //                     this.renderGraph();
-        //                 });
-        //             }).then(() => {
-        //                 this.setDataForSearch(this.cy.json());
-        //             })
-        //     )
+        })
     }
 
     autoFetchData = () => {
-        var intervalNo = new Date().toISOString().split(".")[0];
-        //var serverIP = '52.139.216.32:5000'; /** IP for IPOP server. */
-        var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
-        var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
-
-        var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
-        var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
-
-        var nodeList = [];
-        var linkList = [];
-        var ipop = new CreateGraphContents();
-
-        fetch(nodeURL)
-            .then(res => res.json())
-            .then(nodes =>
-                fetch(linkURL)
-                    .then(res => res.json())
-                    .then(links => {
-                        ipop.init(this.state.selectedOverlay, nodes, links);
-                        this.setState({ ipop: ipop });
-                        Object.keys(nodes[this.state.selectedOverlay]['current_state']).forEach(node => {
-                            /** Test lat lng for map view. */
-                            var [lat, lng] = [this.getRandomInRange(34, 40, 3), this.getRandomInRange(132, 140, 3)]
-                            var nodeJSON = `{ "data": { "id": "${node}", "label": "${nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
-
-                            // var nodeJSON = `{ "data": { "id": "` + node + `", "label": "` + nodes[this.state.selectedOverlay]['current_state'][node]['NodeName'] + `" } }`
-                            var linkIds = Object.keys(links[this.state.selectedOverlay]['current_state'][node]);
-
-                            linkIds.forEach(linkIds => {
-                                var source = links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-                                var target = links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-                                var colorCode;
-                                switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-                                    case 'CETypeILongDistance':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                    case 'CETypeLongDistance':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                    case 'CETypePredecessor':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                    case 'CETypeSuccessor':
-                                        colorCode = '#5E4FA2';
-                                        break;
-                                }
-                                if (Object.keys(nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-                                    var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-                                    linkList.push(JSON.parse(linkJSON));
-                                }
-                                this.setState({ links: linkList });
-                            });
-                            nodeList.push(JSON.parse(nodeJSON));
-                            this.setState({ nodes: nodeList })
-                            this.setOverlayElements(nodes, links);
-                        }
-                        )
-
-                    }
-                    ).then(() => {
-                        this.setState({ renderGraph: true }, () => {
-                            this.renderGraph();
-                        });
-                    }).then(() => {
-                        this.setDataForSearch(this.cy.json());
-                    })
-            )
+        /** For auto refresh function */
     }
 
     /**
@@ -841,21 +705,12 @@ class Graph extends React.Component {
      * 
      * @method handleSwitch
      */
-    handleSwitch = () => {
-        var that = this;
-        var promise = new Promise(function (resolve, reject) {
-            try {
-                that.setState(prevState => {
-                    return { switchToggle: !prevState.switchToggle }
-                })
-                resolve(true)
-            } catch{
-                reject(false)
-            }
-        })
-        promise.then(function () {
-            that.swap()
-        }).catch(function (e) {
+    handleSwitch = (sourceNodeDetails, targetNodeDetails, linkDetails) => {
+        var sourceNode = targetNodeDetails;
+        var targetNode = sourceNodeDetails;
+        linkDetails = this.state.elementObj.getLinkDetails(targetNodeDetails.id, linkDetails.id)
+        this.setState({linkDetails: {linkDetails, sourceNode, targetNode}}, () => {
+            this.createEdgeDetail(true);
         });
     }
 
@@ -893,7 +748,7 @@ class Graph extends React.Component {
                 if (this.cy.zoom() > parseFloat(e.value)) {
                     this.cy.zoom(parseFloat(e.value));
                 }
-                this.setState({ setMinZoom: e.value })
+                this.setState({ setMaxZoom: e.value })
             }
         }
     }
@@ -962,41 +817,13 @@ class Graph extends React.Component {
      * End section `handle` method.
      */
 
-    swap = () => {
-        var that = this;
-        var linkDetails;
-        var promise = new Promise(function (resolve, reject) {
-            try {
-                if (that.state.switchToggle) {
-                    linkDetails = that.state.ipop.getLinkDetails(that.state.currentSelectedElement.data().target, that.state.currentSelectedElement.data().id);
-                } else {
-                    linkDetails = that.state.ipop.getLinkDetails(that.state.currentSelectedElement.data().source, that.state.currentSelectedElement.data().id);
-                }
-                resolve(linkDetails)
-            } catch (e) {
-                console.log(e)
-                reject(false)
-            }
-        })
-
-        promise.then(function (linkDetails) {
-            that.setState(prevState => {
-                return { linkDetails: { "linkDetails": linkDetails, "sourceNodeDetails": prevState.linkDetails.targetNodeDetails, "targetNodeDetails": prevState.linkDetails.sourceNodeDetails } }
-            }, () => {
-                that.createEdgeDetail(true);
-            })
-        }).catch(function (e) {
-            console.log(e)
-        })
-    }
-
     /**
 	* Method called when click node elements on graph.
 	*
 	* @method eventClickNode
     */
     eventClickNode = (node) => {
-        var sourceNode = this.state.ipop.getNodeDetails(node.data('id'));
+        var sourceNode = this.state.elementObj.getNodeDetails(node.data('id'));
         var connectedNodes = this.cy.elements(node.incomers().union(node.outgoers())).filter((ele) => {
             return ele.isNode();
         })
@@ -1022,9 +849,11 @@ class Graph extends React.Component {
 	* @method eventClickEdge
     */
     eventClickEdge = (edge) => {
-        var [linkDetails, sourceNode, targetNode, sourceNodeDetails, targetNodeDetails]
-            = [this.state.ipop.getLinkDetails(edge.data('source'), edge.data('id')), edge.data('source'), edge.data('target'), this.state.ipop.getNodeDetails(edge.data('target')), this.state.ipop.getNodeDetails(edge.data('source'))];
-        this.setState({ linkDetails: { linkDetails, sourceNode, targetNode, sourceNodeDetails, targetNodeDetails } },
+        var [sourceNode, targetNode]
+            = [this.state.elementObj.getNodeDetails(edge.data('source'))
+                , this.state.elementObj.getNodeDetails(edge.data('target'))];
+        var linkDetails = this.state.elementObj.getLinkDetails(sourceNode.id, edge.data('id'))
+        this.setState({ linkDetails: { linkDetails, sourceNode, targetNode } },
             () => {
                 if (this.state.graphType === 'main') {
                     if (!this.state.multiWindowState) this.createEdgeDetail(true); /** Edge Detail */

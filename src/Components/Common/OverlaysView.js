@@ -33,7 +33,7 @@ class OverlaysView extends React.Component {
 
     // URL for REST API.
     // var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
-    var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
+    var url = allowOrigin + `http://67.58.53.58:5000/IPOP/overlays?interval=${intervalNo}&current_state=True`
     console.log(url);
 
     fetch(url).then(res => res.json())
@@ -98,8 +98,8 @@ class OverlaysView extends React.Component {
     // var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/nodes?interval=' + intervalNo + '&current_state=True'
     // var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/links?interval=' + intervalNo + '&current_state=True'
 
-    var nodeURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/nodes?interval=2020-04-29T19:12:41&current_state=True'
-    var linkURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/links?interval=2020-04-29T19:12:41&current_state=True'
+    var nodeURL = allowOrigin + `http://67.58.53.58:5000/IPOP/overlays/101000F/nodes?interval=${intervalNo}&current_state=True`
+    var linkURL = allowOrigin + `http://67.58.53.58:5000/IPOP/overlays/101000F/links?interval=${intervalNo}&current_state=True`
 
     console.log(nodeURL);
 
