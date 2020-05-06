@@ -29,7 +29,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            // , selectedOverlay: '103000F', graphType: 'main' /** For React test */
+            // , selectedOverlay: '104000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -97,18 +97,10 @@ class Graph extends React.Component {
     }
 
     componentDidMount() {
-        //this.fetchData();
+        // this.fetchData();
         this.toggleRightPanel(true);
         this.requestGraphProperty();
         this.requestToolProperty();
-
-        // For test transmissionGraph
-        var date = new Date()
-        var dateList = []
-        for (let index = 0; index < 6; index++) {
-            dateList.push(date.setMinutes(date.getMinutes() + (index + 1)))
-        }
-        this.setState({ testDate: dateList })
     }
 
     componentWillUnmount() {
@@ -260,7 +252,7 @@ class Graph extends React.Component {
                     })
 
                 })
-                this.setState({elementObj:elementObj});
+                this.setState({ elementObj: elementObj });
 
                 resolve(true);
             }
@@ -556,18 +548,19 @@ class Graph extends React.Component {
                 elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
 
                 var nodes = nodesJSON[overlay]['current_state']
-
                 Object.keys(nodes).sort().forEach((nodeID) => {
-
                     // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
                     elementObj.addNodeElement(nodeID)
 
                     var links = linksJSON[overlay]['current_state'][nodeID]
-
-                    Object.keys(links).forEach(linkID => {
-                        // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
-                        elementObj.addLinkElement(nodeID, linkID)
-                    })
+                    try {
+                        Object.keys(links).forEach(linkID => {
+                            // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                            elementObj.addLinkElement(nodeID, linkID)
+                        })
+                    } catch (e) {
+                        console.log(`${nodeID} has no tunnel.`)
+                    }
 
                 })
                 this.setOverlayElements(nodesJSON, linksJSON);

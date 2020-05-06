@@ -4,11 +4,11 @@ import ReactDOM from "react-dom";
 import Cytoscape from 'react-cytoscapejs';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-tippy/dist/tippy.css";
-import CreateGraphContents from './CreateGraphContents';
 import RightPanel from "./RightPanel";
 import CytoscapeStyle from './CytoscapeStyle';
 import GoogleMapReact from "google-map-react";
 import ElementsObj from '../Common/ElementsObj';
+import Config from "../../Config/config";
 
 class Map extends React.Component {
 
@@ -18,31 +18,19 @@ class Map extends React.Component {
             nodes: [], links: [], initMinZoom: 0.2, initMaxZoom: 2, setMinZoom: 0.2, setMaxZoom: 2
             , renderGraph: false
             , currentSelectedElement: null
-            , center: { lat: 35.6762, lng: 139.6503 }
+            , center: { lat: 13.736717, lng: 100.523186 }
             , zoom: 0
             , elementObj: null
-            ,
+            // , selectedOverlay: '104000F'
 
-        }
-        this.nodeLocations = {
-            a100001feb6040628e5fb7e70b04f001: [35.667780, 139.792468],
-            a100002feb6040628e5fb7e70b04f002: [36.063169, 140.135293],
-            a100003feb6040628e5fb7e70b04f003: [36.036767, 139.139504],
-            a100004feb6040628e5fb7e70b04f004: [36.124898, 138.014066],
-            a100005feb6040628e5fb7e70b04f005: [35.176555, 136.856869],
-            a100006feb6040628e5fb7e70b04f006: [34.992293, 135.762571],
-            a100007feb6040628e5fb7e70b04f007: [34.682988, 135.528840],
-            a100008feb6040628e5fb7e70b04f008: [35.864095, 139.667933],
-            a100009feb6040628e5fb7e70b04f009: [36.640714, 138.955405],
-            a100010feb6040628e5fb7e70b04f010: [34.377240, 132.457048]
         }
         this.googleMapReact = React.createRef();
         window.graphComponent = this;
     }
 
     componentDidMount = () => {
-        this.toggleRightPanel(true);
         this.requestGraphProperty();
+        // this.fetchData() /** For Test */
     }
 
     requestGraphProperty = () => {
@@ -82,49 +70,54 @@ class Map extends React.Component {
         })
     }
 
+    fetchData = () => {
+        var intervalNo = new Date().toISOString().split(".")[0];
+        var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
+        var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
+        var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
+        var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
+        var elementObj = null;
+        var overlay = this.state.selectedOverlay;
+        console.log(nodeURL);
+        /** new fetch for influxDB */
+        fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
+            fetch(linkURL).then(res => res.json()).then(linksJSON => {
+                elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
+                var nodes = nodesJSON[overlay]['current_state']
+                Object.keys(nodes).sort().forEach((nodeID) => {
+                    // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+                    elementObj.addNodeElement(nodeID)
+                    var links = linksJSON[overlay]['current_state'][nodeID]
+                    try {
+                        Object.keys(links).forEach(linkID => {
+                            // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                            elementObj.addLinkElement(nodeID, linkID)
+                        })
+                    } catch (e) {
+                        console.log(`${nodeID} has no tunnel.`)
+                    }
+                })
+                return elementObj
+            }).then((elementObj) => {
+                this.setState({ elementObj: elementObj }, () => {
+                    this.renderGraph();
+                })
+            })
+                .then(() => {
+                    this.setState({ renderGraph: true })
+                })
+
+        })
+    }
+
+    hasGeometric = (node) => {
+        if (node.data('coordinate').split(',')[1]) return true;
+        return false;
+    }
+
     createCytoscapeElement = (packet) => {
         return new Promise((resolve, reject) => {
             try {
-                // var ipop = new CreateGraphContents();
-                // var nodeList = [];
-                // var linkList = [];
-                // ipop.init(this.state.selectedOverlay, packet.nodes, packet.links);
-                // this.setState({ ipop: ipop });
-                // Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).sort().forEach(node => {
-                //     /** Test lat lng for map view. */
-                //     var [lat, lng] = [this.getRandomInRange(35.5, 36, 3), this.getRandomInRange(139.5, 140, 3)]
-                //     var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}", "lat":"${this.nodeLocations[node][0]}", "lng":"${this.nodeLocations[node][1]}"}}`
-
-                //     //var nodeJSON = `{ "data": { "id": "${node}", "label": "${packet.nodes[this.state.selectedOverlay]['current_state'][node]['NodeName']}"}}`
-                //     var linkIds = Object.keys(packet.links[this.state.selectedOverlay]['current_state'][node]);
-
-                //     linkIds.forEach(linkIds => {
-                //         var source = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["SrcNodeId"];
-                //         var target = packet.links[this.state.selectedOverlay]['current_state'][node][linkIds]["TgtNodeId"];
-                //         var colorCode;
-                //         switch (ipop.getLinkDetails(source, linkIds).TunnelType) {
-                //             case 'CETypeILongDistance':
-                //                 colorCode = '#5E4FA2';
-                //                 break;
-                //             case 'CETypeLongDistance':
-                //                 colorCode = '#5E4FA2';
-                //                 break;
-                //             case 'CETypePredecessor':
-                //                 colorCode = '#01665E';
-                //                 break;
-                //             case 'CETypeSuccessor':
-                //                 colorCode = '#01665E';
-                //                 break;
-                //         }
-                //         if (Object.keys(packet.nodes[this.state.selectedOverlay]['current_state']).includes(target)) {
-                //             var linkJSON = `{ "data": {"id": "${linkIds}", "source": "${source}", "target": "${target}", "label": "${ipop.getLinkDetails(source, linkIds).InterfaceName}", "color":"${colorCode}" } }`;
-                //             linkList.push(JSON.parse(linkJSON));
-                //         }
-                //     })
-
-                //     nodeList.push(JSON.parse(nodeJSON));
-                // })
-                // this.setState({ nodes: nodeList, links: linkList });
                 var elementObj = null;
                 var overlay = this.state.selectedOverlay;
                 var nodesJSON = packet.nodes;
@@ -158,6 +151,7 @@ class Map extends React.Component {
     }
 
     handleMakerClicked = (node) => {
+        console.log(node)
         var packet = {
             name: `SelectedFromMap`,
             data: {
@@ -167,47 +161,92 @@ class Map extends React.Component {
         }
         window.SAGE2_AppState.callFunctionInContainer(`set`, packet);
         this.resetAnimation(this.state.currentSelectedElement);
-        var center = { lat: parseFloat(node.data().lat), lng: parseFloat(node.data().lng) }
+        var center = { lat: parseFloat(node.data('coordinate').split(',')[0]), lng: parseFloat(node.data('coordinate').split(',')[1]) }
         this.setState({ currentSelectedElement: node, center: center, zoom: 10 }, () => {
             document.getElementById(`nodeMaker-${this.state.currentSelectedElement.data().id}`).classList.add(`selected`);
         })
     }
 
     handleSelectElement = (id) => {
+        console.log('handleSelectElement');
         try {
             this.resetAnimation(this.state.currentSelectedElement);
             var element = this.cy.elements(`#${id}`);
             if (element.isNode()) {
-                var center = { lat: parseFloat(element.data().lat), lng: parseFloat(element.data().lng) }
-                this.setState({ center: center, zoom: 10, currentSelectedElement: element }, () => {
-                    document.getElementById(`nodeMaker-${element.data().id}`).classList.add(`selected`);
-                })
+                console.log('condition is node');
+                if (this.hasGeometric(element)) {
+                    var center = { lat: parseFloat(element.data('coordinate').split(',')[0]), lng: parseFloat(element.data('coordinate').split(',')[1]) }
+                    this.setState({ center: center, zoom: 10, currentSelectedElement: element }, () => {
+                        document.getElementById(`nodeMaker-${element.data().id}`).classList.add(`selected`);
+                    })
+                }
             }
             else {
-                var promise = new Promise((resolve, reject) => {
-                    var center = {};
-                    var zoom = 1;
-                    if (element.connectedNodes().length == 2) {
-                        var [lat1, lng1, lat2, lng2] = [element.connectedNodes()[0].data().lat, element.connectedNodes()[0].data().lng, element.connectedNodes()[1].data().lat, element.connectedNodes()[1].data().lng];
+                console.log('condition is link');
+                /** New Version */
+                var new_element = element.connectedNodes().filter(this.hasGeometric);
+                if (new_element.length === 2) /** link has connected by 2 nodes and all has GEO. */ {
+                    console.log('condition link 1');
+                    var promise = new Promise((resolve, reject) => {
+                        var center = {};
+                        var zoom = 1;
+                        var [lat1, lng1, lat2, lng2] = [element.connectedNodes()[0].data('coordinate').split(',')[0]
+                            , element.connectedNodes()[0].data('coordinate').split(',')[1]
+                            , element.connectedNodes()[1].data('coordinate').split(',')[0]
+                            , element.connectedNodes()[1].data('coordinate').split(',')[1]];
                         var [lat, lng] = this.midpoint(parseFloat(lat1), parseFloat(lng1), parseFloat(lat2), parseFloat(lng2));
                         center = { lat: lat, lng: lng };
                         zoom = this.getZoomLevel(this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001)
                         console.log(`Distance in Kilometers: ${this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001}`);
                         resolve({ center, zoom });
-                    }
-                    else {
-                        reject('Error handleSelectElement > Edge connect more than 2 nodes.');
-                    }
-                })
-                promise.then((packet) => {
-                    this.setState({ center: packet.center, zoom: packet.zoom, currentSelectedElement: element }, () => {
-                        this.state.currentSelectedElement.connectedNodes().forEach((node) => {
-                            document.getElementById(`nodeMaker-${node.data().id}`).classList.add(`selected`);
-                        })
                     })
-                }).catch((e) => {
-                    console.log(`Error handleSelectElement > ${e}`)
-                })
+                    promise.then((packet) => {
+                        this.setState({ center: packet.center, zoom: packet.zoom, currentSelectedElement: element }, () => {
+                            this.state.currentSelectedElement.connectedNodes().forEach((node) => {
+                                document.getElementById(`nodeMaker-${node.data().id}`).classList.add(`selected`);
+                            })
+                        })
+                    }).catch((e) => {
+                        console.log(`Error handleSelectElement > ${e}`)
+                    })
+                }
+                else if (new_element.length === 1)/** link has connected by 2 nodes but one of them has GEO. */ {
+                    console.log('condition link 2');
+                    this.handleSelectElement(new_element[0].data('id'));
+                }
+                else/** link has connected by 2 nodes but all of them not have GEO. */ {
+                    console.log('condition link 3');
+                    console.log(`${id} connected nodes which not have GEO.`)
+                }
+
+                /** Old Version */
+                // var promise = new Promise((resolve, reject) => {
+                //     var center = {};
+                //     var zoom = 1;
+                //     if (element.connectedNodes().length == 2) {
+                //         var [lat1, lng1, lat2, lng2] = [element.connectedNodes()[0].data('coordinate').split(',')[0]
+                //         , element.connectedNodes()[0].data('coordinate').split(',')[1]
+                //         , element.connectedNodes()[1].data('coordinate').split(',')[0]
+                //         , element.connectedNodes()[1].data('coordinate').split(',')[1]];
+                //         var [lat, lng] = this.midpoint(parseFloat(lat1), parseFloat(lng1), parseFloat(lat2), parseFloat(lng2));
+                //         center = { lat: lat, lng: lng };
+                //         zoom = this.getZoomLevel(this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001)
+                //         console.log(`Distance in Kilometers: ${this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001}`);
+                //         resolve({ center, zoom });
+                //     }
+                //     else {
+                //         reject('Error handleSelectElement > Edge connect more than 2 nodes.');
+                //     }
+                // })
+                // promise.then((packet) => {
+                //     this.setState({ center: packet.center, zoom: packet.zoom, currentSelectedElement: element }, () => {
+                //         this.state.currentSelectedElement.connectedNodes().filter(this.hasGeometric).forEach((node) => {
+                //             document.getElementById(`nodeMaker-${node.data().id}`).classList.add(`selected`);
+                //         })
+                //     })
+                // }).catch((e) => {
+                //     console.log(`Error handleSelectElement > ${e}`)
+                // })
             }
         } catch (e) {
             console.log(`Error handleSelectElement > ${e}`)
@@ -311,21 +350,6 @@ class Map extends React.Component {
         return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
     }
 
-    toggleRightPanel = (flag) => {
-        if (typeof flag === 'object' && flag !== null) {
-            this.setState(prevState => {
-                return { isShowRightPanel: !prevState.isShowRightPanel };
-            }, () => {
-                document.getElementById("rightPanel").hidden = this.state.isShowRightPanel;
-            })
-        }
-        else {
-            this.setState({ isShowRightPanel: flag }, () => {
-                document.getElementById("rightPanel").hidden = this.state.isShowRightPanel
-            })
-        }
-    }
-
     handleGoogleApiLoaded = ({ map, maps }) => {
         console.log(`Render react-google-map completed...`);
         if (this.state.currentSelectedElement) {
@@ -354,18 +378,19 @@ class Map extends React.Component {
                                     yesIWantToUseGoogleMapApiInternals
                                     onGoogleApiLoaded={this.handleGoogleApiLoaded}
                                 >
-                                    {/* {this.cy.elements("node").map(node => {
-                                        return <button key={node.data().id + `Maker`} onClick={this.handleMakerClicked.bind(this, node)} id={`nodeMaker-${node.data().id}`} className="nodeMarker" lat={node.data().lat} lng={node.data().lng}>
+                                    {this.cy.elements("node").filter(this.hasGeometric).map((node) => {
+                                        return <button key={node.data('id') + `Maker`} onClick={this.handleMakerClicked.bind(this, node)}
+                                            id={`nodeMaker-${node.data('id')}`} className="nodeMarker"
+                                            lat={node.data('coordinate').split(',')[0]}
+                                            lng={node.data('coordinate').split(',')[1]}>
                                             <label className="markerLabel">
-                                                {node.data().label}
+                                                {node.data('label')}
                                             </label>
                                         </button>
-                                    })} */}
+                                    })}
                                 </GoogleMapReact>
                             </>) : (<div className="loader">Loading...</div>)}
                         </section>
-                        <button onClick={this.toggleRightPanel} id="overlayRightPanelBtn" />
-                        <RightPanel rightPanelTopic='Details'></RightPanel>
                     </div>
                 </div>
             </>
