@@ -1,162 +1,202 @@
-/* customize global */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+/* customize global */
 * {
     font-family: 'Roboto', sans-serif;
 }
 
+
 #root {
-    width: 100vw;
-    height: 100vh;
+    width           : 100vw;
+    height          : 100vh;
     background-color: #101B2B;
-    color: 'white';
-    overflow: hidden;
+    color           : 'white';
+    overflow        : hidden;
 }
 
 header {
-    width: 100vw;
+    width           : 100vw;
     background-color: #213758;
-    /* color: white; */
+    color           : white;
 }
 
-#loading{
+/* customize title name */
+#ipopTitle {
+    margin-left : 5%;
+    margin-right: 5%;
+}
+
+#loading {
     position: absolute;
-    margin: auto;
-    left: 50%;
-    top: 50%;
+    margin  : auto;
+    left    : 50%;
+    top     : 50%;
+}
+
+#mainContent {
+    width: 100%;
 }
 
 /* customize overlay button */
 .overlay {
-    background: url("../Images/Icons/overlay_ic.svg")no-repeat;
+    background     : url("../Images/Icons/overlay_ic.svg")no-repeat;
     background-size: contain;
-    width: 100px;
-    height: 75px;
-    border: none;
-    outline: none;
+    width          : 100px;
+    height         : 75px;
+    border         : none;
+    outline        : none;
 }
 
 .overlay_ic {
     width: 75%;
 }
 
-#rightPanel{
-    padding: 0.5%;
-    color: white;
-    position: fixed;
-    width: 19vw;
-    right: 0;
+#rightPanel {
+    padding         : 0.5%;
+    color           : white;
+    position        : fixed;
+    width           : 19vw;
+    right           : 0;
     background-color: #213758;
-    z-index: 2;
-    overflow-wrap: break-word;
+    z-index         : 2;
+    overflow-wrap   : break-word;
 }
 
-#nodeDetails::-webkit-scrollbar,#linkDetails::-webkit-scrollbar {
+#viewBar {
+    margin    : auto;
+    text-align: center;
+}
+
+#viewSelector {
+    width: 15%;
+}
+
+#rightPanel::-webkit-scrollbar {
     display: none;
 }
 
-#nodeDetails,#linkDetails{
-    height: 90vh;
-    overflow-y: auto;
+#rightPanelBtn {
+    margin-top        : auto;
+    margin-bottom     : auto;
+    margin-left       : 0.25%;
+    margin-right      : 0.25%;
+    padding           : 0;
+    right             : 0;
+    width             : 30px;
+    border            : none;
+    height            : 30px;
+    outline           : none;
+    /* position       : fixed; */
+    background        : url(../Images/Icons/menu_ic.svg) no-repeat;
+    background-size   : contain;
 }
 
-#leftToolsBtn{
-    margin-top: 4.5%;
-    position: fixed;
+.overlayBtn {
+    border-radius   : 3px;
+    border          : solid #486186;
+    background-color: #405B80;
+}
+
+#rightPanel {
+    padding         : 0.5%;
+    color           : white;
+    position        : fixed;
+    width           : 19.5vw;
+    right           : 0;
+    background-color: #213758;
+    z-index         : 2;
+    overflow-wrap   : break-word;
+}
+
+#leftTools {
+    position : absolute;
+    top      : 50%;
+    transform: translatey(-50%);
+    left     : 0.5%;
+    width    : fit-content;
+    height   : fit-content;
     z-index: 2;
 }
 
-#cytoscape{
-    width: 100vw;
-    height: 100vh;
-}
-
-#menuBtn{
-    margin: auto;
-    margin-left: 0;
-    outline: none;
-    border: none;
-    width: 25px;
-    height: 25px;
-    background: url('../Images/Icons/menu_ic.svg') no-repeat;
-    background-size: contain;
-    right: 0;
-}
-
-#homeBtn,#refreshBtn,#infoBtn,#plusBtn,#minusBtn,#switchBtn,#configBtn{
-    outline: none;
-    border: none;
+#homeBtn,
+#refreshBtn,
+#infoBtn,
+#plusBtn,
+#minusBtn,
+#switchBtn,
+#configBtn {
+    outline   : none;
+    border    : none;
     background: none;
-    width: 60px;
-    height: 60px;
-    padding: 0;
+    width     : 60px;
+    height    : 60px;
+    padding   : 0;
 }
 
-#homeBtn{
+#homeBtn {
     background-image: url('../Images/Icons/home_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
 
 #switchBtn {
-    width: 25px;
-    height: 25px;
-    background: url('../Images/Icons/swap_ic.svg')no-repeat;
+    width          : 25px;
+    height         : 25px;
+    background     : url('../Images/Icons/swap_ic.svg')no-repeat;
     background-size: cover;
 }
 
-#refreshBtn{
+#refreshBtn {
     background-image: url('../Images/Icons/refresh_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
 
-#infoBtn{
+#infoBtn {
     background-image: url('../Images/Icons/info_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
 
 .node_img {
     transform: translateY(-2.5px);
-    width: 100%;
+    width    : 100%;
 }
 
 .tunnel_img {
     transform: translateY(1px);
-    width: 90%;
+    width    : 90%;
 }
 
-#configBtn{
+#configBtn {
     background-image: url('../Images/Icons/config_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
 
 .popover {
-    padding: 0.5%;
-    /* width: fit-content; */
-    width: 320px;
+    padding  : 0.5%;
+    /* width : fit-content; */
+    width    : 320px;
     max-width: unset;
 }
 
 .popover-header {
     background-color: white;
-    border: none;
+    border          : none;
 }
 
-#plusBtn{
+#plusBtn {
     background-image: url('../Images/Icons/plus_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
 
 #zoomSlider {
-    position: absolute;
+    position   : absolute;
     margin-left: -14.2vh;
-    margin-top: 15.5vh;
-    transform: rotate(-90deg);
-    width: 35vh;
+    margin-top : 15.5vh;
+    transform  : rotate(-90deg);
+    width      : 35vh;
 }
 
-#minusBtn{
-    margin-top: 34.2vh;
+#minusBtn {
+    margin-top      : 34.2vh;
     background-image: url('../Images/Icons/minus_ic.svg');
-    background-size: cover;
+    background-size : cover;
 }
-

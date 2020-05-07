@@ -32,20 +32,25 @@ class OverlaysView extends React.Component {
     // var allowOrigin=''
 
     // URL for REST API.
-    // var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
-    var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
+    var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    //var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
+    
     console.log(url);
+    try {
 
-    fetch(url).then(res => res.json())
-      .then((overlays) => {
-        console.log(overlays);
+      fetch(url).then(res => res.json())
+        .then((overlays) => {
+          console.log(overlays);
 
-        return new OverlayObj(overlays.current_state) // create overlay object that contain all overlays and its details.
-      })
-      .then((overlaysObj) => { this.setState({ overlaysObj: overlaysObj }) }) // set overlay object to overlaysObj state.
-      .catch(error => {
-        alert(error)
-      })
+          return new OverlayObj(overlays.current_state) // create overlay object that contain all overlays and its details.
+        })
+        .then((overlaysObj) => { this.setState({ overlaysObj: overlaysObj }) }) // set overlay object to overlaysObj state.
+        .catch(error => {
+          alert(error)
+        })
+    } catch{
+
+    }
   }
 
   handleRightPanelToggle = () => {
@@ -95,11 +100,11 @@ class OverlaysView extends React.Component {
     var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
     // var allowOrigin=''
 
-    // var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/nodes?interval=' + intervalNo + '&current_state=True'
-    // var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/links?interval=' + intervalNo + '&current_state=True'
+    var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/nodes?interval=' + intervalNo + '&current_state=True'
+    var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlay + '/links?interval=' + intervalNo + '&current_state=True'
 
-    var nodeURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/nodes?interval=2020-04-29T19:12:41&current_state=True'
-    var linkURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/links?interval=2020-04-29T19:12:41&current_state=True'
+    //var nodeURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/nodes?interval=2020-04-29T19:12:41&current_state=True'
+    //var linkURL = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays/101000F/links?interval=2020-04-29T19:12:41&current_state=True'
 
     console.log(nodeURL);
 
@@ -107,34 +112,39 @@ class OverlaysView extends React.Component {
 
     var elementObj = null
 
-    fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
-      console.log(nodesJSON);
+    try {
 
-      fetch(linkURL).then(res => res.json()).then(linksJSON => {
-        console.log(linksJSON);
+      fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
+        console.log(nodesJSON);
 
-        elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
+        fetch(linkURL).then(res => res.json()).then(linksJSON => {
+          console.log(linksJSON);
 
-        var nodes = nodesJSON[overlay]['current_state']
+          elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
 
-        Object.keys(nodes).sort().forEach((nodeID) => {
+          var nodes = nodesJSON[overlay]['current_state']
 
-          // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
-          elementObj.addNodeElement(nodeID)
+          Object.keys(nodes).sort().forEach((nodeID) => {
 
-          var links = linksJSON[overlay]['current_state'][nodeID]
+            // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
+            elementObj.addNodeElement(nodeID)
 
-          Object.keys(links).forEach(linkID => {
-            // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
-            elementObj.addLinkElement(nodeID, linkID)
+            var links = linksJSON[overlay]['current_state'][nodeID]
+
+            Object.keys(links).forEach(linkID => {
+              // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+              elementObj.addLinkElement(nodeID, linkID)
+            })
+
           })
+          return elementObj
+        }).then((elementObj) => { this.setState({ elementObj: elementObj }) })
 
-        })
-        return elementObj
-      }).then((elementObj) => { this.setState({ elementObj: elementObj }) })
+      })
 
-    })
+    } catch{
 
+    }
   }
 
   renderMainContent = () => {
@@ -186,7 +196,7 @@ class OverlaysView extends React.Component {
           </label>
         </div>
 
-        <div id='viewBar' className='col-7'>
+        <div id='viewBar' className='col-5'>
 
         </div>
 

@@ -151,13 +151,70 @@ class OtherViews extends React.Component {
 
   renderMap = (option) => {
     try {
+
+      document.getElementById('homeBtn').hidden = true
+      document.getElementById('refreshBtn').hidden = true
+      document.getElementById('configBtn').hidden = true
+      document.getElementById('infoBtn').hidden = true
+      document.getElementById('plusBtn').hidden = true
+      document.getElementById('minusBtn').hidden = true
+      document.getElementById('zoomSlider').hidden = true
+
       if (this.state.selectedElement.isNode()) {
-        const nodeDetails = this.props.elementObj.getNodeDetails(this.state.selectedElement.data().id)
-        const connectedNodes = this.cy.elements(this.state.selectedElement.incomers().union(this.state.selectedElement.outgoers())).filter((element) => {
-          return element.isNode()
+
+        var createMapFromNode = new Promise((resolve, reject) => {
+
+          const nodeDetails = this.props.elementObj.getNodeDetails(this.state.selectedElement.data().id)
+          const connectedNodes = this.cy.elements(this.state.selectedElement.incomers().union(this.state.selectedElement.outgoers())).filter((element) => {
+            return element.isNode()
+          })
+          
+          try {
+            const coordinate = this.state.selectedElement.data().coordinate.split(',')
+            console.log(coordinate)
+
+            var selectedElement = this.state.selectedElement
+            var relatedElement = selectedElement.outgoers().union(selectedElement.incomers()).union(selectedElement)
+
+            var map = <GoogleMapReact
+              bootstrapURLKeys={{
+                key: 'AIzaSyBjkkk4UyMh4-ihU1B1RR7uGocXpKECJhs',
+                language: 'en'
+              }}
+              center={{ lat: parseFloat(coordinate[0]), lng: parseFloat(coordinate[1]) }}
+              defaultZoom={10}
+            >
+
+              {connectedNodes.map(node => {
+                return <button onClick={this.handleMakerClicked.bind(this, node)} key={node.data().id + 'Marker'} id={node.data().id + 'Marker'} className="nodeMarker" lat={parseFloat(node.data().coordinate.split(',')[0])} lng={parseFloat(node.data().coordinate.split(',')[1])}>
+                  <label className="markerLabel">
+                    {node.data().label}
+                  </label>
+                </button>
+              })}
+
+            </GoogleMapReact>
+
+            this.setState({ selectedView: option })
+
+            resolve(map)
+
+          } catch (e) {
+            // alert("You have to select a node.")
+            // document.getElementById("viewSelector").value = this.state.currentView;
+            reject(false)
+          }
         })
-        const coordinate = this.state.selectedElement.data().coordinate.split(',')
-        console.log(coordinate)
+
+        createMapFromNode.then((map) => {
+          if (this.state.selectedElement !== null) {
+            console.log(document.getElementById(this.state.selectedElement.data().id + 'Marker'))
+            // document.getElementById(this.state.selectedElement.data().id + 'Marker').classList.add('selected')
+          }
+          ReactDOM.render(map, document.getElementById('cytoscape'))
+        })
+
+
       } else if (this.state.selectedElement.isEdge()) {
 
         var createMapFromEdge = new Promise((resolve, reject) => {
@@ -165,11 +222,11 @@ class OtherViews extends React.Component {
             var selectedElement = this.state.selectedElement
 
             const srcNode = selectedElement.connectedNodes().filter((element) => {
-              return element.data().id == selectedElement.data().source
+              return element.data().id === selectedElement.data().source
             })
 
             const tgtNode = selectedElement.connectedNodes().filter((element) => {
-              return element.data().id == selectedElement.data().target
+              return element.data().id === selectedElement.data().target
             })
 
             const srcCoordinate = srcNode.data().coordinate.split(',')
@@ -177,9 +234,9 @@ class OtherViews extends React.Component {
 
             console.log(srcCoordinate)
             console.log(tgtCoordinate)
-            console.log((srcCoordinate[0])+" "+parseFloat(srcCoordinate[1])+" "+parseFloat(tgtCoordinate[0])+" "+parseFloat(tgtCoordinate[1]))
+            console.log((srcCoordinate[0]) + " " + parseFloat(srcCoordinate[1]) + " " + parseFloat(tgtCoordinate[0]) + " " + parseFloat(tgtCoordinate[1]))
 
-            var centerPoint = this.midpoint(parseFloat(srcCoordinate[0]), parseFloat(srcCoordinate[1]), parseFloat(srcCoordinate[0]), parseFloat(srcCoordinate[1]))
+            var centerPoint = this.midpoint(parseFloat(srcCoordinate[0]), parseFloat(srcCoordinate[1]), parseFloat(tgtCoordinate[0]), parseFloat(tgtCoordinate[1]))
 
             var map = <GoogleMapReact
               bootstrapURLKeys={{
@@ -196,7 +253,7 @@ class OtherViews extends React.Component {
                 </label>
               </button>
 
-              <button onClick={this.handleMakerClicked.bind(this, tgtNode)} key={tgtNode.data().id + 'Marker'} id={tgtNode.data().id + 'Marker'} className="nodeMarker selected" lat={parseFloat(srcCoordinate[0])} lng={parseFloat(srcCoordinate[1])}>
+              <button onClick={this.handleMakerClicked.bind(this, tgtNode)} key={tgtNode.data().id + 'Marker'} id={tgtNode.data().id + 'Marker'} className="nodeMarker selected" lat={parseFloat(tgtCoordinate[0])} lng={parseFloat(tgtCoordinate[1])}>
                 <label className="markerLabel">
                   {tgtNode.data().label}
                 </label>
@@ -264,7 +321,7 @@ class OtherViews extends React.Component {
           document.getElementById('cytoscape').onwheel = this.handleWheelZoom
         })
 
-        this.cy.on('click', (e) => {
+        this.cy.one('click', (e) => {
           var clickEvent = new Promise((resolve, reject) => {
             try {
               if (e.target[0] !== this.state.selectedElement) {
@@ -368,17 +425,17 @@ class OtherViews extends React.Component {
                   {connectedNodeDetails.state}
                   <div className="DetailsLabel">Tunnel Type</div>
                   {connectedNodeDetails.type}
-                  <div className="DetailsLabel">ICE Connection Type</div>
+                  {/* <div className="DetailsLabel">ICE Connection Type</div> */}
                   {/* {connectedNodeDetails.ICEConnectionType} */}
                 -
                 <div className="DetailsLabel">ICE Role</div>
                   {/* {connectedNodeDetails.ICERole} */}
                   {connectedNodeDetails.stats.IceProperties.role}
-                  {/* <div className="DetailsLabel">Remote Address</div> */}
-                  {/* {connectedNodeDetails.remoteAddress} */}
+                  <div className="DetailsLabel">Remote Address</div>
+                  {connectedNodeDetails.remoteAddress}
                   {/* {connectedNodeDetails.stats.IceProperties.remote_addr} */}
-                  {/* <div className="DetailsLabel">Local Address</div> */}
-                  {/* {connectedNodeDetails.localAddress} */}
+                  <div className="DetailsLabel">Local Address</div>
+                  {connectedNodeDetails.localAddress}
                   {/* {connectedNodeDetails.stats.IceProperties.local_addr} */}
                   <div className="DetailsLabel">Latency</div>
                   {/* {connectedNodeDetails.latency} */}
@@ -420,11 +477,11 @@ class OtherViews extends React.Component {
     try {
 
       const srcNode = this.state.selectedElement.connectedNodes().filter((element) => {
-        return element.data().id == sourceNodeDetails.id
+        return element.data().id === sourceNodeDetails.id
       })
 
       const tgtNode = this.state.selectedElement.connectedNodes().filter((element) => {
-        return element.data().id == targetNodeDetails.id
+        return element.data().id === targetNodeDetails.id
       })
 
       const srcCoordinate = srcNode.data().coordinate.split(',')
@@ -526,12 +583,12 @@ class OtherViews extends React.Component {
                 <div className="DetailsLabel">ICE Role</div>
                 {/* {linkDetails.ICERole} */}
                 {linkDetails.stats.IceProperties.role}
-                {/* <div className="DetailsLabel">Remote Address</div> */}
+                <div className="DetailsLabel">Remote Address</div>
                 {/* {linkDetails.remoteAddress} */}
-                {/* {linkDetails.stats.IceProperties.remote_addr} */}
-                {/* <div className="DetailsLabel">Local Address</div> */}
+                {linkDetails.stats.IceProperties.remote_addr}
+                <div className="DetailsLabel">Local Address</div>
                 {/* {linkDetails.localAddress} */}
-                {/* {linkDetails.stats.IceProperties.local_addr} */}
+                {linkDetails.stats.IceProperties.local_addr}
                 <div className="DetailsLabel">Latency</div>
                 {/* {linkDetails.latency} */}
                 {linkDetails.stats.IceProperties.latency}
@@ -715,7 +772,7 @@ class OtherViews extends React.Component {
           <button onClick={this.handleZoomOut} id='minusBtn' ></button>
         </div>
       </div>
-      <div id="map" style={{position:"absolute"}}></div>
+      <div id="map" style={{ position: "absolute" }}></div>
       {this.renderViewContent()}
     </>
   }
