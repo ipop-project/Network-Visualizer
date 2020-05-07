@@ -1,10 +1,10 @@
 import React from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Main from './Components/Common/Main.js'
+import OverlaysView from './Components/Common/OverlaysView.js'
 
 function App () {
   return (
-    <Main />
+    <OverlaysView />
   )
 }
 

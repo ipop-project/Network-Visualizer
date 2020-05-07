@@ -3,9 +3,9 @@ import 'react-tippy/dist/tippy.css'
 import { Spinner } from 'react-bootstrap'
 import { Tooltip } from 'react-tippy'
 import RightPanel from './RightPanel'
-import GraphContent from './GraphContent'
+import OthersView from './OthersView'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import CollapseButton from './CollapseButton'
+import CollapsibleButton from './CollapsibleButton'
 import { Typeahead } from 'react-bootstrap-typeahead'
 import Header from './Header'
 import '../../CSS/Main.css'
@@ -13,7 +13,7 @@ import Config from '../../config'
 import OverlaysObj from './OverlaysObj.js'
 import ElementsObj from './ElementsObj.js'
 
-class Main extends React.Component {
+class OverlaysView extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -28,14 +28,14 @@ class Main extends React.Component {
     var intervalNo = new Date().toISOString().split('.')[0]
 
     // you need to allow origin to get data from outside server.
-    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    // var allowOrigin=''
+    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = ''
 
     // URL for REST API.
     var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
     //var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
 
-    console.log(url);
+    //console.log(url);
 
     fetch(url).then(res => res.json())
       .then((overlays) => {
@@ -43,7 +43,7 @@ class Main extends React.Component {
       })
       .then((overlaysObj) => { this.setState({ overlaysObj: overlaysObj }) }) // set overlay object to overlaysObj state.
       .catch(() => {
-        console.log('error has been occered on fetch overlay process.')
+        //console.log('error has been occered on fetch overlay process.')
       })
   }
 
@@ -56,7 +56,7 @@ class Main extends React.Component {
         })
         resolve()
       } catch (e) {
-        console.log(e)
+        //console.log(e)
       }
     })
 
@@ -86,7 +86,7 @@ class Main extends React.Component {
   }
 
   renderGraphContent = () => {
-    return <GraphContent elementObj={this.state.elementObj} />
+    return <OthersView elementObj={this.state.elementObj} />
   }
 
   renderOverlaysContent = () => {
@@ -109,9 +109,9 @@ class Main extends React.Component {
 
   renderOverlayBtn = () => {
     const overlayBtn = this.state.overlaysObj.getOverlayName().map((overlay) => {
-      return <CollapseButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay}>
+      return <CollapsibleButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay} className='overlayBtn'>
         <div>{this.state.overlaysObj.getOverlayDescription(overlay)}<br />Number of nodes : {this.state.overlaysObj.getNumberOfNodes(overlay)}<br />Number of links : {this.state.overlaysObj.getNumberOfLinks(overlay)}</div>
-      </CollapseButton>
+      </CollapsibleButton>
     })
     return overlayBtn
   }
@@ -121,24 +121,24 @@ class Main extends React.Component {
 
     var intervalNo = new Date().toISOString().split('.')[0]
 
-    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-
+    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = ''
     var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/nodes?interval=' + intervalNo + '&current_state=True'
     var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/links?interval=' + intervalNo + '&current_state=True'
 
-    console.log(nodeURL);
+    //console.log(nodeURL);
 
-    console.log(linkURL);
+    //console.log(linkURL);
 
     var elementObj = null
 
     try {
 
       fetch(nodeURL).then(res => res.json()).then(nodesJSON => {
-        console.log(nodesJSON);
+        //console.log(nodesJSON);
 
         fetch(linkURL).then(res => res.json()).then(linksJSON => {
-          console.log(linksJSON);
+          //console.log(linksJSON);
 
           elementObj = new ElementsObj(nodesJSON[overlayId]['current_state'], linksJSON[overlayId]['current_state'])
 
@@ -167,7 +167,7 @@ class Main extends React.Component {
       })
 
     } catch{
-      console.log('error has been occered on fetch node and tunnel process.')
+      //console.log('error has been occered on fetch node and tunnel process.')
     }
   }
 
@@ -181,7 +181,7 @@ class Main extends React.Component {
             try {
               this.selectOverlay(selected[0])
             } catch {
-              console.log('Error has been occured on select search result.')
+              //console.log('Error has been occured on select search result.')
             }
           }}
           options={this.state.overlaysObj !== null ? this.state.overlaysObj.getOverlayName() : []}
@@ -204,7 +204,7 @@ class Main extends React.Component {
 
       {/* <button onClick={this.handleRightPanelToggle} id="overlayRightPanelBtn" /> */}
 
-      <div id="mainContent" className="row" style={{ backgroundColor: '#101B2B', color: 'white' ,margin:'auto'}}>
+      <div id="mainContent" className="row" style={{ backgroundColor: '#101B2B', color: 'white', margin: 'auto' }}>
         {this.renderMainContent()}
       </div>
 
@@ -212,4 +212,4 @@ class Main extends React.Component {
   }
 }
 
-export default Main
+export default OverlaysView
