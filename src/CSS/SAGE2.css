@@ -12,12 +12,12 @@
 
 /* customize Herder Tag */
 
-header {
+/* header {
     width: 100vw;
     height: 6vh;
     color: white;
     background-color: #213758;
-}
+} */
 
 /* customize title name */
 
@@ -34,7 +34,7 @@ header {
 
 /* customize search bar */
 
-#search {
+/* #search {
     width: 100%;
     margin-bottom: 2%;
     outline: none;
@@ -42,7 +42,7 @@ header {
     border-radius: 3px;
     border-color: #101B2B;
     background-color: #101B2B;
-}
+} */
 
 #container {
     position: absolute;

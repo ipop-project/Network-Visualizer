@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 import Cytoscape from 'react-cytoscapejs';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-tippy/dist/tippy.css";
-import RightPanel from "./RightPanel";
 import CytoscapeStyle from './CytoscapeStyle';
 import GoogleMapReact from "google-map-react";
 import ElementsObj from '../Common/ElementsObj';
