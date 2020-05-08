@@ -89,6 +89,26 @@
     word-wrap: break-word;
 }
 
+.sourceNodeBtn {
+    border-radius   : 3px;
+    border          : solid #8FD24D;
+    background-color: #8FD24D;
+}
+
+.targetNodeBtn {
+    border-radius   : 3px;
+    border          : solid #42B2C3;
+    background-color: #42B2C3;
+}
+
+.overlayBtn,
+.connectedNodeBtn {
+    border-radius   : 3px;
+    border          : solid #486186;
+    background-color: #405B80;
+    margin-bottom   : 2.5%;
+}
+
 @media (max-width: 1280px) and (min-width: 0px) {
     #elementDetails {
         font-size: 16px;

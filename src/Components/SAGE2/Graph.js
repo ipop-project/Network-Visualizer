@@ -45,18 +45,6 @@ class Graph extends React.Component {
             { label: "5", value: "5" },
         ]
         this.timer = null;
-        this.nodeLocations = {
-            a100001feb6040628e5fb7e70b04f001: [35.667780, 139.792468],
-            a100002feb6040628e5fb7e70b04f002: [36.063169, 140.135293],
-            a100003feb6040628e5fb7e70b04f003: [36.036767, 139.139504],
-            a100004feb6040628e5fb7e70b04f004: [36.124898, 138.014066],
-            a100005feb6040628e5fb7e70b04f005: [35.176555, 136.856869],
-            a100006feb6040628e5fb7e70b04f006: [34.992293, 135.762571],
-            a100007feb6040628e5fb7e70b04f007: [34.682988, 135.528840],
-            a100008feb6040628e5fb7e70b04f008: [35.864095, 139.667933],
-            a100009feb6040628e5fb7e70b04f009: [36.640714, 138.955405],
-            a100010feb6040628e5fb7e70b04f010: [34.377240, 132.457048]
-        }
         this.customStyles = {
             control: styles => ({ ...styles }),
             option: (provided) => {
@@ -298,7 +286,7 @@ class Graph extends React.Component {
                                 try {
                                     var connectedNodeDetail = this.state.elementObj.getConnectedNodeDetails(sourceNode.id, connectedNode.id())
                                     var connectedNodeBtn =
-                                        <CollapseButton key={connectedNode.data('id') + "Btn"} id={connectedNode.data('id') + "Btn"} name={connectedNode.data('label')}>
+                                        <CollapseButton className='connectedNodeBtn' key={connectedNode.data('id') + "Btn"} id={connectedNode.data('id') + "Btn"} name={connectedNode.data('label')}>
                                             <div className="DetailsLabel">Node ID</div>
                                             {connectedNode.id()}
                                             <div className="DetailsLabel">Tunnel ID</div>
@@ -532,10 +520,12 @@ class Graph extends React.Component {
     fetchData = () => {
         var intervalNo = new Date().toISOString().split(".")[0];
         var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
-        var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
+        // var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
+        // var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
+        // var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
 
-        var nodeURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
-        var linkURL = allowOrigin + "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
+        var nodeURL = "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/nodes?interval=" + intervalNo + "&current_state=True";
+        var linkURL = "http://" + serverIP + "/IPOP/overlays/" + this.state.selectedOverlay + "/links?interval=" + intervalNo + "&current_state=True";
 
         var elementObj = null;
         var overlay = this.state.selectedOverlay;

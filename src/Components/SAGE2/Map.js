@@ -10,7 +10,6 @@ import ElementsObj from '../Common/ElementsObj';
 import Config from "../../Config/config";
 
 class Map extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -21,7 +20,6 @@ class Map extends React.Component {
             , zoom: 0
             , elementObj: null
             // , selectedOverlay: '104000F'
-
         }
         this.googleMapReact = React.createRef();
         window.graphComponent = this;
@@ -105,7 +103,6 @@ class Map extends React.Component {
                 .then(() => {
                     this.setState({ renderGraph: true })
                 })
-
         })
     }
 
@@ -121,23 +118,16 @@ class Map extends React.Component {
                 var overlay = this.state.selectedOverlay;
                 var nodesJSON = packet.nodes;
                 var linksJSON = packet.links;
-
                 elementObj = new ElementsObj(nodesJSON[overlay]['current_state'], linksJSON[overlay]['current_state'])
-
                 var nodes = nodesJSON[overlay]['current_state']
-
                 Object.keys(nodes).sort().forEach((nodeID) => {
-
                     // graphElement.push(JSON.parse(`{"group":"nodes","data": {"id": "${nodeID}","label": "${nodes[nodeID].NodeName}","state":"","type":""}}`))
                     elementObj.addNodeElement(nodeID)
-
                     var links = linksJSON[overlay]['current_state'][nodeID]
-
                     Object.keys(links).forEach(linkID => {
                         // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
                         elementObj.addLinkElement(nodeID, linkID)
                     })
-
                 })
                 this.setState({ elementObj: elementObj });
                 resolve(true);
@@ -217,35 +207,6 @@ class Map extends React.Component {
                     console.log('condition link 3');
                     console.log(`${id} connected nodes which not have GEO.`)
                 }
-
-                /** Old Version */
-                // var promise = new Promise((resolve, reject) => {
-                //     var center = {};
-                //     var zoom = 1;
-                //     if (element.connectedNodes().length == 2) {
-                //         var [lat1, lng1, lat2, lng2] = [element.connectedNodes()[0].data('coordinate').split(',')[0]
-                //         , element.connectedNodes()[0].data('coordinate').split(',')[1]
-                //         , element.connectedNodes()[1].data('coordinate').split(',')[0]
-                //         , element.connectedNodes()[1].data('coordinate').split(',')[1]];
-                //         var [lat, lng] = this.midpoint(parseFloat(lat1), parseFloat(lng1), parseFloat(lat2), parseFloat(lng2));
-                //         center = { lat: lat, lng: lng };
-                //         zoom = this.getZoomLevel(this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001)
-                //         console.log(`Distance in Kilometers: ${this.getDistanceBetweenPoints(lat1, lng1, lat2, lng2) * 0.001}`);
-                //         resolve({ center, zoom });
-                //     }
-                //     else {
-                //         reject('Error handleSelectElement > Edge connect more than 2 nodes.');
-                //     }
-                // })
-                // promise.then((packet) => {
-                //     this.setState({ center: packet.center, zoom: packet.zoom, currentSelectedElement: element }, () => {
-                //         this.state.currentSelectedElement.connectedNodes().filter(this.hasGeometric).forEach((node) => {
-                //             document.getElementById(`nodeMaker-${node.data().id}`).classList.add(`selected`);
-                //         })
-                //     })
-                // }).catch((e) => {
-                //     console.log(`Error handleSelectElement > ${e}`)
-                // })
             }
         } catch (e) {
             console.log(`Error handleSelectElement > ${e}`)
@@ -257,14 +218,12 @@ class Map extends React.Component {
         lng1 = this.deg2rad(lng1);
         lat2 = this.deg2rad(lat2);
         lng2 = this.deg2rad(lng2);
-
         var dlng = lng2 - lng1;
         var Bx = Math.cos(lat2) * Math.cos(dlng);
         var By = Math.cos(lat2) * Math.sin(dlng);
         var lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2),
             Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
         var lng3 = lng1 + Math.atan2(By, (Math.cos(lat1) + Bx));
-
         return [(lat3 * 180) / Math.PI, (lng3 * 180) / Math.PI];
     }
 
@@ -343,10 +302,6 @@ class Map extends React.Component {
                 layout={{ name: "circle" }}
             />
             , document.getElementById('cy'))
-    }
-
-    getRandomInRange(from, to, fixed) {
-        return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
     }
 
     handleGoogleApiLoaded = ({ map, maps }) => {
