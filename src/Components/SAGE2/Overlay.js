@@ -23,7 +23,7 @@ class Overlay extends React.Component {
         var serverIP = `${Config.IPOP.ip}:${Config.IPOP.port}`;
         // var allowOrigin = 'https://cors-anywhere.herokuapp.com/';  /* you need to allow origin to get data from outside server*/
         // var url = `${allowOrigin}http://${serverIP}/IPOP/overlays?interval=${intervalNo}&current_state=True`
-        var url = `http://localhost/IPOP/overlays?interval=${intervalNo}&current_state=True`
+        var url = `http://127.0.0.1:5000/IPOP/overlays?interval=${intervalNo}&current_state=True`
         console.log(`url:${url}`);
         fetch(url).then(res => res.json())
             .then((overlays) => {
