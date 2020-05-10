@@ -29,7 +29,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            // , selectedOverlay: '104000F', graphType: 'main' /** For React test */
+            , selectedOverlay: '104000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -85,9 +85,9 @@ class Graph extends React.Component {
     }
 
     componentDidMount() {
-        // this.fetchData();
+        this.fetchData();
         this.toggleRightPanel(true);
-        this.requestGraphProperty();
+        // this.requestGraphProperty();
         this.requestToolProperty();
     }
 
@@ -397,7 +397,7 @@ class Graph extends React.Component {
 
                                     <div className="col-10" style={{ paddingRight: "0" }}>
 
-                                        <CollapseButton className="sourceNodeBtn" key={sourceNodeDetails.id + "Btn"} id={sourceNodeDetails.id + "Btn"} name={sourceNodeDetails.name}>
+                                        <CollapseButton className="sourceNodeBtn" style={{marginBottom:'2.5%'}} key={sourceNodeDetails.id + "Btn"} id={sourceNodeDetails.id + "Btn"} name={sourceNodeDetails.name}>
 
                                             <div className="DetailsLabel">Node ID</div>
                                             {sourceNodeDetails.id}
@@ -411,7 +411,7 @@ class Graph extends React.Component {
 
                                         </CollapseButton>
 
-                                        <CollapseButton className="targetNodeBtn" key={targetNodeDetails.id + "Btn"} id={targetNodeDetails.id + "Btn"} name={targetNodeDetails.name}>
+                                        <CollapseButton className="targetNodeBtn" style={{marginBottom:'2.5%'}} key={targetNodeDetails.id + "Btn"} id={targetNodeDetails.id + "Btn"} name={targetNodeDetails.name}>
 
                                             <div className="DetailsLabel">Node ID</div>
                                             {targetNodeDetails.id}

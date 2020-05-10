@@ -70,11 +70,13 @@ class Overlay extends React.Component {
             return <Tooltip className="overlayTooltips" key={overlay} duration="500" animation="scale" interactive distance={40} position="bottom" arrow={true} open={true}
                 html={(<div>{overlay}</div>)}>
                 <button onClick={this.selectOverlay.bind(this, overlay)} id={overlay} className="overlay">
-                    <img onMouseOver={e => this.handleHoverOverlay(overlay)} src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img>
+                    <img onMouseOver={e => this.handleHoverOverlay(overlay)} onMouseOut={e => this.toggleRightPanel(true)} src={overlay_ic} alt="overlay_ic" className="overlay_ic"></img>
                 </button>
             </Tooltip>
         });
-        return overlays;
+        return <>
+            <div id="overlayList">{overlays}</div>
+        </>
     }
 
     selectOverlay = (overlayId) => {
@@ -93,9 +95,7 @@ class Overlay extends React.Component {
             <>
                 <div id="container" className="container-fluid">
                     <div id="mainContent" className="row" style={{ backgroundColor: "#101B2B", color: "white" }}>
-                        <section id="midArea" className="col-10">
-                            {this.state.overlays ? this.renderOverlays() : (<div className="loader">Loading...</div>)}
-                        </section>
+                        {this.state.overlays ? this.renderOverlays() : (<div className="loader">Loading...</div>)}
                     </div>
                     <RightPanel rightPanelTopic='Overlays' ></RightPanel>
                 </div>

@@ -109,6 +109,35 @@
     margin-bottom   : 2.5%;
 }
 
+#overlayList {
+    width : fit-content;
+    height: fit-content;
+    margin: auto;
+}
+
+.overlayBtn>button,
+.connectedNodeBtn>button,
+.sourceNodeBtn>button,
+.targetNodeBtn>button {
+    text-align: left;
+    width     : 100%;
+    padding   : 4%;
+    outline   : transparent;
+    border    : transparent;
+}
+
+.overlayBtn>button:focus,
+.connectedNodeBtn>button:focus,
+.sourceNodeBtn>button:focus,
+.targetNodeBtn>button:focus {
+    box-shadow: none;
+}
+
+.arrow {
+    width: 10%;
+}
+
+
 @media (max-width: 1280px) and (min-width: 0px) {
     #elementDetails {
         font-size: 16px;
