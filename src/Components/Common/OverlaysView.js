@@ -28,8 +28,8 @@ class OverlaysView extends React.Component {
     var intervalNo = new Date().toISOString().split('.')[0]
 
     // you need to allow origin to get data from outside server.
-    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    var allowOrigin = ''
+    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    // var allowOrigin = ''
 
     // URL for REST API.
     var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
@@ -86,7 +86,7 @@ class OverlaysView extends React.Component {
   }
 
   renderGraphContent = () => {
-    return <OthersView elementObj={this.state.elementObj} />
+    return <OthersView overlayName={this.state.selectedOverlay} elementObj={this.state.elementObj} />
   }
 
   renderOverlaysContent = () => {
@@ -98,8 +98,8 @@ class OverlaysView extends React.Component {
     })
 
     return <>
-      {overlays}
-      <RightPanel rightPanelTopic="Overlays" >{this.renderRightPanel()}</RightPanel>
+      <div id="overlayList">{overlays}</div>
+      <RightPanel rightPanelTopic={`Overlays (${this.state.overlaysObj.getOverlayList().length})`} >{this.renderRightPanel()}</RightPanel>
     </>
   }
 
@@ -109,7 +109,7 @@ class OverlaysView extends React.Component {
 
   renderOverlayBtn = () => {
     const overlayBtn = this.state.overlaysObj.getOverlayName().map((overlay) => {
-      return <CollapsibleButton key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay} className='overlayBtn'>
+      return <CollapsibleButton onClick="s" key={overlay + 'Btn'} id={overlay + 'Btn'} name={overlay} className='overlayBtn'>
         <div>{this.state.overlaysObj.getOverlayDescription(overlay)}<br />Number of nodes : {this.state.overlaysObj.getNumberOfNodes(overlay)}<br />Number of links : {this.state.overlaysObj.getNumberOfLinks(overlay)}</div>
       </CollapsibleButton>
     })
@@ -121,8 +121,8 @@ class OverlaysView extends React.Component {
 
     var intervalNo = new Date().toISOString().split('.')[0]
 
-    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    var allowOrigin = ''
+    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    // var allowOrigin = ''
     var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/nodes?interval=' + intervalNo + '&current_state=True'
     var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/links?interval=' + intervalNo + '&current_state=True'
 

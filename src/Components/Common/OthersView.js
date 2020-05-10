@@ -224,6 +224,7 @@ class OthersView extends React.Component {
                     key={sourceNodeDetails.id + 'Btn'}
                     eventKey={sourceNodeDetails.id + 'Btn'}
                     name={sourceNodeDetails.name}
+                    style={{marginBottom:'2.5%'}}
                   >
 
                     <div className="DetailsLabel">Node ID</div>
@@ -243,6 +244,7 @@ class OthersView extends React.Component {
                     key={targetNodeDetails.id + 'Btn'}
                     eventKey={targetNodeDetails.id + 'Btn'}
                     name={targetNodeDetails.name}
+                    style={{marginBottom:'2.5%'}}
                   >
 
                     <div className="DetailsLabel">Node ID</div>
@@ -856,7 +858,7 @@ class OthersView extends React.Component {
             >
             </GoogleMapReact>
           }
-          alert('The visualizer can t find any coordinate of connected node.')
+          // alert('The visualizer can t find any coordinate of connected node.')
           ReactDOM.render(nodeMap, document.getElementById('midArea'))
         } catch (e) {
           //console.log(e)
@@ -904,7 +906,7 @@ class OthersView extends React.Component {
               center={{ lat: centerPoint[0], lng: centerPoint[1] }}
               defaultZoom={10}
             >
-               <Card id="non-coordinate-card">
+              <Card id="non-coordinate-card">
                 <Card.Header>
                   Unmapped nodes.
                   </Card.Header>
@@ -919,10 +921,10 @@ class OthersView extends React.Component {
                 </Card.Body>
               </Card>
             </GoogleMapReact>
-             
-            
 
-            alert('The visualizer can t find any coordinate of connected node.')
+
+
+            // alert('The visualizer can t find any coordinate of connected node.')
           }
 
           ReactDOM.render(edgeMap, document.getElementById('midArea'))
@@ -948,6 +950,19 @@ class OthersView extends React.Component {
   render() {
     return <>
       <div id="leftTools">
+
+        <button id="elementBreadcrumb" className="leftToolsBtn">
+          <div className="breadcrumbLabel">
+            {this.state.currentSelectedElement !== null ? this.state.currentSelectedElement.isNode() ? 'Node : ' + this.state.currentSelectedElement.data().label : 'Tunnel : ' + this.state.currentSelectedElement.data().label : 'None.'}
+          </div>
+        </button>
+
+        <button id="overlayBreadcrumb" className="leftToolsBtn">
+          <div className="breadcrumbLabel">
+            Overlay : {this.props.overlayName}
+          </div>
+        </button>
+
         <div>
           <button onClick={this.handleBackToHome} id="homeBtn" className="leftToolsBtn"></button>
         </div>

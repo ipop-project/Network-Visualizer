@@ -35,7 +35,13 @@ header {
 
 #mainContent {
     width : 100%;
-    height: 100%;
+    height: 100vh;
+}
+
+#overlayList {
+    width : fit-content;
+    height: fit-content;
+    margin: auto;
 }
 
 #midArea {
@@ -51,6 +57,30 @@ header {
     height         : 75px;
     border         : none;
     outline        : none;
+    margin         : auto;
+
+}
+
+.overlayBtn>button,
+.connectedNodeBtn>button,
+.sourceNodeBtn>button,
+.targetNodeBtn>button {
+    text-align: left;
+    width     : 100%;
+    padding   : 4%;
+    outline   : transparent;
+    border    : transparent;
+}
+
+.overlayBtn>button:focus,
+.connectedNodeBtn>button:focus,
+.sourceNodeBtn>button:focus,
+.targetNodeBtn>button:focus {
+    box-shadow: none;
+}
+
+.arrow {
+    width: 10%;
 }
 
 .overlay_ic {
@@ -138,7 +168,7 @@ header {
     left     : 0.5%;
     width    : fit-content;
     height   : fit-content;
-    z-index  : 2;
+    z-index  : 1;
 }
 
 #homeBtn,
@@ -147,7 +177,8 @@ header {
 #plusBtn,
 #minusBtn,
 #switchBtn,
-#configBtn {
+#configBtn,
+#breadcrum {
     outline   : none;
     border    : none;
     background: none;
@@ -253,26 +284,59 @@ header {
 
 #non-coordinate-card {
     font-family: 'Roboto', sans-serif;
-    position : relative;
-    max-width    : fit-content;
-    z-index  : 5;
-    transform: translateY(-50%);
-    transform: translateX(-60%);
+    position   : relative;
+    max-width  : fit-content;
+    z-index    : 5;
+    transform  : translateY(-50%);
+    transform  : translateX(-60%);
 }
 
-#non-coordinate-card>.card-header{
-    font-size: large;
-    text-align: center;
-    padding: 2.5%;
+#non-coordinate-card>.card-header {
+    font-size       : large;
+    text-align      : center;
+    padding         : 2.5%;
     background-color: #213758;
 }
 
-#non-coordinate-card>.card-body{
-    text-align: center;
-    padding: 1%;
+#non-coordinate-card>.card-body {
+    text-align      : center;
+    padding         : 1%;
     background-color: #101B2B;
 }
 
-.nodeMarker{
+.nodeMarker {
     margin: 1%;
+}
+
+.breadcrumbName {
+    color    : white;
+    transform: translateX(-10%);
+}
+
+#overlayBreadcrumb,
+#elementBreadcrumb {
+    position  : absolute;
+    outline   : none;
+    border    : none;
+    background: none;
+    padding   : 0;
+    width     : 240px;
+    height    : 60px;
+}
+
+#overlayBreadcrumb {
+    background     : url('../Images/Icons/overlayBreadcrumb.svg') no-repeat;
+    background-size: contain;
+    transform      : translateX(25%);
+}
+
+#elementBreadcrumb {
+    background     : url('../Images/Icons/elementBreadcrumb.svg') no-repeat;
+    background-size: contain;
+    transform      : translateX(100%);
+}
+
+.breadcrumbLabel {
+    color    : white;
+    transform: translateX(-6%);
 }
