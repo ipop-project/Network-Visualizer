@@ -29,7 +29,7 @@ class Graph extends React.Component {
             , multiWindowState: false
             , targetId: null
             , viewSelector: { label: "Topology", value: "Topology" } /** Deault view */
-            , selectedOverlay: '104000F', graphType: 'main' /** For React test */
+            // , selectedOverlay: '104000F', graphType: 'main' /** For React test */
         };
         this.viewOptions = [
             { label: "Topology", value: "Topology" },
@@ -85,9 +85,9 @@ class Graph extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchData();
+        // this.fetchData();
         this.toggleRightPanel(true);
-        // this.requestGraphProperty();
+        this.requestGraphProperty();
         this.requestToolProperty();
     }
 
