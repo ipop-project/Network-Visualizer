@@ -5,7 +5,6 @@
     font-family: 'Roboto', sans-serif;
 }
 
-
 #root {
     width           : 100vw;
     height          : 100vh;
@@ -39,7 +38,11 @@ header {
 }
 
 #overlayList {
+    width : -webkit-fit-content;
+    width : -moz-fit-content;
     width : fit-content;
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
     height: fit-content;
     margin: auto;
 }
@@ -76,7 +79,8 @@ header {
 .connectedNodeBtn>button:focus,
 .sourceNodeBtn>button:focus,
 .targetNodeBtn>button:focus {
-    box-shadow: none;
+    -webkit-box-shadow: none;
+            box-shadow: none;
 }
 
 .arrow {
@@ -157,16 +161,22 @@ header {
     width           : 19.5vw;
     right           : 0;
     background-color: #213758;
-    z-index         : 2;
+    z-index         : 3;
     overflow-wrap   : break-word;
 }
 
 #leftTools {
     position : absolute;
     top      : 50%;
-    transform: translatey(-50%);
+    -webkit-transform: translatey(-50%);
+        -ms-transform: translatey(-50%);
+            transform: translatey(-50%);
     left     : 0.5%;
+    width    : -webkit-fit-content;
+    width    : -moz-fit-content;
     width    : fit-content;
+    height   : -webkit-fit-content;
+    height   : -moz-fit-content;
     height   : fit-content;
     z-index  : 1;
 }
@@ -210,12 +220,16 @@ header {
 }
 
 .node_img {
-    transform: translateY(-2.5px);
+    -webkit-transform: translateY(-2.5px);
+        -ms-transform: translateY(-2.5px);
+            transform: translateY(-2.5px);
     width    : 100%;
 }
 
 .tunnel_img {
-    transform: translateY(1px);
+    -webkit-transform: translateY(1px);
+        -ms-transform: translateY(1px);
+            transform: translateY(1px);
     width    : 90%;
 }
 
@@ -245,7 +259,9 @@ header {
     position   : absolute;
     margin-left: -14.2vh;
     margin-top : 15.5vh;
-    transform  : rotate(-90deg);
+    -webkit-transform  : rotate(-90deg);
+        -ms-transform  : rotate(-90deg);
+            transform  : rotate(-90deg);
     width      : 35vh;
 }
 
@@ -273,7 +289,9 @@ header {
 }
 
 .nodeMarker.selected {
-    transform      : translate(-15%, -15%);
+    -webkit-transform      : translate(-15%, -15%);
+        -ms-transform      : translate(-15%, -15%);
+            transform      : translate(-15%, -15%);
     outline        : none;
     border         : none;
     width          : 100px;
@@ -285,10 +303,16 @@ header {
 #non-coordinate-card {
     font-family: 'Roboto', sans-serif;
     position   : relative;
+    max-width  : -webkit-fit-content;
+    max-width  : -moz-fit-content;
     max-width  : fit-content;
     z-index    : 5;
-    transform  : translateY(-50%);
-    transform  : translateX(-60%);
+    -webkit-transform  : translateY(-50%);
+        -ms-transform  : translateY(-50%);
+            transform  : translateY(-50%);
+    -webkit-transform  : translateX(-60%);
+        -ms-transform  : translateX(-60%);
+            transform  : translateX(-60%);
 }
 
 #non-coordinate-card>.card-header {
@@ -310,7 +334,9 @@ header {
 
 .breadcrumbName {
     color    : white;
-    transform: translateX(-10%);
+    -webkit-transform: translateX(-10%);
+        -ms-transform: translateX(-10%);
+            transform: translateX(-10%);
 }
 
 #overlayBreadcrumb,
@@ -327,16 +353,22 @@ header {
 #overlayBreadcrumb {
     background     : url('../Images/Icons/overlayBreadcrumb.svg') no-repeat;
     background-size: contain;
-    transform      : translateX(25%);
+    -webkit-transform      : translateX(25%);
+        -ms-transform      : translateX(25%);
+            transform      : translateX(25%);
 }
 
 #elementBreadcrumb {
     background     : url('../Images/Icons/elementBreadcrumb.svg') no-repeat;
     background-size: contain;
-    transform      : translateX(100%);
+    -webkit-transform      : translateX(100%);
+        -ms-transform      : translateX(100%);
+            transform      : translateX(100%);
 }
 
 .breadcrumbLabel {
     color    : white;
-    transform: translateX(-6%);
+    -webkit-transform: translateX(-6%);
+        -ms-transform: translateX(-6%);
+            transform: translateX(-6%);
 }

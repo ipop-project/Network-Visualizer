@@ -28,8 +28,8 @@ class OverlaysView extends React.Component {
     var intervalNo = new Date().toISOString().split('.')[0]
 
     // you need to allow origin to get data from outside server.
-    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    // var allowOrigin = ''
+    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = ''
 
     // URL for REST API.
     var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
@@ -98,7 +98,7 @@ class OverlaysView extends React.Component {
     })
 
     return <>
-      <div id="overlayList">{overlays}</div>
+      <div id="overlayList">{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}</div>
       <RightPanel rightPanelTopic={`Overlays (${this.state.overlaysObj.getOverlayList().length})`} >{this.renderRightPanel()}</RightPanel>
     </>
   }
@@ -121,8 +121,8 @@ class OverlaysView extends React.Component {
 
     var intervalNo = new Date().toISOString().split('.')[0]
 
-    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    // var allowOrigin = ''
+    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = ''
     var nodeURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/nodes?interval=' + intervalNo + '&current_state=True'
     var linkURL = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays/' + overlayId + '/links?interval=' + intervalNo + '&current_state=True'
 
@@ -150,12 +150,16 @@ class OverlaysView extends React.Component {
             elementObj.addNodeElement(nodeID)
 
             var links = linksJSON[overlayId]['current_state'][nodeID]
+            try {
 
-            Object.keys(links).forEach(linkID => {
-              // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
-              elementObj.addLinkElement(nodeID, linkID)
-            })
+              Object.keys(links).forEach(linkID => {
+                // graphElement.push(JSON.parse(`{"group":"edges","data": { "id":"${linkID}" ,"label":"${links[linkID]['InterfaceName']}","source": "${links[linkID]['SrcNodeId']}","target": "${links[linkID]['TgtNodeId']}","state":"","type":"${links[linkID]['Type']}"}}`))
+                elementObj.addLinkElement(nodeID, linkID)
+              })
 
+            } catch{
+                console.log(`${nodeID} has no tunnel.`)
+            }
           })
 
           return elementObj
@@ -167,7 +171,7 @@ class OverlaysView extends React.Component {
       })
 
     } catch{
-      //console.log('error has been occered on fetch node and tunnel process.')
+      // console.log('error has been occered on fetch node and tunnel process.')
     }
   }
 

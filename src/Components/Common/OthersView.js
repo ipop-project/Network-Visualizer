@@ -950,7 +950,6 @@ class OthersView extends React.Component {
   render() {
     return <>
       <div id="leftTools">
-
         <button id="elementBreadcrumb" className="leftToolsBtn">
           <div className="breadcrumbLabel">
             {this.state.currentSelectedElement !== null ? this.state.currentSelectedElement.isNode() ? 'Node : ' + this.state.currentSelectedElement.data().label : 'Tunnel : ' + this.state.currentSelectedElement.data().label : 'None.'}
