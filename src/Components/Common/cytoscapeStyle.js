@@ -67,6 +67,13 @@ var cytoscapeStyle = [{
     'background-color': '#F2BE22'
   }
 }, {
+  selector: 'node.noTunnel:selected',
+  style: {
+    'border-width': '30%',
+    'border-opacity': '0.3',
+    'border-color': '#F2BE22'
+  }
+}, {
   selector: 'edge.static',
   style: {
     'line-color': '#F27405'

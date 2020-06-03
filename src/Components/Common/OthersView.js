@@ -224,7 +224,7 @@ class OthersView extends React.Component {
                     key={sourceNodeDetails.id + 'Btn'}
                     eventKey={sourceNodeDetails.id + 'Btn'}
                     name={sourceNodeDetails.name}
-                    style={{marginBottom:'2.5%'}}
+                    style={{ marginBottom: '2.5%' }}
                   >
 
                     <div className="DetailsLabel">Node ID</div>
@@ -244,7 +244,7 @@ class OthersView extends React.Component {
                     key={targetNodeDetails.id + 'Btn'}
                     eventKey={targetNodeDetails.id + 'Btn'}
                     name={targetNodeDetails.name}
-                    style={{marginBottom:'2.5%'}}
+                    style={{ marginBottom: '2.5%' }}
                   >
 
                     <div className="DetailsLabel">Node ID</div>
@@ -601,6 +601,8 @@ class OthersView extends React.Component {
   }
 
   renderTopology = () => {
+    document.getElementById('elementBreadcrumb').hidden = false
+    document.getElementById('overlayBreadcrumb').hidden = false
     document.getElementById('homeBtn').hidden = false
     document.getElementById('refreshBtn').hidden = false
     document.getElementById('configBtn').hidden = false
@@ -803,7 +805,18 @@ class OthersView extends React.Component {
   }
 
   componentDidUpdate() {
+    if (this.cy != null && this.cy != undefined) {
+      var nodes = this.cy.elements('nodes')
+      nodes.toArray().forEach((node) => {
+        if (node.incomers().length == 0 && node.outgoers().length == 0) {
+          node.addClass('noTunnel')
+        }
+      })
+    }
+
     if (this.state.currentView === 'Map') {
+      document.getElementById('elementBreadcrumb').hidden = true
+      document.getElementById('overlayBreadcrumb').hidden = true
       document.getElementById('homeBtn').hidden = true
       document.getElementById('refreshBtn').hidden = true
       document.getElementById('configBtn').hidden = true

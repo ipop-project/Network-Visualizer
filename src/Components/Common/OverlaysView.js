@@ -28,11 +28,11 @@ class OverlaysView extends React.Component {
     var intervalNo = new Date().toISOString().split('.')[0]
 
     // you need to allow origin to get data from outside server.
-    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
     var allowOrigin = ''
 
     // URL for REST API.
-    var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    // var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
     //var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
 
     //console.log(url);
@@ -98,7 +98,7 @@ class OverlaysView extends React.Component {
     })
 
     return <>
-      <div id="overlayList">{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}{overlays}</div>
+      <div id="overlayList">{overlays}</div>
       <RightPanel rightPanelTopic={`Overlays (${this.state.overlaysObj.getOverlayList().length})`} >{this.renderRightPanel()}</RightPanel>
     </>
   }
