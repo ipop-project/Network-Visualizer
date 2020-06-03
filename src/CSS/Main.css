@@ -144,14 +144,14 @@ header {
 
 .sourceNodeBtn {
     border-radius   : 3px;
-    border          : solid #8FD24D;
-    background-color: #8FD24D;
+    /* border          : solid #8FD24D; */
+    /* background-color: #8FD24D; */
 }
 
 .targetNodeBtn {
     border-radius   : 3px;
-    border          : solid #42B2C3;
-    background-color: #42B2C3;
+    /* border          : solid #42B2C3; */
+    /* background-color: #42B2C3; */
 }
 
 #rightPanel {

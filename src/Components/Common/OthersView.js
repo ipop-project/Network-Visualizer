@@ -211,6 +211,18 @@ class OthersView extends React.Component {
               return '-'
             }
           }).then(targetLocation => {
+            let sourceNodeColor
+            let targetNodeColor
+            this.cy.elements('nodes').forEach((node) => {
+              if (node.data().id == sourceNodeDetails.id) {
+                sourceNodeColor = node.css('background-color')
+              }
+            })
+            this.cy.elements('nodes').forEach((node) => {
+              if (node.data().id == targetNodeDetails.id) {
+                targetNodeColor = node.css('background-color')
+              }
+            })
             var linkContent = <div>
               <h5>{linkDetails.name}</h5>
 
@@ -224,7 +236,7 @@ class OthersView extends React.Component {
                     key={sourceNodeDetails.id + 'Btn'}
                     eventKey={sourceNodeDetails.id + 'Btn'}
                     name={sourceNodeDetails.name}
-                    style={{ marginBottom: '2.5%' }}
+                    style={{ marginBottom: '2.5%',backgroundColor:sourceNodeColor,border:`solid ${sourceNodeColor}` }}
                   >
 
                     <div className="DetailsLabel">Node ID</div>
@@ -244,7 +256,7 @@ class OthersView extends React.Component {
                     key={targetNodeDetails.id + 'Btn'}
                     eventKey={targetNodeDetails.id + 'Btn'}
                     name={targetNodeDetails.name}
-                    style={{ marginBottom: '2.5%' }}
+                    style={{ marginBottom: '2.5%',backgroundColor:targetNodeColor,border:`solid ${targetNodeColor}`}}
                   >
 
                     <div className="DetailsLabel">Node ID</div>

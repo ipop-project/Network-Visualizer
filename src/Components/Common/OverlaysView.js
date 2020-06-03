@@ -28,8 +28,8 @@ class OverlaysView extends React.Component {
     var intervalNo = new Date().toISOString().split('.')[0]
 
     // you need to allow origin to get data from outside server.
-    var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    // var allowOrigin = ''
+    // var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
+    var allowOrigin = ''
 
     // URL for REST API.
     var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
