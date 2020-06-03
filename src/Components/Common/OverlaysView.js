@@ -29,10 +29,10 @@ class OverlaysView extends React.Component {
 
     // you need to allow origin to get data from outside server.
     var allowOrigin = 'https://cors-anywhere.herokuapp.com/'
-    var allowOrigin = ''
+    // var allowOrigin = ''
 
     // URL for REST API.
-    // var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
+    var url = allowOrigin + 'http://' + Config.ip + ':' + Config.port + '/IPOP/overlays?interval=' + intervalNo + '&current_state=True'
     //var url = allowOrigin + 'http://67.58.53.58:5000/IPOP/overlays?interval=2020-04-29T21:28:42&current_state=True'
 
     //console.log(url);
