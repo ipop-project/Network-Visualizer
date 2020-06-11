@@ -2,7 +2,7 @@
 
 1. Go to Network-Visualizer Directory	
 2. Use command "npm install" to install necessary module	
-3.	
+3.		
 	3.1 If you install this app on your local network, skip this step	
 	3.2 If you install this app on your web server, go to directory : src\Components\Common	and follow a step below :	
 		3.2.1 Open "OverlaysView.js" on your Notepad, Notepad++ or code editor	
