@@ -10,7 +10,7 @@ class Header extends React.Component {
     }
   }
 
-  // toggle overlay right panel
+  // toggle right panel
   handleRightPanelToggle = () => {
     var rightPanelEvent = new Promise((resolve, reject) => {
       try {
@@ -49,7 +49,7 @@ class Header extends React.Component {
         {this.props.children}
       </div>
 
-        <button onClick={this.handleRightPanelToggle} id="rightPanelBtn" />
+      <button onClick={this.handleRightPanelToggle} id="rightPanelBtn" />
 
     </header>
   }
