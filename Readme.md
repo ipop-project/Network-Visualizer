@@ -38,7 +38,7 @@ git clone -b dev/sage2app https://github.com/ipop-project/Network-Visualizer.git
 
 1. go to `localhost.com:9292`. ( Google Chrome is recommended. )
 
-2. Zip the `SAGE2_IPOPVisualizer` folder and drop it on browser.
+2. Compress `SAGE2_IPOPVisualizer` folder and drop it to on SAGE2 browser screen.
 
 
 ## **Author**
