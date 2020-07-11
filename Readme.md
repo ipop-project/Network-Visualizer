@@ -12,8 +12,6 @@ Read more about SAGE2 : http://sage2.sagecommons.org/ & https://bitbucket.org/sa
 
 ## **Getting started**
 
-Download SAGE2 : https://sage2.sagecommons.org/downloads/
-
 if you don't have git on your device, install it first and clone the project to your local directory
 ```
 git clone -b dev/sage2app https://github.com/ipop-project/Network-Visualizer.git
@@ -23,7 +21,7 @@ git clone -b dev/sage2app https://github.com/ipop-project/Network-Visualizer.git
 
 ### Server side
 
-1. Extract SAGE2 zip file.
+1. Download SAGE2 : https://sage2.sagecommons.org/downloads/ and extract it to your local directoty.
 
 2. In SAGE2 folder, Run `Launcher.bat`.
 
