@@ -23,9 +23,9 @@ git clone -b dev/sage2app https://github.com/ipop-project/Network-Visualizer.git
 
 ### Server side
 
-1. Extract downloaded zip file
+1. Extract SAGE2 zip file.
 
-2. In SAGE2 folder, Run `Launcher.bat`
+2. In SAGE2 folder, Run `Launcher.bat`.
 
 3. Log in by using username and password.
    ```
