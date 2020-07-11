@@ -1,5 +1,5 @@
 # **IPOP NETWORK VISUALIZER - SAGE2 APPLICATION** ![version badge](https://img.shields.io/badge/version-0.1.0-grey.svg)
-The IPOP Network Visualizer - SAGE2 APPLICATION is an application that expanded from IPOP NETWORK VISUALIZER web application to using with SAGE2.
+The IPOP Network Visualizer - SAGE2 Application is an application that expanded from IPOP Network VIisualizer web application to using with SAGE2.
 
 Read more about SAGE2 : http://sage2.sagecommons.org/ & https://bitbucket.org/sage2/sage2/wiki/Home
  
