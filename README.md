@@ -35,7 +35,7 @@ in `config.js` ( Network-Visualizer/src/config.js )
 
 you can change an `ip address and port of data collector service`.
 
-## **Depolyment**
+## **Deployment**
 in project directory, use npm command to build the project.
 ```
 npm run build
